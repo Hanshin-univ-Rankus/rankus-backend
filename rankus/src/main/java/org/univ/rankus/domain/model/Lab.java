@@ -2,15 +2,14 @@ package org.univ.rankus.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.univ.rankus.common.BaseTimeEntity;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
+
 @Getter
 @Entity
 @Table(name = "labs")
-public class Lab {
+public class Lab extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,23 +30,14 @@ public class Lab {
     @Column(nullable = false)
     private int ranking;              // 랭킹 점수 (초기값 0)
 
-    @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime createdAt;  // 생성 시간
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;  // 수정 시간
-
     // JPA 스펙을 위한 기본 생성자 (protected 권한)
-    protected Lab() { }
+    protected Lab() {
+    }
 
     /**
      * 도메인 불변 조건 검증을 포함한 생성자.
      */
-    public Lab(String name,
-               String description,
-               String department,
-               LabCategory category) {
+    public Lab(String name, String description, String department, LabCategory category) {
         // 필수 값 검증
         this.name = Objects.requireNonNull(name, "랩실 이름은 필수입니다.");
         this.department = Objects.requireNonNull(department, "소속 학과는 필수입니다.");
