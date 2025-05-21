@@ -3,61 +3,104 @@ package org.univ.rankus.domain.model;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("Lab 도메인 단위 테스트")
 class LabTest {
 
     @Test
-    @DisplayName("정상적인 Lab 생성")
+    @DisplayName("Lab 객체를 올바른 값으로 생성하면 모든 필드가 정상적으로 초기화된다.")
     void createLab_success() {
-        String name = "AI 연구실";
+        // given
+        String name        = "AI 연구실";
         String description = "인공지능 알고리즘 연구";
-        String department = "컴퓨터공학과";
+        String department  = "컴퓨터공학과";
         LabCategory category = LabCategory.AI;
 
+        // when
         Lab lab = new Lab(name, description, department, category);
 
-        assertAll(
-                () -> assertEquals(name, lab.getName()),
-                () -> assertEquals(description, lab.getDescription()),
-                () -> assertEquals(department, lab.getDepartment()),
-                () -> assertEquals(category, lab.getCategory()),
-                () -> assertEquals(0, lab.getRanking())
+        // then
+        assertAll("Lab 생성 기본 검증",
+                () -> assertEquals(name, lab.getName(),        "name이 설정되어야 한다"),
+                () -> assertEquals(description, lab.getDescription(), "description이 설정되어야 한다"),
+                () -> assertEquals(department, lab.getDepartment(),   "department가 설정되어야 한다"),
+                () -> assertEquals(category, lab.getCategory(),       "category가 설정되어야 한다"),
+                () -> assertEquals(0, lab.getRanking(),               "초기 ranking은 0이어야 한다")
         );
     }
 
     @Test
-    @DisplayName("필수 파라미터 누락 시 예외 발생")
-    void createLab_requiredFieldsNull_throws() {
-        // name 누락
-        assertThrows(NullPointerException.class, () -> {
-            new Lab(null, "desc", "dept", LabCategory.DB);
-        });
+    @DisplayName("name 필드가 null일 때 Lab 객체를 생성하면 NullPointerException이 발생한다.")
+    void createLab_nameNull_throws() {
+        // given
+        String name        = null;
+        String description = "desc";
+        String department  = "dept";
+        LabCategory category = LabCategory.DB;
 
-        // department 누락
-        assertThrows(NullPointerException.class, () -> {
-            new Lab("Name", "desc", null, LabCategory.DB);
-        });
-
-        // category 누락
-        assertThrows(NullPointerException.class, () -> {
-            new Lab("Name", "desc", "dept", null);
-        });
+        // when & then
+        assertThrows(NullPointerException.class, () ->
+                        new Lab(name, description, department, category),
+                "name이 null이면 NullPointerException이 발생해야 한다"
+        );
     }
 
     @Test
-    @DisplayName("랭킹 업데이트 검증")
-    void updateRanking_successAndFailure() {
-        Lab lab = new Lab("AI", "", "CS", LabCategory.AI);
+    @DisplayName("department 필드가 null일 때 Lab 객체를 생성하면 NullPointerException이 발생한다.")
+    void createLab_departmentNull_throws() {
+        // given
+        String name        = "Name";
+        String description = "desc";
+        String department  = null;
+        LabCategory category = LabCategory.DB;
 
-        // 정상 업데이트
+        // when & then
+        assertThrows(NullPointerException.class, () ->
+                        new Lab(name, description, department, category),
+                "department가 null이면 NullPointerException이 발생해야 한다"
+        );
+    }
+
+    @Test
+    @DisplayName("category 필드가 null일 때 Lab 객체를 생성하면 NullPointerException이 발생한다.")
+    void createLab_categoryNull_throws() {
+        // given
+        String name        = "Name";
+        String description = "desc";
+        String department  = "dept";
+        LabCategory category = null;
+
+        // when & then
+        assertThrows(NullPointerException.class, () ->
+                        new Lab(name, description, department, category),
+                "category가 null이면 NullPointerException이 발생해야 한다"
+        );
+    }
+
+    @Test
+    @DisplayName("updateRanking을 양수로 호출하면 랭킹 값이 정상적으로 변경된다.")
+    void updateRanking_success() {
+        // given
+        Lab lab = new Lab("AI", "desc", "CS", LabCategory.AI);
+
+        // when
         lab.updateRanking(5);
-        assertEquals(5, lab.getRanking());
 
-        // 음수 랭킹 설정 시 예외
-        assertThrows(IllegalArgumentException.class, () -> {
-            lab.updateRanking(-1);
-        });
+        // then
+        assertEquals(5, lab.getRanking(), "랭킹이 5로 변경되어야 한다");
+    }
+
+    @Test
+    @DisplayName("updateRanking을 음수로 호출하면 IllegalArgumentException이 발생한다.")
+    void updateRanking_negative_throws() {
+        // given
+        Lab lab = new Lab("AI", "desc", "CS", LabCategory.AI);
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () ->
+                        lab.updateRanking(-1),
+                "음수 랭킹 설정 시 IllegalArgumentException이 발생해야 한다"
+        );
     }
 }
