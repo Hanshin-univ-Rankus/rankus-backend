@@ -1,4 +1,4 @@
-package org.univ.rankus.domain.model;
+package org.univ.rankus.domain.model.lab;
 
 
 /**

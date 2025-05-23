@@ -4,8 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.univ.rankus.domain.model.Lab;
-import org.univ.rankus.domain.model.LabCategory;
+import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.lab.LabCategory;
 
 import java.util.List;
 import java.util.Optional;
