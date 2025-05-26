@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3307/rankus_dev?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    username: rankus_dev_user # 개발용 DB 사용자 이름 (실제 환경에 맞게 변경 필요)
+    password: dev_password # 개발용 DB 비밀번호 (실제 환경에 맞게 변경 필요)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create # 애플리케이션 시작 시 스키마를 생성하고, 종료 시 유지 (목 데이터 유지를 위해)
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true # SQL 로깅 활성화
+    properties:
+      hibernate:
+        format_sql: true # SQL 로깅 포맷팅
+
+  sql:
+    init:
+      mode: always # 항상 data.sql 실행
+      data-locations: classpath:data.sql # data.sql 파일 위치 지정
+      encoding: UTF-8

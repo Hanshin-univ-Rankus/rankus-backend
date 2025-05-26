@@ -7,11 +7,27 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update  # 또는 테스트용이라면 create-drop 사용 가능
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
-        show_sql: true
+    defer-datasource-initialization: true  # data.sql이 JPA 초기화 후 실행되도록 설정
+
+  sql:
+    init:
+      mode: always  # 항상 data.sql 실행
+      data-locations: classpath:data.sql  # 데이터 파일 위치 지정
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+    web:
+      resources:
+        add-mappings: false
+
+  profiles:
+    active: dev # 기본적으로 dev 프로필 활성화
 
 server:
   port: 8080
+

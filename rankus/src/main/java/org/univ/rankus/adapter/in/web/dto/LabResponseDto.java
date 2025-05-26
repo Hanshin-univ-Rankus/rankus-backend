@@ -14,6 +14,7 @@ public class LabResponseDto {
     private String department;
     private LabCategory category;
     private int ranking;
+    private String professorName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -28,6 +29,7 @@ public class LabResponseDto {
         dto.ranking     = lab.getRanking();
         dto.createdAt   = lab.getCreatedAt();
         dto.updatedAt   = lab.getUpdatedAt();
+        dto.professorName = lab.getProfessorName();  //
         return dto;
     }
 

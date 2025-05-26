@@ -3,7 +3,9 @@ package org.univ.rankus.adapter.out.persistence;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.univ.rankus.domain.model.lab.Lab;
 import org.univ.rankus.domain.model.lab.LabCategory;
 
@@ -15,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @DisplayName("SpringDataLabRepository 기본 동작 테스트")
+@ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class SpringDataLabRepositoryTest {
 
     @Autowired

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mysql:
     image: mysql:8.0
@@ -13,5 +11,38 @@ services:
     volumes:
       - db-data:/var/lib/mysql
 
+  mysql_dev:
+    image: mysql:8.0
+    container_name: rankus-db-dev
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: rankus_dev
+      MYSQL_USER: rankus_dev_user
+      MYSQL_PASSWORD: dev_password
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3307:3306" # dev 환경용 포트
+    volumes:
+      - db-data-dev:/var/lib/mysql
+      - ./rankus/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql # 초기 데이터 로드
+    restart: always
+
+  mysql_test:
+    image: mysql:8.0
+    container_name: rankus-db-test
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: rankus_test
+      MYSQL_USER: rankus_test_user
+      MYSQL_PASSWORD: test_password
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3308:3306" # test 환경용 포트
+    volumes:
+      - db-data-test:/var/lib/mysql
+    restart: always
+
 volumes:
   db-data:
+  db-data-dev:
+  db-data-test:

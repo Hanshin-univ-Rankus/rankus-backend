@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.context.ActiveProfiles;
 import org.univ.rankus.adapter.out.persistence.SpringDataLabRepository;
 import org.univ.rankus.domain.model.lab.Lab;
 import org.univ.rankus.domain.model.lab.LabCategory;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LabPromotionService 단위 테스트")
+@ActiveProfiles("test")
 class LabPromotionServiceTest {
 
     @Mock

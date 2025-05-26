@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:mysql://<your_prod_db_host>:<your_prod_db_port>/rankus_prod?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    username: <your_prod_db_username> # 실제 운영 DB 사용자 이름으로 변경 필요
+    password: <your_prod_db_password> # 실제 운영 DB 비밀번호로 변경 필요
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate # 또는 none, 운영 환경에서는 스키마 자동 변경 비활성화 권장
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: false # 운영 환경에서는 SQL 로깅 비활성화 권장
+
+  sql:
+    init:
+      mode: never # 운영 환경에서는 data.sql을 사용하지 않음

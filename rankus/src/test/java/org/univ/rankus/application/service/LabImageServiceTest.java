@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 import org.univ.rankus.adapter.out.persistence.SpringDataLabImageRepository;
 import org.univ.rankus.adapter.out.persistence.SpringDataLabRepository;
 import org.univ.rankus.domain.model.lab.Lab;
@@ -24,6 +25,7 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LabImageService 단위 테스트")
+@ActiveProfiles("test")
 class LabImageServiceTest {
 
     @Mock

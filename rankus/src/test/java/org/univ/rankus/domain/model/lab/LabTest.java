@@ -2,10 +2,12 @@ package org.univ.rankus.domain.model.lab;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Lab 도메인 단위 테스트")
+@ActiveProfiles("test")
 class LabTest {
 
     @Test
