@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import org.univ.rankus.common.BaseTimeEntity;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
-
 /**
  * 랩실 가입 신청 도메인 엔티티
  */
@@ -43,10 +41,13 @@ public class LabApplication extends BaseTimeEntity {
      * 생성자: 필수 파라미터 검증 + 기본 상태 설정
      */
     public LabApplication(Lab lab, Long userId, LocalDateTime interviewTime) {
-        this.lab = Objects.requireNonNull(lab, "Lab은 필수입니다.");
-        this.userId = Objects.requireNonNull(userId, "userId는 필수입니다.");
-        this.interviewTime = Objects.requireNonNull(interviewTime, "interviewTime은 필수입니다.");
-        this.status = ApplicationStatus.PENDING; // 초기 상태
+        if (lab == null) throw new IllegalArgumentException("Lab(lab)은 null일 수 없습니다.");
+        if (userId == null) throw new IllegalArgumentException("userId는 null일 수 없습니다.");
+        if (interviewTime == null) throw new IllegalArgumentException("interviewTime은 null일 수 없습니다.");
+        this.lab = lab;
+        this.userId = userId;
+        this.interviewTime = interviewTime;
+        this.status = ApplicationStatus.PENDING;
     }
 
     /** 신청을 승인 처리 */

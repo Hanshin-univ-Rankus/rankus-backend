@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("LabImageRepository JPA 테스트")
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+
 class LabImageRepositoryTest {
 
     @Autowired

@@ -19,3 +19,7 @@ spring:
       mode: always # 항상 data.sql 실행
       data-locations: classpath:data.sql # data.sql 파일 위치 지정
       encoding: UTF-8
+
+  server:
+    address: 0.0.0.0
+    port: 8080
