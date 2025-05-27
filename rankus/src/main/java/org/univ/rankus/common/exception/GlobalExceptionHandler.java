@@ -1,5 +1,6 @@
 package org.univ.rankus.common.exception;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.Ordered;
@@ -68,7 +69,7 @@ public class GlobalExceptionHandler {
         Throwable cause = ex.getCause();
         if (cause instanceof InvalidFormatException ife) {
             String field = ife.getPath().stream()
-                    .map(ref -> ref.getFieldName())
+                    .map(JsonMappingException.Reference::getFieldName)
                     .findFirst()
                     .orElse("필드");
             msg = String.format("%s 값이 유효하지 않습니다: %s", field, ife.getValue());
@@ -118,12 +119,6 @@ public class GlobalExceptionHandler {
                 path
         );
     }
-
-
-
-
-
-
 
     //────────────────────────────────────────────────────────────
     // 4) 커스텀·도메인 예외

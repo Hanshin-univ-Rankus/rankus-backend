@@ -28,6 +28,11 @@ spring:
   profiles:
     active: dev # 기본적으로 dev 프로필 활성화
 
+security:
+  jwt:
+    secret: yDeGly34tDXIxkjo6MQKgBNCI+2iMFLdT0i8zD2JZuE=
+    expiration-ms: 3600000  # 1시간
+
 server:
   port: 8080
 

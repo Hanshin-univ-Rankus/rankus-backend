@@ -11,15 +11,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class LabApplicationResponseDto {
 
+    private Long id;
     private Long userId;
     private LocalDateTime interviewTime;
     private ApplicationStatus status;
 
     public static LabApplicationResponseDto from(LabApplication app) {
         LabApplicationResponseDto dto = new LabApplicationResponseDto();
+        dto.id = app.getId();
         dto.userId = app.getUserId();
         dto.interviewTime = app.getInterviewTime();
         dto.status = app.getStatus();
         return dto;
     }
 }
+
