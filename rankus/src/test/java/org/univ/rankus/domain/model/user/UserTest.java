@@ -28,7 +28,7 @@ class UserTest {
             String rawPassword = "password123";
 
             // when
-            User user = new User(name, email, rawPassword, dummyLab);
+            User user = new User(name, email, rawPassword);
 
             // then
             assertAll("User 필드 검증",
@@ -37,27 +37,7 @@ class UserTest {
                     () -> assertEquals(email, user.getEmail(), "이메일이 설정되어야 한다"),
                     () -> assertNotNull(user.getPassword().getHash(), "비밀번호 해시가 생성되어야 한다"),
                     () -> assertTrue(user.matchesPassword(rawPassword), "matchesPassword로 원문 검증 가능해야 한다"),
-                    () -> assertEquals(dummyLab, user.getLab(), "소속 랩실이 설정되어야 한다")
-            );
-        }
-
-        @Test
-        @DisplayName("소속 랩실이 null이어도 생성에 성공한다")
-        void createUser_nullLab_success() {
-            // given
-            String name = "김철수";
-            String email = "kim@univ.ac.kr";
-            String rawPassword = "securePass1";
-
-            // when
-            User user = new User(name, email, rawPassword, null);
-
-            // then
-            assertAll("null lab 허용 검증",
-                    () -> assertNull(user.getLab(), "lab이 null이어야 한다"),
-                    () -> assertEquals(name, user.getName()),
-                    () -> assertEquals(email, user.getEmail()),
-                    () -> assertTrue(user.matchesPassword(rawPassword))
+                    () -> assertNull(user.getLab(), "소속 랩실이 설정되어야 한다")
             );
         }
 
@@ -66,7 +46,7 @@ class UserTest {
         @DisplayName("이름이 비어 있으면 IllegalArgumentException이 발생한다")
         void createUser_invalidName_throws(String invalidName) {
             assertThrows(IllegalArgumentException.class, () ->
-                    new User(invalidName, "test@univ.ac.kr", "password123", dummyLab)
+                    new User(invalidName, "test@univ.ac.kr", "password123")
             );
         }
 
@@ -74,7 +54,7 @@ class UserTest {
         @DisplayName("이름이 null이면 IllegalArgumentException이 발생한다")
         void createUser_nullName_throws() {
             assertThrows(IllegalArgumentException.class, () ->
-                    new User(null, "test@univ.ac.kr", "password123", dummyLab)
+                    new User(null, "test@univ.ac.kr", "password123")
             );
         }
 
@@ -83,7 +63,7 @@ class UserTest {
         @DisplayName("유효하지 않은 이메일이면 IllegalArgumentException이 발생한다")
         void createUser_invalidEmail_throws(String invalidEmail) {
             assertThrows(IllegalArgumentException.class, () ->
-                    new User("홍길동", invalidEmail, "password123", dummyLab)
+                    new User("홍길동", invalidEmail, "password123")
             );
         }
 
@@ -91,7 +71,7 @@ class UserTest {
         @DisplayName("이메일이 null이면 IllegalArgumentException이 발생한다")
         void createUser_nullEmail_throws() {
             assertThrows(IllegalArgumentException.class, () ->
-                    new User("홍길동", null, "password123", dummyLab)
+                    new User("홍길동", null, "password123")
             );
         }
 
@@ -100,7 +80,7 @@ class UserTest {
         @DisplayName("비밀번호가 8자 미만이면 IllegalArgumentException이 발생한다")
         void createUser_shortPassword_throws(String shortPwd) {
             assertThrows(IllegalArgumentException.class, () ->
-                    new User("홍길동", "test@univ.ac.kr", shortPwd, dummyLab)
+                    new User("홍길동", "test@univ.ac.kr", shortPwd)
             );
         }
 
@@ -108,7 +88,7 @@ class UserTest {
         @DisplayName("비밀번호가 null이면 IllegalArgumentException이 발생한다")
         void createUser_nullPassword_throws() {
             assertThrows(IllegalArgumentException.class, () ->
-                    new User("홍길동", "test@univ.ac.kr", null, dummyLab)
+                    new User("홍길동", "test@univ.ac.kr", null)
             );
         }
     }

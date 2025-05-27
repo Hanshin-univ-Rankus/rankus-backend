@@ -35,7 +35,6 @@ class UserServiceLoginTest {
     @InjectMocks
     private UserService service;
 
-    private final Lab dummyLab = new Lab("TestLab", "desc", "CS", LabCategory.AI);
 
     @Nested
     @DisplayName("login 성공 케이스")
@@ -48,7 +47,7 @@ class UserServiceLoginTest {
             String email = "user@univ.ac.kr";
             String rawPassword = "password123";
             String fakeToken = "jwt.token.value";
-            User user = new User("홍길동", email, rawPassword, dummyLab);
+            User user = new User("홍길동", email, rawPassword);
 
             given(userRepo.findByEmail(email)).willReturn(Optional.of(user));
             given(authTokenPort.generateToken(user)).willReturn(fakeToken);
@@ -88,7 +87,7 @@ class UserServiceLoginTest {
             // given
             String email = "user@univ.ac.kr";
             String rawPassword = "password123";
-            User user = new User("홍길동", email, rawPassword, dummyLab);
+            User user = new User("홍길동", email, rawPassword);
 
             given(userRepo.findByEmail(email)).willReturn(Optional.of(user));
 

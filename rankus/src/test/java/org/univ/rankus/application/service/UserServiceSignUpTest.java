@@ -53,7 +53,7 @@ class UserServiceSignUpTest {
             given(userRepo.save(any(User.class))).willAnswer(inv -> inv.getArgument(0));
 
             // when
-            User created = service.signUp(validName, validEmail, validPassword, validLabId);
+            User created = service.signUp(validName, validEmail, validPassword);
 
             // then
             assertAll("생성된 User 검증",
@@ -64,6 +64,28 @@ class UserServiceSignUpTest {
             );
             then(userRepo).should().existsByEmail(validEmail);
             then(labRepo).should().findById(validLabId);
+            then(userRepo).should().save(any(User.class));
+        }
+        
+        @Test
+        @DisplayName("labId가 null이면 Lab 없이 User 생성 후 반환")
+        void signUp_withoutLab_success() {
+            // given
+            given(userRepo.existsByEmail(validEmail)).willReturn(false);
+            given(userRepo.save(any(User.class))).willAnswer(inv -> inv.getArgument(0));
+
+            // when
+            User created = service.signUp(validName, validEmail, validPassword);
+
+            // then
+            assertAll("생성된 User 검증",
+                    () -> assertEquals(validName, created.getName()),
+                    () -> assertEquals(validEmail, created.getEmail()),
+                    () -> assertTrue(created.matchesPassword(validPassword)),
+                    () -> assertNull(created.getLab())
+            );
+            then(userRepo).should().existsByEmail(validEmail);
+            then(labRepo).should(never()).findById(any());
             then(userRepo).should().save(any(User.class));
         }
     }
@@ -80,7 +102,7 @@ class UserServiceSignUpTest {
 
             // when & then
             assertThrows(IllegalStateException.class, () ->
-                    service.signUp(validName, validEmail, validPassword, validLabId)
+                    service.signUp(validName, validEmail, validPassword)
             );
             then(userRepo).should().existsByEmail(validEmail);
             then(userRepo).should(never()).save(any());
@@ -95,7 +117,7 @@ class UserServiceSignUpTest {
 
             // when & then
             assertThrows(NoSuchElementException.class, () ->
-                    service.signUp(validName, validEmail, validPassword, validLabId)
+                    service.signUp(validName, validEmail, validPassword)
             );
             then(userRepo).should().existsByEmail(validEmail);
             then(labRepo).should().findById(validLabId);
@@ -113,7 +135,7 @@ class UserServiceSignUpTest {
 
             // when & then
             assertThrows(IllegalArgumentException.class, () ->
-                    service.signUp(invalidName, validEmail, validPassword, validLabId)
+                    service.signUp(invalidName, validEmail, validPassword)
             );
             then(userRepo).should().existsByEmail(validEmail);
             then(labRepo).should().findById(validLabId);
@@ -129,7 +151,7 @@ class UserServiceSignUpTest {
 
             // when & then
             assertThrows(IllegalArgumentException.class, () ->
-                    service.signUp(validName, invalidEmail, validPassword, validLabId)
+                    service.signUp(validName, invalidEmail, validPassword)
             );
             then(userRepo).should().existsByEmail(invalidEmail);
             then(labRepo).should().findById(validLabId);
@@ -145,7 +167,7 @@ class UserServiceSignUpTest {
 
             // when & then
             assertThrows(IllegalArgumentException.class, () ->
-                    service.signUp(validName, validEmail, shortPwd, validLabId)
+                    service.signUp(validName, validEmail, shortPwd)
             );
             then(userRepo).should().existsByEmail(validEmail);
             then(labRepo).should().findById(validLabId);

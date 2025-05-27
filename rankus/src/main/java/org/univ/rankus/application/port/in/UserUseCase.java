@@ -12,10 +12,9 @@ public interface UserUseCase {
      * @param name        사용자 이름
      * @param email       이메일 (중복 불가)
      * @param rawPassword 평문 비밀번호
-     * @param labId       소속 랩실 ID
      * @return 생성된 User 엔티티
      */
-    User signUp(String name, String email, String rawPassword, Long labId);
+    User signUp(String name, String email, String rawPassword);
 
     // 추가: 로그인
     /**

@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,7 +43,7 @@ public class AuthController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "회원가입 성공"),
         @ApiResponse(responseCode = "400", description = "중복된 이메일 또는 유효하지 않은 입력값"),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 랩실 ID")
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 랩실 ID (랩실 ID가 제공된 경우)")
     })
     @PostMapping(path = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponseDto> signUp(
@@ -54,8 +53,7 @@ public class AuthController {
             User user = userUseCase.signUp(
                     request.getName(),
                     request.getEmail(),
-                    request.getPassword(),
-                    request.getLabId()
+                    request.getPassword()
             );
             return ResponseEntity.ok(UserResponseDto.from(user));
 
@@ -116,9 +114,6 @@ public class AuthController {
 
         @NotBlank(message = "password는 필수입니다.")
         private String password;
-
-        @NotNull(message = "labId는 필수입니다.")
-        private Long labId;
     }
 
     @Getter

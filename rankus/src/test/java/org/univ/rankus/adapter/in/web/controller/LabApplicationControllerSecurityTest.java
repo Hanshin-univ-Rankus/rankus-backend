@@ -22,7 +22,6 @@ import org.univ.rankus.domain.model.lab.LabApplication;
 import org.univ.rankus.domain.model.lab.ApplicationStatus;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;

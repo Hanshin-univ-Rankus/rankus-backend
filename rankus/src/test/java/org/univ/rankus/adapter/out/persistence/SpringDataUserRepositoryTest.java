@@ -9,8 +9,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.univ.rankus.config.DomainConfig;
-import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.lab.LabCategory;
 import org.univ.rankus.domain.model.user.User;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -39,8 +37,7 @@ class SpringDataUserRepositoryTest {
         @DisplayName("User를 저장하면 ID가 생성되고 findById로 조회 가능하다")
         void saveAndFindById() {
             // given
-            Lab lab = labRepo.save(new Lab("LabX", "desc", "ME", LabCategory.DB));
-            User user = new User("이철수", "lee@univ.ac.kr", "password123", lab);
+            User user = new User("이철수", "lee@univ.ac.kr", "password123");
 
             // when
             User saved = userRepo.saveAndFlush(user);
@@ -52,7 +49,7 @@ class SpringDataUserRepositoryTest {
                     () -> assertEquals("이철수", found.get().getName()),
                     () -> assertEquals("lee@univ.ac.kr", found.get().getEmail()),
                     () -> assertTrue(found.get().matchesPassword("password123")),
-                    () -> assertEquals(lab.getId(), found.get().getLab().getId())
+                    () -> assertNull(found.get().getLab(), "랩실이 설정되지 않았으므로 null이어야 함")
             );
         }
 
@@ -60,7 +57,7 @@ class SpringDataUserRepositoryTest {
         @DisplayName("lab이 null인 User도 저장할 수 있다")
         void save_nullLab() {
             // given
-            User user = new User("김영희", "kim@univ.ac.kr", "securePass1", null);
+            User user = new User("김영희", "kim@univ.ac.kr", "securePass1");
 
             // when
             User saved = userRepo.saveAndFlush(user);
@@ -80,8 +77,7 @@ class SpringDataUserRepositoryTest {
         @DisplayName("findByEmail로 User 조회가 가능하다")
         void findByEmail_success() {
             // given
-            Lab lab = labRepo.save(new Lab("LabY", "desc", "CE", LabCategory.WEB));
-            userRepo.save(new User("박수민", "park@univ.ac.kr", "pass1234", lab));
+            userRepo.save(new User("박수민", "park@univ.ac.kr", "pass1234"));
 
             // when
             Optional<User> found = userRepo.findByEmail("park@univ.ac.kr");
@@ -95,7 +91,7 @@ class SpringDataUserRepositoryTest {
         @DisplayName("existsByEmail로 중복 체크가 가능하다")
         void existsByEmail() {
             // given
-            userRepo.save(new User("최민수", "choi@univ.ac.kr", "mypassword", null));
+            userRepo.save(new User("최민수", "choi@univ.ac.kr", "mypassword"));
 
             // when & then
             assertTrue(userRepo.existsByEmail("choi@univ.ac.kr"));
@@ -111,7 +107,7 @@ class SpringDataUserRepositoryTest {
         @DisplayName("삭제 후 findById가 empty를 반환한다")
         void deleteUser_success() {
             // given
-            User user = userRepo.save(new User("오지훈", "oh@univ.ac.kr", "delete123", null));
+            User user = userRepo.save(new User("오지훈", "oh@univ.ac.kr", "delete123"));
             Long id = user.getId();
 
             // when
@@ -130,11 +126,11 @@ class SpringDataUserRepositoryTest {
         @DisplayName("중복 이메일 저장 시 DataIntegrityViolationException이 발생한다")
         void duplicateEmail_throws() {
             // given
-            userRepo.save(new User("장민호", "jang@univ.ac.kr", "dup12345", null));
+            userRepo.save(new User("장민호", "jang@univ.ac.kr", "dup12345"));
 
             // when & then
             assertThrows(DataIntegrityViolationException.class, () ->
-                    userRepo.saveAndFlush(new User("장민호2", "jang@univ.ac.kr", "dup67890", null))
+                    userRepo.saveAndFlush(new User("장민호2", "jang@univ.ac.kr", "dup67890"))
             );
         }
     }

@@ -109,7 +109,7 @@ class UserControllerTest {
 
             // 준비된 User
             Lab lab = new Lab("TestLab", "desc", "CS", LabCategory.AI);
-            User user = new User("홍길동", email, "password12345", lab);
+            User user = new User("홍길동", email, "password12345");
             // id 설정
             var idField = User.class.getDeclaredField("id");
             idField.setAccessible(true);

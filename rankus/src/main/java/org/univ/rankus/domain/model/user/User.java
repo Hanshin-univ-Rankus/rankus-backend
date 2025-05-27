@@ -38,7 +38,7 @@ public class User {
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    public User(String name, String email, String rawPassword, Lab lab) {
+    public User(String name, String email, String rawPassword) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("name은 필수입니다.");
         }
@@ -51,7 +51,7 @@ public class User {
         this.name = name;
         this.email = email;
         this.password = Password.of(rawPassword);
-        this.lab = lab;  // null 허용
+        this.lab = null;  // null 허용
     }
 
 
