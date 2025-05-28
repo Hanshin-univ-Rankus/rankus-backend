@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.univ.rankus.domain.model.lab.Lab;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 @Getter
@@ -38,6 +40,7 @@ public class User {
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
+
     public User(String name, String email, String rawPassword) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("name은 필수입니다.");
@@ -52,9 +55,22 @@ public class User {
         this.email = email;
         this.password = Password.of(rawPassword);
         this.lab = null;  // null 허용
+        this.roles.add(Role.STUDENT);
     }
 
 
+    // 권한(Role) 저장
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private Set<Role> roles = new HashSet<>();
+
+
+    // 권한 확인 헬퍼
+    public boolean hasRole(Role role) {
+        return roles.contains(role);
+    }
 
     /** 비밀번호 검증 편의 메서드 */
     public boolean matchesPassword(String raw) {

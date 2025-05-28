@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.univ.rankus.application.port.in.UserQueryUseCase;
@@ -20,6 +21,7 @@ import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.config.SecurityConfig;
 import org.univ.rankus.adapter.out.security.JwtTokenProvider;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -97,6 +99,7 @@ class UserControllerTest {
 
     @Nested
     @DisplayName("유효한 토큰")
+    @WithMockUser(username = "userName", roles = "STUDENT")
     class ValidToken {
         @Test
         @DisplayName("토큰이 유효하면 200 OK와 사용자 정보 반환")
@@ -105,6 +108,7 @@ class UserControllerTest {
             Claims claims = Mockito.mock(Claims.class);
             given(claims.getSubject()).willReturn(email);
             given(jwtTokenProvider.validateToken(validToken)).willReturn(true);
+            given(claims.get("roles", List.class)).willReturn(List.of("USER"));
             given(jwtTokenProvider.parseClaims(validToken)).willReturn(claims);
 
             // 준비된 User
@@ -140,6 +144,7 @@ class UserControllerTest {
             given(claims.getSubject()).willReturn(email);
             given(jwtTokenProvider.validateToken(validToken)).willReturn(true);
             given(jwtTokenProvider.parseClaims(validToken)).willReturn(claims);
+            given(claims.get("roles", List.class)).willReturn(List.of("USER"));
             given(queryUseCase.getProfile(email)).willThrow(new NoSuchElementException("not found"));
 
             // when & then

@@ -96,6 +96,7 @@ class LabApplicationControllerSecurityTest {
             given(jwtTokenProvider.validateToken(validToken)).willReturn(true);
             given(jwtTokenProvider.parseClaims(validToken)).willReturn(claims);
             given(claims.getSubject()).willReturn(email);
+            given(claims.get("roles", List.class)).willReturn(List.of("USER"));
 
             given(applicationUseCase.registerApplication(eq(labId), eq(userId), eq(userName), any(LocalDateTime.class)))
                     .willReturn(app);
@@ -137,6 +138,7 @@ class LabApplicationControllerSecurityTest {
             given(jwtTokenProvider.validateToken(validToken)).willReturn(true);
             given(jwtTokenProvider.parseClaims(validToken)).willReturn(claims);
             given(claims.getSubject()).willReturn(email);
+            given(claims.get("roles", List.class)).willReturn(List.of("USER"));
 
             given(applicationUseCase.listApplications(labId)).willReturn(List.of(app));
 

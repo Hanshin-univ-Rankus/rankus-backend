@@ -47,7 +47,8 @@ public class JwtTokenProvider implements AuthTokenPort {
         Date expiry = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
-                .setSubject(user.getEmail())            // 토큰 제목: 사용자 이메일
+                .setSubject(user.getEmail())
+                .claim("roles", user.getRoles()) // 토큰 제목: 사용자 이메일
                 .claim("name", user.getName())        // 추가 클레임: 사용자 이름
                 .claim("labId", user.getLab() != null ? user.getLab().getId() : null)
                 .setIssuedAt(now)

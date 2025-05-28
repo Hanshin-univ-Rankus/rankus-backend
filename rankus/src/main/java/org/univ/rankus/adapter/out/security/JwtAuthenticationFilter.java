@@ -8,18 +8,20 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * JWT 인증용 필터
  * - Authorization 헤더에서 Bearer 토큰을 파싱
  * - 토큰 유효성 확인 후 SecurityContext에 Authentication 설정
+ * - roles 클레임을 읽어 권한(GrantedAuthority) 세팅
  */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -34,63 +36,58 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-        // 1) 헤더에서 토큰 추출
         String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
         String token = parseBearerToken(bearer);
+        String uri = request.getRequestURI();
+        boolean protectedPath = isProtectedPath(uri);
 
-        // 보호된 경로에 대한 요청인지 확인
-        String requestURI = request.getRequestURI();
-        boolean isProtectedPath = isProtectedPath(requestURI);
-
-        // 인증 헤더가 없는 경우 체크
-        if (isProtectedPath && (bearer == null || token == null)) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            return;
-        }
-
-        // 토큰 형식이 올바르지 않은 경우 (Bearer 접두사 없음)
-        if (isProtectedPath && bearer != null && !bearer.startsWith("Bearer ")) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            return;
-        }
-
-        // 2) 토큰 유효성 검사
-        if (token != null && isProtectedPath) {
-            if (tokenProvider.validateToken(token)) {
-                try {
-                    // 3) 클레임(Subject: email) 추출
-                    Claims claims = tokenProvider.parseClaims(token);
-                    String email = claims.getSubject();
-
-                    // 4) Authentication 객체 생성 (Role 등 권한 정보가 있으면 추가)
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(
-                                    email,          // principal (식별자)
-                                    null,           // credentials
-                                    Collections.emptyList() // authorities: 없으면 빈 리스트
-                            );
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                    // 5) SecurityContext에 인증 정보 세팅
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                } catch (Exception ex) {
-                    // 클레임 파싱 실패 등의 오류 처리
-                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    return;
-                }
-            } else {
-                // 토큰이 유효하지 않은 경우
+        // 인증이 필요한 경로에서 토큰 누락 또는 잘못된 형식
+        if (protectedPath) {
+            if (!StringUtils.hasText(bearer) || token == null) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                return;
+            }
+            if (!bearer.startsWith("Bearer ")) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
         }
 
-        // 다음 필터 실행
+        // 토큰 유효성 및 권한 파싱
+        if (protectedPath && token != null) {
+            if (!tokenProvider.validateToken(token)) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                return;
+            }
+            try {
+                Claims claims = tokenProvider.parseClaims(token);
+                String email = claims.getSubject();
+
+                // roles 클레임 읽기
+                List<String> roles = claims.get("roles", List.class);
+                var authorities = roles.stream()
+                        .map(r -> new SimpleGrantedAuthority("ROLE_" + r))
+                        .collect(Collectors.toList());
+
+                var auth = new UsernamePasswordAuthenticationToken(
+                        email,
+                        null,
+                        authorities
+                );
+                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } catch (Exception ex) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                return;
+            }
+        }
+
+        // 다음 필터 진행
         filterChain.doFilter(request, response);
     }
 
     /**
-     * "Bearer eyJ.." 형태의 헤더에서 토큰 부분만 리턴
+     * Bearer 토큰만 추출
      */
     private String parseBearerToken(String bearer) {
         if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
@@ -100,28 +97,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 보호된 경로인지 확인하는 메서드
+     * 인증이 필요한 보호된 경로인지 판단
      */
     private boolean isProtectedPath(String uri) {
-        // 인증이 필요 없는 경로들
-        if (uri.startsWith("/api/auth") ||
-            uri.startsWith("/swagger-ui") ||
-            uri.startsWith("/v3/api-docs")) {
+        // 인증 예외 경로
+        if (uri.startsWith("/api/auth") || uri.startsWith("/swagger-ui") || uri.startsWith("/v3/api-docs")) {
             return false;
         }
-
-        // 랩실 기본 조회 API는 인증 불필요 (GET이고, /applications가 포함되지 않은 경우)
+        // 랩실 정보 GET은 공개
         if (uri.startsWith("/api/labs")) {
-            // 경로에 applications가 포함되어 있으면 보호 경로
-            if (uri.contains("/applications")) {
-                return true;
-            }
-
-            // GET 요청인지 확인 (테스트에서는 체크하지 않음)
-            return false;
+            return uri.contains("/applications");
         }
-
-        // 기본적으로 다른 모든 경로는 보호됨
+        // 나머지 모두 보호
         return true;
     }
 }
