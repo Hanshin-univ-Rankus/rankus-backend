@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
                 .permitAll()
                 // ✅ 랩실 API 허용 (GET만) - 단, applications 하위 경로는 제외
-                .requestMatchers(HttpMethod.GET, "/api/labs", "/api/labs/", "/api/labs/{labId}")
+                .requestMatchers(HttpMethod.GET, "/api/labs", "/api/labs/", "/api/labs/{labId}", "/api/labs/{labId}/images")
                 .permitAll()
                 // 그 외 모든 요청은 인증 필요
                 .anyRequest()

@@ -11,6 +11,7 @@ INSERT INTO labs (name, department, field, description, ranking, professor, crea
 -- ==================================================
 INSERT INTO lab_images (lab_id, image_url, type, created_at, updated_at) VALUES
                                                                              (1, 'https://example.com/ai_thumb.jpg', 'REPRESENTATIVE', NOW(), NOW()),
+                                                                             (1, 'https://example.com/ai_thumb.jpg', 'ADDITIONAL', NOW(), NOW()),
                                                                              (2, 'https://example.com/web_thumb.jpg', 'REPRESENTATIVE', NOW(), NOW()),
                                                                              (3, 'https://example.com/data_thumb.jpg', 'REPRESENTATIVE', NOW(), NOW());
 -- ==================================================

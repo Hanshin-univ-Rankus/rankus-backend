@@ -11,5 +11,6 @@ public enum LabCategory {
     WEB,
     NETWORK,
     SECURITY,
+    IOT,
     ETC  // 기타
 }
