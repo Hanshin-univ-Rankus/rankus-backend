@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/labs")
-@Tag(name = "Lab", description = "랩실 홍보 관련 API")
+@Tag(name = "Lab API", description = "랩실 홍보 관련 API")
 public class LabController {
 
     private final LabPromotionUseCase useCase;

@@ -22,4 +22,8 @@ public interface LabApplicationUseCase {
      * 주어진 랩실 ID의 모든 가입신청 목록을 반환한다.
      */
     List<LabApplication> listApplications(Long labId);
+
+    void approveApplication(Long labId, Long applicationId);
+
+    void rejectApplication (Long labId, Long applicationId);
 }

@@ -76,4 +76,10 @@ public class User {
     public boolean matchesPassword(String raw) {
         return this.password.matches(raw);
     }
+
+    /** Lab 설정 메서드 */
+    public void setLab(Lab lab) {
+        this.lab = lab;
+    }
 }
+

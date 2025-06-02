@@ -112,7 +112,7 @@ class LabControllerTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 랩실 ID로 조회 시 500 내부 서버 오류와 표준 에러 메시지를 반환한다")
+        @DisplayName("존재하지 않는 랩실 ID로 조회 시 404 Not Found와 에러 메시지를 반환한다")
         void 랩실상세_없는랩실() throws Exception {
             // given
             Long id = 999L;
@@ -122,9 +122,9 @@ class LabControllerTest {
             // when & then
             mockMvc.perform(get("/api/labs/{id}", id)
                             .accept(APPLICATION_JSON))
-                    .andExpect(status().isInternalServerError())
-                    .andExpect(jsonPath("$.status").value(500))
-                    .andExpect(jsonPath("$.message").value("내부 서버 오류가 발생했습니다."));
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.status").value(404))
+                    .andExpect(jsonPath("$.message").value("해당 ID의 랩실을 찾을 수 없습니다: " + id));
         }
 
         @Test

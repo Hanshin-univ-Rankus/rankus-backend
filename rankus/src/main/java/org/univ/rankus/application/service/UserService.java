@@ -77,3 +77,4 @@ public class UserService implements UserUseCase {
         return authTokenPort.generateToken(user);
     }
 }
+

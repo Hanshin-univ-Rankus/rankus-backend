@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/labs/{labId}/images")
-@Tag(name = "LabImage", description = "랩실 이미지 관리 API")
+@Tag(name = "LabImage API", description = "랩실 이미지 관리 API")
 public class LabImageController {
 
     private final LabImageUseCase imageUseCase;

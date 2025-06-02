@@ -98,42 +98,58 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.NOT_FOUND, msg, req.getRequestURI());
     }
 
-
-    // NoSuchElementException 전용 핸들러 추가
+    //────────────────────────────────────────────────────────────
+    // 4) 도메인 비즈니스 예외
+    //────────────────────────────────────────────────────────────
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ErrorResponse> handleNoSuchElement(
+    public ResponseEntity<ErrorResponse> handleNotFound(
             NoSuchElementException ex,
             HttpServletRequest req) {
 
-        String path = req.getRequestURI();
+        // 존재하지 않는 리소스에 대한 요청은 404 Not Found로 일관되게 처리
+        String msg = ex.getMessage() != null ? ex.getMessage() : "요청한 리소스를 찾을 수 없습니다";
+        return buildError(HttpStatus.NOT_FOUND, msg, req.getRequestURI());
+    }
 
-        // '/applications'가 경로에 포함된 경우 404로 처리
-        if (path.contains("/applications")) {
-            return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), path);
-        }
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalState(
+            IllegalStateException ex,
+            HttpServletRequest req) {
 
-        // 그 외의 경우 500으로 처리
-        return buildError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "내부 서버 오류가 발생했습니다.",
-                path
-        );
+        String msg = ex.getMessage() != null ? ex.getMessage() : "요청을 처리할 수 없습니다";
+        return buildError(HttpStatus.BAD_REQUEST, msg, req.getRequestURI());
     }
 
     //────────────────────────────────────────────────────────────
-    // 4) 커스텀·도메인 예외
+    // 5) Spring Web 예외
+    //────────────────────────────────────────────────────────────
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatus(
+            org.springframework.web.server.ResponseStatusException ex,
+            HttpServletRequest req) {
+
+        String msg = ex.getReason() != null ? ex.getReason() : "요청을 처리할 수 없습니다";
+        return buildError(ex.getStatusCode().is4xxClientError()
+                        ? HttpStatus.valueOf(ex.getStatusCode().value())
+                        : HttpStatus.INTERNAL_SERVER_ERROR,
+                msg, req.getRequestURI());
+    }
+
+    //────────────────────────────────────────────────────────────
+    // 6) 커스텀·도메인 예외
     //────────────────────────────────────────────────────────────
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(
-            RuntimeException ex,
+            IllegalArgumentException ex,
             HttpServletRequest req) {
 
-        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), req.getRequestURI());
+        String msg = ex.getMessage() != null ? ex.getMessage() : "잘못된 입력값입니다";
+        return buildError(HttpStatus.BAD_REQUEST, msg, req.getRequestURI());
     }
 
     //────────────────────────────────────────────────────────────
-    // 5) 그 외 예외(500)
+    // 7) 그 외 예외(500)
     //────────────────────────────────────────────────────────────
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAll(
@@ -147,3 +163,4 @@ public class GlobalExceptionHandler {
         );
     }
 }
+

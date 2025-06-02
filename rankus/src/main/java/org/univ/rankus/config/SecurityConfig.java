@@ -43,6 +43,12 @@ public class SecurityConfig {
                 // ✅ 랩실 API 허용 (GET만) - 단, applications 하위 경로는 제외
                 .requestMatchers(HttpMethod.GET, "/api/labs", "/api/labs/", "/api/labs/{labId}", "/api/labs/{labId}/images")
                 .permitAll()
+                // 승인·거절 API는 랩장/교수만
+                .requestMatchers(HttpMethod.POST, "/api/labs/*/applications/*/approve")
+                .hasAnyRole("LAB_MANAGER","PROFESSOR")
+                .requestMatchers(HttpMethod.POST, "/api/labs/*/applications/*/reject")
+                .hasAnyRole("LAB_MANAGER","PROFESSOR")
+
                 // 그 외 모든 요청은 인증 필요
                 .anyRequest()
                 .authenticated()

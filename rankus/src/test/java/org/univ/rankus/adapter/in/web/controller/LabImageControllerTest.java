@@ -115,7 +115,7 @@ class LabImageControllerTest {
         }
 
         @Test
-        @DisplayName("labId가 존재하지 않을 경우 500 에러 반환")
+        @DisplayName("labId가 존재하지 않을 경우 404 에러 반환")
         void 랩실없음_등록실패() throws Exception {
             // given
             Long labId = 999L;
@@ -133,8 +133,8 @@ class LabImageControllerTest {
             mockMvc.perform(post("/api/labs/{labId}/images", labId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(body))
-                    .andExpect(status().isInternalServerError())
-                    .andExpect(jsonPath("$.message").value("내부 서버 오류가 발생했습니다."));
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value("랩실을 찾을 수 없습니다: " + labId));
         }
     }
 
@@ -181,7 +181,7 @@ class LabImageControllerTest {
         }
 
         @Test
-        @DisplayName("없는 랩실 ID로 조회 시 500 에러 반환")
+        @DisplayName("없는 랩실 ID로 조회 시 404 에러 반환")
         void 없는랩실() throws Exception {
             // given
             Long labId = 99L;
@@ -190,8 +190,8 @@ class LabImageControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/images", labId))
-                    .andExpect(status().isInternalServerError())
-                    .andExpect(jsonPath("$.message").value("내부 서버 오류가 발생했습니다."));
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value("랩실을 찾을 수 없습니다: " + labId));
         }
 
         @Test

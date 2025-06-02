@@ -7,16 +7,20 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.univ.rankus.adapter.in.web.dto.LabApplicationRequestDto;
 import org.univ.rankus.adapter.in.web.dto.LabApplicationResponseDto;
 import org.univ.rankus.application.port.in.LabApplicationUseCase;
 import org.univ.rankus.domain.model.lab.LabApplication;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestController
@@ -75,5 +79,45 @@ public class LabApplicationController {
                 .map(LabApplicationResponseDto::from)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
+    }
+
+    /**
+     * 가입신청 승인 (랩장·교수 권한 필요)
+     */
+    @PostMapping(path = "/{appId}/approve")
+    @PreAuthorize("hasAnyRole('LAB_MANAGER','PROFESSOR')")
+    public ResponseEntity<Void> approveApplication(
+            @PathVariable Long labId,
+            @PathVariable Long appId
+    ) {
+        try {
+            applicationUseCase.approveApplication(labId, appId);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException ex) {
+            // 신청 자체가 없을 때 404
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        } catch (IllegalStateException ex) {
+            // 이미 처리된 경우 400
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * 가입신청 거절 (랩장·교수 권한 필요)
+     */
+    @PostMapping(path = "/{appId}/reject")
+    @PreAuthorize("hasAnyRole('LAB_MANAGER','PROFESSOR')")
+    public ResponseEntity<Void> rejectApplication(
+            @PathVariable Long labId,
+            @PathVariable Long appId
+    ) {
+        try {
+            applicationUseCase.rejectApplication(labId, appId);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
+        }
     }
 }

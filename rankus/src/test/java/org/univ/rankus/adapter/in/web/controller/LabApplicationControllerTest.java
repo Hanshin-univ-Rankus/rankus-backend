@@ -24,10 +24,15 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * LabApplicationController 슬라이스 테스트
+ * - 가입신청 등록·조회
+ * - 가입신청 승인·거절
+ */
 @WebMvcTest(
         controllers = LabApplicationController.class,
         excludeAutoConfiguration = SecurityAutoConfiguration.class,
@@ -64,9 +69,8 @@ class LabApplicationControllerTest {
             Long labId = 1L;
             Long userId = 10L;
             String userName = "홍길동";
-            LocalDateTime interview = LocalDateTime.of(2025,5,30,14,0);
+            LocalDateTime interview = LocalDateTime.of(2025, 5, 30, 14, 0);
 
-            // null 랩 생성자 방어로 실제 Lab 객체 필요
             Lab dummyLab = new Lab("Dummy", "설명", "학과", LabCategory.AI);
             LabApplication app = new LabApplication(dummyLab, userId, interview);
 
@@ -176,7 +180,7 @@ class LabApplicationControllerTest {
         @DisplayName("등록된 가입신청이 있으면 모든 신청을 반환한다")
         void listApplications_success() throws Exception {
             Long labId = 2L;
-            LocalDateTime t1 = LocalDateTime.of(2025,6,1,10,0);
+            LocalDateTime t1 = LocalDateTime.of(2025, 6, 1, 10, 0);
             LocalDateTime t2 = t1.plusHours(1);
 
             Lab dummyLab = new Lab("Dummy", "desc", "학과", LabCategory.DB);
@@ -214,6 +218,116 @@ class LabApplicationControllerTest {
             mockMvc.perform(get("/api/labs/{labId}/applications", "abc")
                             .accept(JSON))
                     .andExpect(status().isBadRequest());
+        }
+    }
+
+    @Nested
+    @DisplayName("가입신청 승인 API [POST /applications/{appId}/approve]")
+    class ApproveEndpoint {
+
+        @Test
+        @DisplayName("올바른 요청이면 204 No Content를 반환한다")
+        void approve_success() throws Exception {
+            Long labId = 1L;
+            Long appId = 5L;
+
+            willDoNothing().given(applicationUseCase)
+                    .approveApplication(labId, appId);
+
+            mockMvc.perform(post(BASE + "/{appId}/approve", labId, appId)
+                            .contentType(JSON))
+                    .andExpect(status().isNoContent());
+
+            then(applicationUseCase).should().approveApplication(labId, appId);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 applicationId면 404 Not Found를 반환한다")
+        void approve_notFound() throws Exception {
+            Long labId = 1L;
+            Long appId = 99L;
+
+            willThrow(new NoSuchElementException("해당 랩실의 가입신청을 찾을 수 없습니다."))
+                    .given(applicationUseCase)
+                    .approveApplication(labId, appId);
+
+            mockMvc.perform(post(BASE + "/{appId}/approve", labId, appId)
+                            .contentType(JSON))
+                    .andExpect(status().isNotFound());
+
+            then(applicationUseCase).should().approveApplication(labId, appId);
+        }
+
+        @Test
+        @DisplayName("이미 처리된 신청이면 400 Bad Request를 반환한다")
+        void approve_alreadyProcessed() throws Exception {
+            Long labId = 1L;
+            Long appId = 5L;
+
+            willThrow(new IllegalStateException("이미 처리된 신청입니다."))
+                    .given(applicationUseCase)
+                    .approveApplication(labId, appId);
+
+            mockMvc.perform(post(BASE + "/{appId}/approve", labId, appId)
+                            .contentType(JSON))
+                    .andExpect(status().isBadRequest());
+
+            then(applicationUseCase).should().approveApplication(labId, appId);
+        }
+    }
+
+    @Nested
+    @DisplayName("가입신청 거절 API [POST /applications/{appId}/reject]")
+    class RejectEndpoint {
+
+        @Test
+        @DisplayName("올바른 요청이면 204 No Content를 반환한다")
+        void reject_success() throws Exception {
+            Long labId = 2L;
+            Long appId = 7L;
+
+            willDoNothing().given(applicationUseCase)
+                    .rejectApplication(labId, appId);
+
+            mockMvc.perform(post(BASE + "/{appId}/reject", labId, appId)
+                            .contentType(JSON))
+                    .andExpect(status().isNoContent());
+
+            then(applicationUseCase).should().rejectApplication(labId, appId);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 applicationId면 404 Not Found를 반환한다")
+        void reject_notFound() throws Exception {
+            Long labId = 2L;
+            Long appId = 99L;
+
+            willThrow(new NoSuchElementException("해당 랩실의 가입신청을 찾을 수 없습니다."))
+                    .given(applicationUseCase)
+                    .rejectApplication(labId, appId);
+
+            mockMvc.perform(post(BASE + "/{appId}/reject", labId, appId)
+                            .contentType(JSON))
+                    .andExpect(status().isNotFound());
+
+            then(applicationUseCase).should().rejectApplication(labId, appId);
+        }
+
+        @Test
+        @DisplayName("이미 처리된 신청이면 400 Bad Request를 반환한다")
+        void reject_alreadyProcessed() throws Exception {
+            Long labId = 2L;
+            Long appId = 7L;
+
+            willThrow(new IllegalStateException("이미 처리된 신청입니다."))
+                    .given(applicationUseCase)
+                    .rejectApplication(labId, appId);
+
+            mockMvc.perform(post(BASE + "/{appId}/reject", labId, appId)
+                            .contentType(JSON))
+                    .andExpect(status().isBadRequest());
+
+            then(applicationUseCase).should().rejectApplication(labId, appId);
         }
     }
 }
