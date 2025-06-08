@@ -7,12 +7,14 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create # 애플리케이션 시작 시 스키마를 생성하고, 종료 시 유지 (목 데이터 유지를 위해)
+      ddl-auto: create-drop # 데이터베이스 스키마 생성만 하고 종료 시 삭제하지 않음
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true # SQL 로깅 활성화
+    generate-ddl: true # DDL 생성 활성화
     properties:
       hibernate:
         format_sql: true # SQL 로깅 포맷팅
+    defer-datasource-initialization: true # SQL 스크립트 실행 전 JPA가 스키마를 생성하도록 함
 
   sql:
     init:
@@ -20,12 +22,11 @@ spring:
       data-locations: classpath:data.sql # data.sql 파일 위치 지정
       encoding: UTF-8
 
-  server:
-    address: 0.0.0.0
-    port: 8080
+server:
+  address: 0.0.0.0
+  port: 8080
 
 security:
   jwt:
-    secret: yDeGly34tDXIxkjo6MQKgBNCI+2iMFLdT0i8zD2JZuE=
-
+    secret: yDeGly34tDXIxkjo6MQKgBNCI+2iMFLdT0i8zD2JZuE= # JWT 비밀 키 (실제 환경에 맞게 변경 필요)
     expiration-ms: 3600000  # 1시간

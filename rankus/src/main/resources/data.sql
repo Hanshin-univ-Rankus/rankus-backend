@@ -1,24 +1,26 @@
--- ==================================================
--- 1) LABS 테이블: 랩실 샘플 데이터
--- ==================================================
-INSERT INTO labs (name, department, field, description, ranking, professor, created_at, updated_at) VALUES
-                                                                                                        ('AI 연구실', '컴퓨터공학과', 'AI', '머신러닝·딥러닝 연구', 1, '홍석진', NOW(), NOW()),
-                                                                                                        ('웹서비스랩', '소프트웨어학과', 'WEB', '풀스택 개발 실습', 2, '김민수', NOW(), NOW()),
-                                                                                                        ('데이터융합랩', '정보통계학과', 'DB', '빅데이터 분석·시각화 연구', 3, '이영희', NOW(), NOW());
-
--- ==================================================
--- 2) LAB_IMAGES 테이블: 랩실별 이미지 샘플
--- ==================================================
-INSERT INTO lab_images (lab_id, image_url, type, created_at, updated_at) VALUES
-                                                                             (1, 'https://example.com/ai_thumb.jpg', 'REPRESENTATIVE', NOW(), NOW()),
-                                                                             (1, 'https://example.com/ai_thumb.jpg', 'ADDITIONAL', NOW(), NOW()),
-                                                                             (2, 'https://example.com/web_thumb.jpg', 'REPRESENTATIVE', NOW(), NOW()),
-                                                                             (3, 'https://example.com/data_thumb.jpg', 'REPRESENTATIVE', NOW(), NOW());
--- ==================================================
--- 3) LAB_APPLICATIONS 테이블: 신청 정보 샘플
--- ==================================================
-INSERT INTO lab_applications
-(lab_id, user_id, status, interview_time, created_at, updated_at)
+-- 1. labs
+INSERT INTO labs (id, name, category, description, ranking, professor_name, created_at, updated_at)
 VALUES
-    (1, 1, 'PENDING',    NOW(), NOW(), NOW()),
-    (2, 2, 'APPROVED',   NOW(), NOW(), NOW());
+    (1, 'AI랩', 'AI', '인공지능 랩', 1, '김교수', NOW(), NOW()),
+    (2, 'DB랩', 'DB', '데이터베이스 랩', 2, '이교수', NOW(), NOW());
+
+-- 2. users
+INSERT INTO users (id, name, email, password_hash, role, lab_id, created_at, updated_at)
+VALUES
+    (1, '학생1', 'user1@example.com', '$2a$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmno', 'STUDENT', NULL, NOW(), NOW()),
+    (2, '랩장1', 'leader1@example.com', '$2a$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmno', 'LAB_LEADER', 1, NOW(), NOW()),
+    (3, '교수', 'prof@example.com', '$2a$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmno', 'PROFESSOR', 2, NOW(), NOW());
+
+-- 3. lab_images
+INSERT INTO lab_images (id, lab_id, image_url, type)
+VALUES
+    (1, 1, 'https://example.com/lab1_img1.png', 'REPRESENTATIVE'),
+    (2, 1, 'https://example.com/lab1_img2.png', 'ADDITIONAL'),
+    (3, 2, 'https://example.com/lab2_img1.png', 'REPRESENTATIVE');
+
+-- 4. lab_applications
+INSERT INTO lab_applications (id, lab_id, user_id, interview_time, status, created_at, updated_at)
+VALUES
+    (1, 1, 1, '2025-07-01 13:00:00', 'PENDING', NOW(), NOW()),
+    (2, 1, 2, '2025-07-01 15:00:00', 'APPROVED', NOW(), NOW()),
+    (3, 2, 3, '2025-07-01 16:00:00', 'PENDING', NOW(), NOW());

@@ -24,7 +24,6 @@ services:
       - "3307:3306" # dev 환경용 포트
     volumes:
       - db-data-dev:/var/lib/mysql
-      - ./rankus/src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql # 초기 데이터 로드
     restart: always
 
   mysql_test:

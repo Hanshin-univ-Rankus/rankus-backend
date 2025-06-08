@@ -4,82 +4,140 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
+import org.univ.rankus.common.BaseTimeEntity;
 import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.user.exception.UserErrorCode;
+import org.univ.rankus.domain.model.user.exception.UserValidationException;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Pattern;
-
+/**
+ * User 엔티티 - 사용자 정보를 나타내는 도메인 모델
+ */
 @Getter
 @Entity
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "users")
-public class User {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User extends BaseTimeEntity {
 
-    @Column(nullable = false, length = 50)
-    private String name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // 사용자 고유 ID
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
+    @Column(nullable = false, length = 30)
+    private String name; // 사용자 이름
 
+    @Column(nullable = false, length = 100, unique = true)
+    private String email; // 사용자 이메일(고유)
+
+    // Password는 @Embeddable로 정의된 값 객체
     @Embedded
-    private Password password;
+    private Password password; // 비밀번호(해시값)
 
-    /**
-     * 이제 Optional 관계로 변경: 소속 랩실이 없을 수 있음
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lab_id")  // nullable=true 가 default
-    private Lab lab;
-
-    /**
-     * 생성자: 이제 lab은 null 허용
-     */
-    private static final Pattern EMAIL_PATTERN =
-            Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
-
-
-    public User(String name, String email, String rawPassword) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("name은 필수입니다.");
-        }
-        if (email == null || email.isBlank() || !EMAIL_PATTERN.matcher(email).matches()) {
-            throw new IllegalArgumentException("유효한 email을 입력하세요.");
-        }
-        if (rawPassword == null || rawPassword.length() < 8) {
-            throw new IllegalArgumentException("password는 8자 이상이어야 합니다.");
-        }
-        this.name = name;
-        this.email = email;
-        this.password = Password.of(rawPassword);
-        this.lab = null;  // null 허용
-        this.roles.add(Role.STUDENT);
-    }
-
-
-    // 권한(Role) 저장
-    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role")
-    private Set<Role> roles = new HashSet<>();
+    @Column(nullable = false, length = 20)
+    private Role role; // 사용자 권한(기본값: STUDENT)
 
+    // Optional: User가 소속된 Lab이 있을 수 있으므로 ManyToOne 관계
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lab_id")
+    private Lab lab; // 소속 랩실(선택)
 
-    // 권한 확인 헬퍼
-    public boolean hasRole(Role role) {
-        return roles.contains(role);
+    /**
+     * 생성자: 필수 필드(name, email, Password 객체) 검증 후 세팅
+     * - Role은 기본값으로 STUDENT 설정
+     * Service 계층에서 Password.fromRaw(...)을 사용해 Password 객체를 생성한 후 넘겨주어야 한다.
+     */
+    public User(String name, String email, Password password) {
+        if (password == null) {
+            throw new UserValidationException(UserErrorCode.INVALID_CREDENTIALS);
+        }
+        this.name = validateName(name);
+        this.email = validateEmail(email);
+        this.password = password;
+        this.role = Role.STUDENT;  // 기본값 설정
     }
 
-    /** 비밀번호 검증 편의 메서드 */
-    public boolean matchesPassword(String raw) {
-        return this.password.matches(raw);
+    /**
+     * 이름 유효성 검증
+     */
+    private String validateName(String name) {
+        if (!StringUtils.hasText(name)) {
+            throw new UserValidationException(UserErrorCode.NAME_REQUIRED);
+        }
+        String trimmed = name.trim();
+        if (trimmed.length() > 30) {
+            throw new UserValidationException(UserErrorCode.NAME_TOO_LONG);
+        }
+        return trimmed;
     }
 
-    /** Lab 설정 메서드 */
-    public void setLab(Lab lab) {
+    /**
+     * 이메일 유효성 검증
+     */
+    private String validateEmail(String email) {
+        if (!StringUtils.hasText(email)) {
+            throw new UserValidationException(UserErrorCode.EMAIL_REQUIRED);
+        }
+        String trimmed = email.trim();
+        if (!trimmed.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
+            throw new UserValidationException(UserErrorCode.EMAIL_INVALID);
+        }
+        if (trimmed.length() > 100) {
+            // 이메일 길이 초과 시에도 INVALID로 처리
+            throw new UserValidationException(UserErrorCode.EMAIL_INVALID);
+        }
+        return trimmed;
+    }
+
+    /**
+     * 로그인 시 비밀번호 일치 여부를 확인하기 위한 헬퍼 메서드
+     */
+    public boolean checkPassword(String rawPassword, org.springframework.security.crypto.password.PasswordEncoder encoder) {
+        return this.password.matches(rawPassword, encoder);
+    }
+
+    /**
+     * 비밀번호 변경
+     * @param rawNewPassword 새 비밀번호 (평문)
+     */
+    public void changePassword(String rawNewPassword, org.springframework.security.crypto.password.PasswordEncoder encoder) {
+        if (!StringUtils.hasText(rawNewPassword)) {
+            throw new UserValidationException(UserErrorCode.EMAIL_INVALID);
+        }
+        this.password = Password.fromRaw(rawNewPassword, encoder);
+    }
+
+    /**
+     * User가 Lab에 소속될 때 호출
+     * @param lab 소속될 Lab 객체
+     */
+    public void assignLab(Lab lab) {
+        if (lab == null) {
+            throw new UserValidationException(UserErrorCode.LAB_REQUIRED);
+        }
         this.lab = lab;
     }
-}
 
+    /**
+     * User 권한(role) 변경
+     * @param newRole 새 권한
+     */
+    public void changeRole(Role newRole) {
+        if (newRole == null) {
+            throw new UserValidationException(UserErrorCode.ROLE_REQUIRED);
+        }
+        this.role = newRole;
+    }
+
+    /**
+     * 사용자 이름 변경
+     * @param newName 새 사용자 이름
+     */
+    public void changeName(String newName) {
+        this.name = validateName(newName);
+    }
+
+    public boolean isLabLeaderOrLabManagerInLab(Lab lab) {
+        return (this.role == Role.LAB_LEADER || this.role == Role.LAB_MANAGER) && this.lab != null && this.lab.equals(lab);
+    }
+}

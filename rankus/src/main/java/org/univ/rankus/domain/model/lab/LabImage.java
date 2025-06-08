@@ -1,52 +1,66 @@
 package org.univ.rankus.domain.model.lab;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.univ.rankus.common.BaseTimeEntity;
-import java.util.Objects;
+import org.univ.rankus.domain.model.lab.exception.LabImageErrorCode;
+import org.univ.rankus.domain.model.lab.exception.LabImageValidationException;
 
 @Getter
-@Setter
 @Entity
-@Table(name = "lab_images")
+@Table(name = "lab_images",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"lab_id", "type"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LabImage extends BaseTimeEntity {
+public class LabImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 어느 Lab에 속하는 이미지인지 (필수)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "lab_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)  // DB FK에 ON DELETE CASCADE
+    @JoinColumn(name = "lab_id")
     private Lab lab;
 
-    @Column(nullable = false, length = 500)
+    // 이미지 URL (필수, 최대 255자)
+    @Column(name = "image_url", nullable = false, length = 255)
+    @Pattern(regexp = "^(https?|ftp)://[a-zA-Z0-9\\-._~:/?#\\[\\]@!$&'()*+,;=]+$",
+             message = "Invalid image URL format")
     private String imageUrl;
 
+    // 이미지 타입 (필수)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private ImageType type;
 
     /**
-     * 도메인 불변 조건 검증을 포함한 생성자
+     * 생성자: 필수 필드(lab, imageUrl, type) 검증 후 세팅
      */
     public LabImage(Lab lab, String imageUrl, ImageType type) {
-        this.lab      = Objects.requireNonNull(lab, "Lab은 필수입니다.");
-        this.imageUrl = Objects.requireNonNull(imageUrl, "imageUrl은 필수입니다.");
-        this.type     = Objects.requireNonNull(type, "ImageType은 필수입니다.");
+        if (lab == null) {
+            throw new LabImageValidationException(LabImageErrorCode.IMAGE_NOT_FOUND);
+        }
+        this.lab = lab;
+        this.imageUrl = validateImageUrl(imageUrl);
+        if (type == null) {
+            throw new LabImageValidationException(LabImageErrorCode.INVALID_IMAGE_TYPE);
+        }
+        this.type = type;
     }
 
-    // setter for 양방향 연관관계
-    public void setLab(Lab lab) {
-        this.lab = lab;
-        if (lab != null && !lab.getImages().contains(this)) {
-            lab.getImages().add(this);
+    private String validateImageUrl(String imageUrl) {
+        if (imageUrl == null || imageUrl.isBlank()) {
+            throw new LabImageValidationException(LabImageErrorCode.IMAGE_URL_REQUIRED);
         }
+        // (Optional) URL 형식 검증 로직이 필요하면 추가
+        String trimmed = imageUrl.trim();
+        if (trimmed.length() > 255) {
+            throw new LabImageValidationException(LabImageErrorCode.INVALID_IMAGE_TYPE);
+            // 또는 별도 에러코드 추가 가능
+        }
+        return trimmed;
     }
+
 }

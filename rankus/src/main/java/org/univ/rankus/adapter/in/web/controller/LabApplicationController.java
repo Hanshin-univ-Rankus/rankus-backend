@@ -1,123 +1,156 @@
 package org.univ.rankus.adapter.in.web.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import org.univ.rankus.adapter.in.web.dto.LabApplicationRequestDto;
-import org.univ.rankus.adapter.in.web.dto.LabApplicationResponseDto;
-import org.univ.rankus.application.port.in.LabApplicationUseCase;
+import org.univ.rankus.adapter.in.web.dto.request.LabApplicationRequestDto;
+import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;
+import org.univ.rankus.adapter.in.web.dto.response.LabApplicationResponseDto;
+import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
+import org.univ.rankus.application.port.in.command.LabApplicationCommandUseCase;
+import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.lab.LabApplication;
 
+import java.net.URI;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-@RestController
 @Validated
-@RequestMapping(path = "/api/labs/{labId}/applications", produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "랩실 지원 API", description = "랩실 지원서 등록 및 조회 API")
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/labs/{labId}/applications")
 public class LabApplicationController {
 
-    private final LabApplicationUseCase applicationUseCase;
+    private final LabApplicationCommandUseCase commandUseCase;
+    private final LabApplicationQueryUseCase queryUseCase;
 
-    public LabApplicationController(LabApplicationUseCase applicationUseCase) {
-        this.applicationUseCase = applicationUseCase;
-    }
-
-    @Operation(
-        summary = "랩실 지원서 등록",
-        description = "특정 랩실에 지원서를 등록합니다.",
-        security = @SecurityRequirement(name = "Bearer Authentication")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "지원서 등록 성공"),
-        @ApiResponse(responseCode = "400", description = "유효하지 않은 입력값"),
-        @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 랩실")
-    })
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LabApplicationResponseDto> registerApplication(
-            @Parameter(description = "랩실 ID", required = true) @PathVariable Long labId,
-            @Valid @RequestBody LabApplicationRequestDto request
+    /**
+     * POST /api/v1/labs/{labId}/applications
+     * - 랩 가입 신청 (로그인 사용자)
+     * - 201 Created + Location 헤더 + ApiResponse<LabApplicationResponseDto>
+     */
+    @PostMapping
+    public ResponseEntity<ApiResponse<LabApplicationResponseDto>> applyToLab(
+            @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다.") Long labId,
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestBody @Valid LabApplicationRequestDto dto
     ) {
-        LabApplication app = applicationUseCase.registerApplication(
+        LabApplication created = commandUseCase.applyToLab(
                 labId,
-                request.getUserId(),
-                request.getUserName(),
-                request.getInterviewTime()
+                principal.getUserId(),
+                dto.interviewTime()
         );
-        return ResponseEntity.ok(LabApplicationResponseDto.from(app));
+
+        LabApplicationResponseDto respDto = LabApplicationResponseDto.from(created);
+
+        ApiResponse<LabApplicationResponseDto> body = ApiResponse.<LabApplicationResponseDto>builder()
+                .status(HttpStatus.CREATED.value())
+                .message("가입 신청 성공")
+                .data(respDto)
+                .build();
+
+        URI location = URI.create("/api/v1/labs/" + labId + "/applications/" + created.getId());
+        return ResponseEntity
+                .created(location)
+                .body(body);
     }
 
-    @Operation(
-        summary = "랩실 지원서 목록 조회",
-        description = "특정 랩실에 등록된 모든 지원서를 조회합니다.",
-        security = @SecurityRequirement(name = "Bearer Authentication")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "지원서 목록 조회 성공"),
-        @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 랩실")
-    })
-    @GetMapping
-    public ResponseEntity<List<LabApplicationResponseDto>> listApplications(
-            @Parameter(description = "랩실 ID", required = true) @PathVariable Long labId
+    /**
+     * DELETE /api/v1/labs/{labId}/applications/{appId}
+     * - 자신의 신청서 취소
+     * - 204 No Content
+     */
+    @DeleteMapping("/{appId}")
+    @PreAuthorize("hasPermission(#appId, 'LabApplication', 'cancel')")
+    public ResponseEntity<Void> cancelApplication(
+            @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다.") Long labId,
+            @PathVariable @Positive(message = "신청서 ID는 양수여야 합니다.") Long appId,
+            @AuthenticationPrincipal CustomUserDetails principal
     ) {
-        List<LabApplication> list = applicationUseCase.listApplications(labId);
-        List<LabApplicationResponseDto> dtos = list.stream()
+        commandUseCase.cancelApplication(appId, principal.getUserId());
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * GET /api/v1/labs/{labId}/applications
+     * - 특정 랩실의 모든 신청서 조회 (리더/매니저)
+     * - 200 OK + ApiResponse<List<LabApplicationResponseDto>>
+     */
+    @GetMapping
+    @PreAuthorize("hasPermission(#labId, 'LabApplication', 'view')")
+    public ResponseEntity<ApiResponse<List<LabApplicationResponseDto>>> listApplications(
+            @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다.") Long labId
+    ) {
+        List<LabApplication> apps = queryUseCase.listApplicationsByLab(labId);
+        List<LabApplicationResponseDto> dtos = apps.stream()
                 .map(LabApplicationResponseDto::from)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+
+        ApiResponse<List<LabApplicationResponseDto>> body = ApiResponse.<List<LabApplicationResponseDto>>builder()
+                .status(HttpStatus.OK.value())
+                .message("신청서 목록 조회 성공")
+                .data(dtos)
+                .build();
+
+        return ResponseEntity.ok(body);
     }
 
     /**
-     * 가입신청 승인 (랩장·교수 권한 필요)
+     * GET /api/v1/labs/{labId}/applications/{appId}
+     * - 단일 신청서 조회 (리더/매니저)
+     * - 200 OK + ApiResponse<LabApplicationResponseDto>
      */
-    @PostMapping(path = "/{appId}/approve")
-    @PreAuthorize("hasAnyRole('LAB_MANAGER','PROFESSOR')")
+    @GetMapping("/{appId}")
+    @PreAuthorize("hasPermission(#labId, 'LabApplication', 'view')")
+    public ResponseEntity<ApiResponse<LabApplicationResponseDto>> getApplication(
+            @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다.") Long labId,
+            @PathVariable @Positive(message = "신청서 ID는 양수여야 합니다.") Long appId
+    ) {
+        LabApplication app = queryUseCase.getApplicationById(appId);
+        LabApplicationResponseDto dto = LabApplicationResponseDto.from(app);
+
+        ApiResponse<LabApplicationResponseDto> body = ApiResponse.<LabApplicationResponseDto>builder()
+                .status(HttpStatus.OK.value())
+                .message("신청서 조회 성공")
+                .data(dto)
+                .build();
+
+        return ResponseEntity.ok(body);
+    }
+
+    /**
+     * PUT /api/v1/labs/{labId}/applications/{appId}/approve
+     * - 신청서 승인 (리더/매니저)
+     * - 204 No Content
+     */
+    @PutMapping("/{appId}/approve")
+    @PreAuthorize("hasPermission(#appId, 'LabApplication', 'approve')")
     public ResponseEntity<Void> approveApplication(
-            @PathVariable Long labId,
-            @PathVariable Long appId
+            @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다.") Long labId,
+            @PathVariable @Positive(message = "신청서 ID는 양수여야 합니다.") Long appId
     ) {
-        try {
-            applicationUseCase.approveApplication(labId, appId);
-            return ResponseEntity.noContent().build();
-        } catch (NoSuchElementException ex) {
-            // 신청 자체가 없을 때 404
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
-        } catch (IllegalStateException ex) {
-            // 이미 처리된 경우 400
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
-        }
+        commandUseCase.approveApplication(appId);
+        return ResponseEntity.noContent().build();
     }
 
     /**
-     * 가입신청 거절 (랩장·교수 권한 필요)
+     * PUT /api/v1/labs/{labId}/applications/{appId}/reject
+     * - 신청서 거절 (리더/매니저)
+     * - 204 No Content
      */
-    @PostMapping(path = "/{appId}/reject")
-    @PreAuthorize("hasAnyRole('LAB_MANAGER','PROFESSOR')")
+    @PutMapping("/{appId}/reject")
+    @PreAuthorize("hasPermission(#appId, 'LabApplication', 'reject')")
     public ResponseEntity<Void> rejectApplication(
-            @PathVariable Long labId,
-            @PathVariable Long appId
+            @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다.") Long labId,
+            @PathVariable @Positive(message = "신청서 ID는 양수여야 합니다.") Long appId
     ) {
-        try {
-            applicationUseCase.rejectApplication(labId, appId);
-            return ResponseEntity.noContent().build();
-        } catch (NoSuchElementException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
-        } catch (IllegalStateException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
-        }
+        commandUseCase.rejectApplication(appId);
+        return ResponseEntity.noContent().build();
     }
 }

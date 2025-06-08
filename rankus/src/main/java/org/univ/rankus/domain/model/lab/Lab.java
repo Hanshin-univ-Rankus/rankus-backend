@@ -1,100 +1,115 @@
 package org.univ.rankus.domain.model.lab;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
+import lombok.Setter;
+import org.springframework.util.StringUtils;
 import org.univ.rankus.common.BaseTimeEntity;
+import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
+import org.univ.rankus.domain.model.lab.exception.LabValidationException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
+/**
+ * Lab 엔티티
+ */
 @Getter
 @Entity
 @Table(name = "labs")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Lab extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // 랩실 고유 ID
 
-    @Column(nullable = false, length = 100)
+    // 랩실 이름(필수, 최대 10자)
+    @Column(nullable = false, length = 10)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
-    @Column(nullable = false, length = 50)
-    private String department;
-
-    @Column(name = "professor", length = 100)
-    private String professorName;    // 교수님 이름 저장용
-
+    // 랩실 카테고리(필수, 최대 10자)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20, name = "field")
+    @Column(nullable = false, length = 10)
     private LabCategory category;
 
-    @Column(nullable = false)
-    private int ranking;
+    // 랩실 설명(최대 255자)
+    private String description;
 
-    // ★ 추가: Lab ↔ LabImage 1:N 연관관계 정의
-    @OneToMany(
-            mappedBy = "lab",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<LabImage> images = new ArrayList<>();
+    // 랭킹(0이상 정수)
+    @Setter
+    private Integer ranking;
 
-    // 편의 메서드: LabImage를 추가하고 양쪽 연관관계 설정
-    public void addImage(LabImage img) {
-        images.add(img);
-        img.setLab(this);
-    }
+    // Optional: 교수님 이름
+    @Column(name = "professor_name", length = 10)
+    private String professorName;
 
-    // 편의 메서드: LabImage를 제거하고 양쪽 연관관계 해제
-    public void removeImage(LabImage img) {
-        images.remove(img);
-        img.setLab(null);
-    }
-    public Lab(String name, String description, String department, LabCategory category) {
-        this.name        = Objects.requireNonNull(name,        "랩실 이름은 필수입니다.");
-        this.department  = Objects.requireNonNull(department,  "소속 학과는 필수입니다.");
-        this.category    = Objects.requireNonNull(category,    "연구 분야는 필수입니다.");
-        this.description = description;
-        this.ranking     = 0;
-    }
-    public Lab(String name, String department, String field,
-               String description, Integer ranking, String professorName) {
-        this.name = name;
-        this.department = department;
-        this.category = getCategory();
-        this.description = description;
-        this.ranking = ranking;
-        this.professorName = professorName;
-    }
-
-    public void updateRanking(int newRanking) {
-        if (newRanking < 0) {
-            throw new IllegalArgumentException("랭킹은 0 이상이어야 합니다.");
-        }
-        this.ranking = newRanking;
+    /**
+     * 생성자: 필수 필드(name, category)와 선택 필드(description, professorName) 검증 후 세팅
+     */
+    public Lab(String name, LabCategory category, String description, String professorName) {
+        this.name = validateName(name);
+        this.category = validateCategory(category);
+        this.description = validateDescription(description);
+        this.ranking = 0;
+        this.professorName = (professorName != null && !professorName.isBlank())
+                ? professorName.trim()
+                : null;
     }
 
     /**
-     * 랩장(또는 관리자가) 교수님을 수동으로 설정할 때 사용합니다.
+     * 랩실 이름 검증 (필수)
      */
-    public void assignProfessor(String professorName) {
-        this.professorName = Objects.requireNonNull(professorName, "professorName은 필수입니다.");
+    private String validateName(String name) {
+        if (!StringUtils.hasText(name)) {
+            throw new LabValidationException(LabErrorCode.LAB_NAME_REQUIRED);
+        }
+        return name.trim();
+    }
+
+    /**
+     * 랩실 카테고리 검증 (필수)
+     */
+    private LabCategory validateCategory(LabCategory category) {
+        if (category == null) {
+            throw new LabValidationException(LabErrorCode.LAB_CATEGORY_REQUIRED);
+        }
+        return category;
+    }
+
+    /**
+     * 랩실 설명 검증 (최대 200자)
+     */
+    private String validateDescription(String description) {
+        if (description == null) {
+            return null;
+        }
+        String trimmed = description.trim();
+        if (trimmed.length() > 255) {
+            throw new LabValidationException(LabErrorCode.LAB_DESCRIPTION_TOO_LONG);
+        }
+        return trimmed;
+    }
+
+    /**
+     * 랭킹 검증 (0 이상)
+     */
+    private Integer validateRanking(Integer ranking) {
+        if (ranking == null) {
+            return 0; // 랭킹이 없으면 기본값 0으로 설정
+        }
+        if (ranking < 0) {
+            throw new LabValidationException(LabErrorCode.LAB_RANKING_INVALID);
+        }
+        return ranking;
     }
 
     /**
      * 신청 처리 중, 신청자 이름이 교수님 이름과 같으면 교수님으로 자동 배정
      */
     public void autoAssignProfessorIfMatches(String applicantName) {
-        if (this.professorName == null && applicantName.equals(this.professorName)) {
-            // 이미 professorName이 설정되어 있으면 건너뜀
-            this.professorName = applicantName;
+        // this.professorName이 null인지 먼저 체크하여 NPE 방지
+        if (this.professorName == null && StringUtils.hasText(applicantName)) {
+            this.professorName = applicantName.trim();
         }
     }
 }

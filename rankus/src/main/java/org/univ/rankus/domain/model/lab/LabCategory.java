@@ -12,5 +12,9 @@ public enum LabCategory {
     NETWORK,
     SECURITY,
     IOT,
+    MOBILE,
+    GAME,
+    ROBOTICS,
+    COMPUTER_SCIENCE,  // 컴퓨터 과학
     ETC  // 기타
 }
