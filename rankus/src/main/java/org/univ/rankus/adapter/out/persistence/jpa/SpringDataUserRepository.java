@@ -1,6 +1,7 @@
 package org.univ.rankus.adapter.out.persistence.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import org.univ.rankus.domain.model.user.User;
 
 import java.util.Optional;
@@ -10,6 +11,7 @@ import java.util.Optional;
  * - JpaRepository 에서 기본 CRUD 메서드를 모두 제공
  * - 이메일로 조회하는 커스텀 메서드는 아래에 선언
  */
+@Repository
 public interface SpringDataUserRepository extends JpaRepository<User, Long> {
 
     /**

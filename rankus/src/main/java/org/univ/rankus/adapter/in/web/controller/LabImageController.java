@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.univ.rankus.adapter.in.web.dto.LabImageRequestDto;
+import org.univ.rankus.adapter.in.web.dto.request.LabImageRequestDto;
 import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;
 import org.univ.rankus.adapter.in.web.dto.response.LabImageResponseDto;
 import org.univ.rankus.application.port.in.query.LabImageQueryUseCase;

@@ -43,6 +43,12 @@ public class LabImage {
             throw new LabImageValidationException(LabImageErrorCode.IMAGE_NOT_FOUND);
         }
         this.lab = lab;
+        if (imageUrl == null || imageUrl.isBlank()) {
+            throw new LabImageValidationException(LabImageErrorCode.IMAGE_URL_REQUIRED);
+        }
+        if (imageUrl.length() > 255) {
+            throw new LabImageValidationException(LabImageErrorCode.IMAGE_URL_INVALID);
+        }
         this.imageUrl = validateImageUrl(imageUrl);
         if (type == null) {
             throw new LabImageValidationException(LabImageErrorCode.INVALID_IMAGE_TYPE);

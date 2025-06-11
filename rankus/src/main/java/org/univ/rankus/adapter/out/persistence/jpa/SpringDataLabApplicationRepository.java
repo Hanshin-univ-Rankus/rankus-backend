@@ -1,6 +1,7 @@
 package org.univ.rankus.adapter.out.persistence.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import org.univ.rankus.domain.model.lab.LabApplication;
 import org.univ.rankus.domain.model.user.User;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
  * - JpaRepository<LabApplication, Long>을 상속하면 기본 CRUD 메서드를 모두 제공
  * - 추가로 LabApplication 조회·검증을 위한 커스텀 메서드를 선언
  */
+@Repository
 public interface SpringDataLabApplicationRepository extends JpaRepository<LabApplication, Long> {
 
     /**

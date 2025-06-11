@@ -28,7 +28,10 @@ public class Password {
     }
 
     private Password(String hashed) {
-        this.hashed = Objects.requireNonNull(hashed, "비밀번호 해시가 필요합니다."); // 혹은 PasswordErrorCode.HASH_REQUIRED
+        if (hashed == null || hashed.isBlank()) {
+            throw new PasswordValidationException(PasswordErrorCode.HASH_REQUIRED);
+        }
+        this.hashed = hashed;// 혹은 PasswordErrorCode.HASH_REQUIRED
     }
 
     /**

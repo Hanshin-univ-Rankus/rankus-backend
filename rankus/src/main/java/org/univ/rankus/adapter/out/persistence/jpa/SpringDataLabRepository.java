@@ -2,6 +2,7 @@ package org.univ.rankus.adapter.out.persistence.jpa;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import org.univ.rankus.domain.model.lab.Lab;
 
 /**
@@ -10,6 +11,7 @@ import org.univ.rankus.domain.model.lab.Lab;
  * - findAllByRankingDesc() 메서드는 아래와 같이 커스텀으로 정의할 수도 있지만,
  *   Sort.by("ranking").descending()을 서비스 단에서 직접 전달해도 무방합니다.
  */
+@Repository
 public interface SpringDataLabRepository extends JpaRepository<Lab, Long> {
 
     /**

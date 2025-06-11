@@ -49,7 +49,7 @@ public class User extends BaseTimeEntity {
      */
     public User(String name, String email, Password password) {
         if (password == null) {
-            throw new UserValidationException(UserErrorCode.INVALID_CREDENTIALS);
+            throw new UserValidationException(UserErrorCode.PASSWORD_REQUIRED);
         }
         this.name = validateName(name);
         this.email = validateEmail(email);

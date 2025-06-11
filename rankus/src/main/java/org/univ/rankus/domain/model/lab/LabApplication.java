@@ -59,7 +59,7 @@ public class LabApplication extends BaseTimeEntity {
         this.user = user;
 
         if (interviewTime == null || interviewTime.isBefore(LocalDateTime.now())) {
-            throw new LabApplicationNotFoundException(LabApplicationErrorCode.INVALID_INTERVIEW_TIME);
+            throw new LabApplicationValidationException(LabApplicationErrorCode.INVALID_INTERVIEW_TIME);
         }
         this.interviewTime = interviewTime;
 
