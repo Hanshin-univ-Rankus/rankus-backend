@@ -77,7 +77,20 @@ public class SecurityConfig {
                 .addFilterBefore(
                         new JwtAuthenticationFilter(tokenProvider),
                         UsernamePasswordAuthenticationFilter.class
-                );
+                )
+
+                .cors(cors -> cors
+                        .configurationSource(request -> {
+                            var corsConfig = new org.springframework.web.cors.CorsConfiguration();
+                            corsConfig.setAllowedOriginPatterns(java.util.List.of("*"));
+                            corsConfig.setAllowedMethods(java.util.List.of("*"));
+                            corsConfig.setAllowedHeaders(java.util.List.of("*"));
+                            corsConfig.setAllowCredentials(true);
+                            return corsConfig;
+                        })
+                )
+
+        ;
 
         return http.build();
     }
