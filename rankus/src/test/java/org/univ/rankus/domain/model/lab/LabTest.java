@@ -72,7 +72,7 @@ class LabTest {
         void descriptionTooLong_throwsDescriptionTooLong() {
             // given
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < 1001; i++) sb.append('a');
+            sb.append("a".repeat(1001));
             String longDesc = sb.toString();
             // when & then
             LabValidationException ex = assertThrows(
