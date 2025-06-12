@@ -30,7 +30,7 @@ spring:
 
 security:
   jwt:
-    secret: yDeGly34tDXIxkjo6MQKgBNCI+2iMFLdT0i8zD2JZuE=
+    secret: "yDeGly34tDXIxkjo6MQKgBNCI+2iMFLdT0i8zD2JZuE="
     expiration-ms: 3600000  # 1시간
 
 server:

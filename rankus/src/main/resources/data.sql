@@ -7,13 +7,13 @@ VALUES
 -- 2. users
 INSERT INTO users (id, name, email, password_hash, role, lab_id, created_at, updated_at)
 VALUES
-    (100001, '학생1', 'user1@example.com', '$2a$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmno', 'STUDENT', NULL, NOW(), NOW()),
-    (100002, '랩장1', 'leader1@example.com', '$2a$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmno', 'LAB_LEADER', 1, NOW(), NOW()),
-    (100003, '교수', 'prof@example.com', '$2a$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmno', 'PROFESSOR', 2, NOW(), NOW()),
-    (100004, '학생2', 'user2@example.com', '$2a$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmno', 'STUDENT', NULL, NOW(), NOW()),
-    (100005, '학생3', 'user3@example.com', '$2a$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmno', 'STUDENT', 1, NOW(), NOW()),
-    (100006, '랩장2', 'leader2@example.com', '$2a$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmno', 'LAB_LEADER', 2, NOW(), NOW()),
-    (100007, '관리자', 'admin@example.com', '$2a$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmno', 'ADMIN', NULL, NOW(), NOW());
+     (100001, '학생1', 'user1@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'STUDENT', NULL, NOW(), NOW()),
+    (100002, '랩장1', 'leader1@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'LAB_LEADER', 1, NOW(), NOW()),
+    (100003, '교수', 'prof@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'PROFESSOR', 2, NOW(), NOW()),
+    (100004, '학생2', 'user2@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'STUDENT', NULL, NOW(), NOW()),
+    (100005, '학생3', 'user3@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'STUDENT', 1, NOW(), NOW()),
+    (100006, '랩장2', 'leader2@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'LAB_LEADER', 2, NOW(), NOW()),
+    (100007, '관리자', 'admin@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'ADMIN', NULL, NOW(), NOW());
 
 -- 3. lab_images
 INSERT INTO lab_images (id, lab_id, image_url, type)
