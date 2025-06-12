@@ -164,4 +164,56 @@ class LabTest {
             assertNull(lab.getProfessorName());
         }
     }
+
+    @Nested
+    @DisplayName("ProfessorName 설정 검증")
+    class ProfessorNameTests {
+        @Test
+        @DisplayName("null 입력 시 null로 설정")
+        void setProfessorName_null_setsNull() {
+            // given
+            Lab lab = DomainLabFactory.buildValidLab();
+            // when
+            lab.setProfessorName(null);
+            // then
+            assertNull(lab.getProfessorName());
+        }
+
+        @ParameterizedTest(name = "[{index}] name=''{0}'' → null로 설정")
+        @ValueSource(strings = {"   "})
+        @DisplayName("blank 입력 시 null로 설정")
+        void setProfessorName_blank_setsNull(String name) {
+            // given
+            Lab lab = DomainLabFactory.buildValidLab();
+            // when
+            lab.setProfessorName(name);
+            // then
+            assertNull(lab.getProfessorName());
+        }
+
+        @Test
+        @DisplayName("유효한 이름 입력 시 trim 적용")
+        void setProfessorName_valid_setsTrimmed() {
+            // given
+            Lab lab = DomainLabFactory.buildValidLab();
+            // when
+            lab.setProfessorName(" ProfX ");
+            // then
+            assertEquals("ProfX", lab.getProfessorName());
+        }
+
+        @Test
+        @DisplayName("10자 초과 입력 시 LAB_PROFESSOR_NAME_TOO_LONG 예외 발생")
+        void setProfessorName_tooLong_throwsException() {
+            // given
+            Lab lab = DomainLabFactory.buildValidLab();
+            String longName = "a".repeat(11); // 11자 이름
+            // when & then
+            LabValidationException ex = assertThrows(
+                    LabValidationException.class,
+                    () -> lab.setProfessorName(longName)
+            );
+            assertEquals(LabErrorCode.LAB_PROFESSOR_NAME_TOO_LONG, ex.getErrorCode());
+        }
+    }
 }

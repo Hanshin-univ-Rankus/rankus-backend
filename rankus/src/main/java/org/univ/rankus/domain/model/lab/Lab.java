@@ -112,4 +112,17 @@ public class Lab extends BaseTimeEntity {
             this.professorName = applicantName.trim();
         }
     }
+
+    public void setProfessorName(String professorName) {
+        if (professorName == null || professorName.isBlank()) {
+            this.professorName = null; // null은 null로 설정
+            return;
+        }
+        // 교수님 이름은 최대 10자
+        if (professorName.length() > 10) {
+            throw new LabValidationException(LabErrorCode.LAB_PROFESSOR_NAME_TOO_LONG);
+        } else {
+            this.professorName = professorName.trim();
+        }
+    }
 }

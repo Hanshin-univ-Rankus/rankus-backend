@@ -16,11 +16,12 @@ public enum LabErrorCode implements ErrorCode {
     LAB_CATEGORY_REQUIRED  ("LAB_002", HttpStatus.BAD_REQUEST,    "랩실 카테고리는 필수입니다."),
     LAB_DESCRIPTION_TOO_LONG("LAB_003", HttpStatus.BAD_REQUEST,   "랩실 설명이 너무 깁니다. 최대 255자까지 가능합니다."),
     LAB_RANKING_INVALID    ("LAB_004", HttpStatus.BAD_REQUEST,    "랩실 랭킹은 0 이상의 정수여야 합니다."),
+    LAB_PROFESSOR_NAME_TOO_LONG("LAB_005", HttpStatus.BAD_REQUEST, "랩실 교수 이름이 너무 깁니다. 최대 10자까지 가능합니다."),
 
     // ------------------------------------------------------------------------
     // 404 Not Found: 조회 실패
     // ------------------------------------------------------------------------
-    LAB_NOT_FOUND          ("LAB_005", HttpStatus.NOT_FOUND,      "해당 랩실을 찾을 수 없습니다.");
+    LAB_NOT_FOUND          ("LAB_006", HttpStatus.NOT_FOUND,      "해당 랩실을 찾을 수 없습니다.");
 
     private final String code;
     private final HttpStatus status;

@@ -37,6 +37,10 @@ public final class DomainLabImageFactory {
         return new LabImage(lab, sb.toString(), ImageType.REPRESENTATIVE);
     }
 
+    public static LabImage buildInvalidLabImage_InvalidUrl(Lab lab) {
+        return new LabImage(lab, "invalid-url", ImageType.ADDITIONAL);
+    }
+
     public static LabImage buildInvalidLabImage_NullType(Lab lab, String url) {
         return new LabImage(lab, url, null);
     }

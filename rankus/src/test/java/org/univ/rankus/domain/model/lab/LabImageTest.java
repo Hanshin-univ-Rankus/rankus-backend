@@ -49,7 +49,7 @@ class LabImageTest {
         }
 
         @Test
-        @DisplayName("url 길이가 255 초과일 때 INVALID_IMAGE_TYPE 예외 발생")
+        @DisplayName("url 길이가 255 초과일 때 IMAGE_URL_TOO_LONG 예외 발생")
         void longUrl_throwsInvalidImageType() {
             // given
             String base = "http://ex.com/";
@@ -62,7 +62,7 @@ class LabImageTest {
                     LabImageValidationException.class,
                     () -> DomainLabImageFactory.buildInvalidLabImage_LongUrl(validLab, base)
             );
-            assertEquals(LabImageErrorCode.IMAGE_URL_INVALID, ex.getErrorCode());
+            assertEquals(LabImageErrorCode.IMAGE_URL_TOO_LONG, ex.getErrorCode());
         }
 
         @Test
@@ -74,6 +74,17 @@ class LabImageTest {
                     () -> DomainLabImageFactory.buildInvalidLabImage_NullType(validLab, rawUrl)
             );
             assertEquals(LabImageErrorCode.INVALID_IMAGE_TYPE, ex.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 URL 형식일 때 IMAGE_URL_INVALID 예외 발생")
+        void invalidUrl_throwsImageUrlInvalid() {
+            // when & then
+            LabImageValidationException ex = assertThrows(
+                    LabImageValidationException.class,
+                    () -> DomainLabImageFactory.buildInvalidLabImage_InvalidUrl(validLab)
+            );
+            assertEquals(LabImageErrorCode.IMAGE_URL_INVALID, ex.getErrorCode());
         }
 
         @ParameterizedTest(name = "[{index}] type={0} → 정상 생성")
