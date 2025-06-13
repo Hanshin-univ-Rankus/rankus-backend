@@ -29,12 +29,8 @@ public class LabImageCommandService implements LabImageCommandUseCase {
                 .orElseThrow(() -> new LabNotFoundException(LabErrorCode.LAB_NOT_FOUND));
 
         // 2) 도메인 생성자 내부에서 유효성 검증 수행
-        LabImage image;
-        try {
-            image = new LabImage(lab, imageUrl, type);
-        } catch (LabImageValidationException ex) {
-            throw ex; // validation 실패 시 상위로 전달 (400/409 처리)
-        }
+        LabImage image = new LabImage(lab, imageUrl, type);
+
 
         // 3) 저장 후 반환
         return labImageRepositoryPort.save(image);

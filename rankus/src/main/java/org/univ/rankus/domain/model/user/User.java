@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.univ.rankus.common.BaseTimeEntity;
 import org.univ.rankus.domain.model.lab.Lab;
@@ -92,7 +93,7 @@ public class User extends BaseTimeEntity {
     /**
      * 로그인 시 비밀번호 일치 여부를 확인하기 위한 헬퍼 메서드
      */
-    public boolean checkPassword(String rawPassword, org.springframework.security.crypto.password.PasswordEncoder encoder) {
+    public boolean checkPassword(String rawPassword, PasswordEncoder encoder) {
         return this.password.matches(rawPassword, encoder);
     }
 
@@ -100,7 +101,7 @@ public class User extends BaseTimeEntity {
      * 비밀번호 변경
      * @param rawNewPassword 새 비밀번호 (평문)
      */
-    public void changePassword(String rawNewPassword, org.springframework.security.crypto.password.PasswordEncoder encoder) {
+    public void changePassword(String rawNewPassword, PasswordEncoder encoder) {
         if (!StringUtils.hasText(rawNewPassword)) {
             throw new UserValidationException(UserErrorCode.EMAIL_INVALID);
         }
