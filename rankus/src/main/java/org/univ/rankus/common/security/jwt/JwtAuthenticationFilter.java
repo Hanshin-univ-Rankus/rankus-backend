@@ -38,14 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * JWT 인증 필터의 핵심 로직.
-     * Authorization 헤더에서 Bearer 토큰을 추출하고,
-     * 토큰이 유효하면 인증 정보를 SecurityContext에 저장합니다.
-     * @param request HTTP 요청
-     * @param response HTTP 응답
-     * @param chain 필터 체인
-     * @throws ServletException
-     * @throws IOException
+        * HTTP 요청을 필터링하는 메서드입니다.
      */
     @Override
     protected void doFilterInternal(
