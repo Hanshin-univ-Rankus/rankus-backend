@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: default
+      on-profile: secure
 
   datasource:
     url: jdbc:mysql://localhost:3306/rankus?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
@@ -11,7 +11,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create-drop  # 개발 환경에서는 create-drop을 사용하여 매번 스키마를 초기화
     defer-datasource-initialization: true
 
   sql:
@@ -23,5 +23,6 @@ server:
 
 security:
   jwt:
-    secret: default-jwt-secret
+    secret: local-jwt-secret   # 로컬용 테스트 비밀키
     expiration-ms: 3600000  # 1시간 (밀리초 단위)
+

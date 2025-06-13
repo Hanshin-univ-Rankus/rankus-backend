@@ -1,4 +1,6 @@
 spring:
+  prifiles: test
+
   datasource:
     url: jdbc:mysql://localhost:3308/rankus_test?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
     username: rankus_test_user # 테스트용 DB 사용자 이름 (실제 환경에 맞게 변경 필요)
@@ -17,3 +19,4 @@ spring:
   sql:
     init:
       mode: never # 테스트에서는 data.sql을 사용하지 않음
+

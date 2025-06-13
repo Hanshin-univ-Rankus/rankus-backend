@@ -1,6 +1,16 @@
-# docker-compose.yml
 services:
-  # ─── 테스트용 (test) ────────────
+  mysql:
+    image: mysql:8.0
+    container_name: rankus-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: rankus
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
   mysql_test:
     image: mysql:8.0
     container_name: rankus-db-test
@@ -18,88 +28,7 @@ services:
       - "3308:3306"
     volumes:
       - db-data-test:/var/lib/mysql
-    restart: always
-
-  app_test:
-    build:
-      context: ./rankus
-      dockerfile: Dockerfile
-    image: rankus-api:test
-    container_name: rankus-app-test
-    profiles: ["test"]
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: test
-    depends_on:
-      - mysql_test
-
-  # ─── 로컬 개발용 (local) ────────────
-  mysql:
-    image: mysql:8.0
-    container_name: rankus-db
-    profiles: ["local"]
-    command: >
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: rankus
-      MYSQL_ROOT_HOST: '%'
-    ports:
-      - "3306:3306"
-    volumes:
-      - db-data:/var/lib/mysql
-
-  app:
-    build:
-      context: ./rankus
-      dockerfile: Dockerfile
-    image: rankus-api:local
-    container_name: rankus-app
-    profiles: ["local"]
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: local
-    depends_on:
-      - mysql
-
-  # ─── AWS/Dev용 (dev) ────────────
-  mysql_dev:
-    image: mysql:8.0
-    container_name: rankus-db-dev
-    profiles: ["dev"]
-    command: >
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: rankus_dev
-      MYSQL_USER: rankus_dev_user
-      MYSQL_PASSWORD: dev_password
-      MYSQL_ROOT_HOST: '%'
-    ports:
-      - "3307:3306"
-    volumes:
-      - db-data-dev:/var/lib/mysql
-    restart: always
-
-  app_dev:
-    build:
-      context: ./rankus
-      dockerfile: Dockerfile
-    image: rankus-api:dev
-    container_name: rankus-app-dev
-    profiles: ["dev"]
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: dev
-    depends_on:
-      - mysql_dev
 
 volumes:
   db-data:
-  db-data-dev:
   db-data-test:

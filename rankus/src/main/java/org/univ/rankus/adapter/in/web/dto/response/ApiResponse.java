@@ -17,5 +17,7 @@ public class ApiResponse<T> {
     private T data;                  // 실제 응답 페이로드
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Object errors;           // validation 등 에러 세부 정보
+
+    @Builder.Default
     private Instant timestamp = Instant.now();
 }

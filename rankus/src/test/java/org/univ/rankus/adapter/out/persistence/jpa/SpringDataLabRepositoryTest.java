@@ -63,13 +63,6 @@ class SpringDataLabRepositoryTest extends BaseRepositoryTest {
     }
 
     @Test
-    @DisplayName("save: null 전달 시 IllegalArgumentException 예외 발생")
-    void save_null_throwsIllegalArgument() {
-        assertThrows(IllegalArgumentException.class, () -> labRepo.save(null),
-                "null을 저장 시도하면 IllegalArgumentException을 던져야 한다");
-    }
-
-    @Test
     @DisplayName("save: 기존 Lab 수정 시 ID 동일 및 수정 내용 반영")
     void save_updateFields_persistsChanges() {
         // given

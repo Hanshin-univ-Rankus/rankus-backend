@@ -26,5 +26,5 @@ VALUES
 INSERT INTO lab_applications (id, lab_id, user_id, interview_time, status, created_at, updated_at)
 VALUES
     (1, 1, 1, '2025-07-01 13:00:00', 'PENDING', NOW(), NOW()),
-    (2, 1, 14, '2025-07-01 15:00:00', 'APPROVED', NOW(), NOW()),
-    (3, 2, 15, '2025-07-01 16:00:00', 'PENDING', NOW(), NOW());
+    (2, 1, 4, '2025-07-01 15:00:00', 'APPROVED', NOW(), NOW()),
+    (3, 2, 5, '2025-07-01 16:00:00', 'PENDING', NOW(), NOW());

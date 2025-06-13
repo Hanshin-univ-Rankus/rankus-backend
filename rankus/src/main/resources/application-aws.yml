@@ -1,0 +1,21 @@
+spring:
+  config:
+    activate:
+      on-profile: aws
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 개발 환경에서는 create-drop을 사용하여 매번 스키마를 초기화
+
+server:
+  port: 8080
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
