@@ -1,43 +1,73 @@
+# .github/workflows/ci-dev.yml
+name: Build, Upload & Deploy (Dev)
+
+# dev 브랜치에 push 될 때마다 실행
+on:
+  push:
+    branches: [ dev ]
+
 jobs:
   build:
-  # … (생략)
+    name: Build & Upload JAR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build application JAR
+        run: |
+          cd rankus
+          ./gradlew clean bootJar
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ap-northeast-2
+
+      - name: Upload JAR to S3
+        run: |
+          aws s3 cp rankus/build/libs/app.jar s3://${{ secrets.S3_BUCKET }}/app.jar
 
   deploy:
+    name: Deploy to EC2 (Dev)
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      # 1) EC2에 ~/app 폴더 미리 만들어 두기
-      - name: Create app directory on EC2
+      - name: Configure AWS credentials for S3 download
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ap-northeast-2
+
+      - name: Download JAR from S3
+        run: |
+          aws s3 cp s3://${{ secrets.S3_BUCKET }}/app.jar ./app.jar
+
+      - name: Deploy to EC2 via SSH and restart service
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host:     ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_SSH_USER }}
-          key:      ${{ secrets.EC2_SSH_KEY }}
-          port:     22
+          host:       ${{ secrets.EC2_HOST }}      # ex: 13.209.232.125
+          username:   ${{ secrets.EC2_SSH_USER }}  # ec2-user
+          key:        ${{ secrets.EC2_SSH_KEY }}   # PEM 파일 전체 내용
+          port:       22
           script: |
+            set -a
+            source ~/app/.env      # EC2에 미리 만들어 둔 .env 로드
+            set +a
+
+            # 앱 디렉터리 준비
             mkdir -p ~/app
-
-      # 2) scp-action 으로 JAR 복사
-      - name: Copy JAR to EC2
-        uses: appleboy/scp-action@v0.1.5
-        with:
-          host:     ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_SSH_USER }}
-          key:      ${{ secrets.EC2_SSH_KEY }}
-          port:     22
-          source:   "app.jar"                            # 워크러너에 있는 파일
-          target:   "/home/${{ secrets.EC2_SSH_USER }}/app/app.jar"  # EC2의 정확한 경로까지 파일명 지정
-
-      # 3) SSH로 배포 스크립트 실행
-      - name: Restart Service on EC2
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host:     ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_SSH_USER }}
-          key:      ${{ secrets.EC2_SSH_KEY }}
-          port:     22
-          script: |
             cd ~/app
 
             # 이전 JAR 백업
@@ -45,13 +75,14 @@ jobs:
               mv app.jar app-$(date +'%Y%m%d%H%M%S').jar
             fi
 
-            # 새 JAR은 이미 ~/app/app.jar 로 복사되어 있으므로 바로 실행 준비
+            # 새 JAR 덮어쓰기
+            mv ~/github/workspace/app.jar ./app.jar
             chmod 644 app.jar
 
             # 기존 프로세스 종료
             pkill -f 'java -jar .*app.jar' || true
 
-            # 새 JAR 실행
+            # 새 프로세스 실행 (백그라운드)
             nohup java -jar app.jar \
-              --spring.profiles.active=secure \
+              --spring.profiles.active=dev \
               >> deploy.log 2>&1 &
