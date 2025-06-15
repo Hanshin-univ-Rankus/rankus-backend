@@ -1,81 +1,93 @@
 name: Build, Upload & Deploy to EC2
 
+# dev 브랜치에 푸시될 때마다 동작합니다
 on:
   push:
-    branches: [ dev ]
+    branches:
+      - dev
+
+env:
+  AWS_REGION: ap-northeast-2       # 공통 리전
+  S3_BUCKET: ${{ secrets.S3_BUCKET }} # S3 버킷 이름을 GitHub Secret 으로 관리
 
 jobs:
-  build:
+  # 1) Jar 빌드하고 S3에 업로드
+  build-and-upload:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: 17
 
-      - name: Build application Jar
+      - name: Build Spring Boot Jar
         run: |
           cd rankus
           ./gradlew clean bootJar
 
-      - name: Configure AWS credentials
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ap-northeast-2
+          aws-region:            ${{ env.AWS_REGION }}
 
       - name: Upload Jar to S3
         run: |
-          aws s3 cp rankus/build/libs/app.jar s3://${{ secrets.S3_BUCKET }}/app.jar
+          aws s3 cp rankus/build/libs/app.jar s3://${{ env.S3_BUCKET }}/app.jar \
+            --acl private
 
-  deploy:
-    needs: build
+  # 2) S3에서 Jar를 내려받아 EC2에 배포
+  deploy-to-ec2:
+    needs: build-and-upload
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download JAR from S3 to runner
-        run: |
-          aws s3 cp s3://rankus-dev/app.jar ./app.jar
+      - name: Configure AWS Credentials (for S3 download)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
 
-      - name: Copy JAR to EC2 and restart service
+      - name: Download Jar from S3
+        run: |
+          # 워크플로우 실행 머신(runner)에 내려받습니다
+          aws s3 cp s3://${{ env.S3_BUCKET }}/app.jar ./app.jar
+
+      - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host:       ${{ secrets.EC2_HOST }}        # ex: 13.209.xx.xx
-          username:   ${{ secrets.EC2_SSH_USER }}    # ec2-user
-          key:        ${{ secrets.EC2_SSH_KEY }}     # PEM 파일 내용
+          host:       ${{ secrets.EC2_HOST }}      # ex. 13.209.xx.xx
+          username:   ${{ secrets.EC2_SSH_USER }}  # ex. ec2-user
+          key:        ${{ secrets.EC2_SSH_KEY }}   # PEM 파일 내용 전체
           port:       22
+          # runner → EC2 로 app.jar 파일 복사
+          source:     "./app.jar"
+          target:     "/home/${{ secrets.EC2_SSH_USER }}/app/app.jar"
+          # EC2 에서 실행할 스크립트
           script: |
-            # 작업 디렉터리로 이동
+            # apps 폴더 준비
             mkdir -p ~/app
-            cd ~/app
 
-            # 이전 JAR 백업 (선택)
-            if [ -f app.jar ]; then
-              mv app.jar app-$(date +'%Y%m%d%H%M%S').jar
+            # 백업: 기존 JAR 있으면 타임스탬프 붙여 보관
+            if [ -f ~/app/app.jar ]; then
+              mv ~/app/app.jar ~/app/app-$(date +'%Y%m%d%H%M%S').jar
             fi
 
-            # 새 JAR 덮어쓰기
-            cat << 'EOF' > deploy.sh
-            #!/bin/bash
-            # 이전 프로세스 종료
+            # 새 JAR을 해당 위치로 옮기고 권한 설정
+            mv ~/app/app.jar ~/app/app.jar
+            chmod 644 ~/app/app.jar
+
+            # 기존 프로세스 종료(포트 8080으로 실행한다고 가정)
             pkill -f 'java -jar .*app.jar' || true
 
             # 새 JAR 실행 (백그라운드)
             nohup java -jar ~/app/app.jar \
               --spring.profiles.active=secure \
               >> ~/app/deploy.log 2>&1 &
-            EOF
-
-            chmod +x deploy.sh
-
-            # 복사한 JAR을 ~/app/app.jar 로 이동
-            mv ~/app/app.jar .
-
-            # 배포 스크립트 실행
-            ./deploy.sh
