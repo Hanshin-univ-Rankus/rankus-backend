@@ -32,7 +32,7 @@ jobs:
 
       - name: Upload Jar to S3
         run: |
-          aws s3 cp rankus/build/libs/app.jar s3://rankus-dev/app.jar
+          aws s3 cp rankus/build/libs/app.jar s3://${{ secrets.S3_BUCKET }}/app.jar
 
   deploy:
     needs: build
