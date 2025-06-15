@@ -7,19 +7,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) 먼저 S3에서 JAR 내려받기
-      - name: Configure AWS credentials (for S3 download)
-        uses: aws-actions/configure-aws-credentials@v2
+      # 1) EC2에 ~/app 폴더 미리 만들어 두기
+      - name: Create app directory on EC2
+        uses: appleboy/ssh-action@v0.1.5
         with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ap-northeast-2
+          host:     ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_SSH_USER }}
+          key:      ${{ secrets.EC2_SSH_KEY }}
+          port:     22
+          script: |
+            mkdir -p ~/app
 
-      - name: Download JAR from S3
-        run: |
-          aws s3 cp s3://${{ secrets.S3_BUCKET }}/app.jar ./app.jar
-
-      # 2) scp-action 으로 EC2에 JAR 업로드
+      # 2) scp-action 으로 JAR 복사
       - name: Copy JAR to EC2
         uses: appleboy/scp-action@v0.1.5
         with:
@@ -27,10 +26,10 @@ jobs:
           username: ${{ secrets.EC2_SSH_USER }}
           key:      ${{ secrets.EC2_SSH_KEY }}
           port:     22
-          source:   "app.jar"                                   # 로컬 파일
-          target:   "/home/${{ secrets.EC2_SSH_USER }}/app/"     # EC2 경로 (폴더)
+          source:   "app.jar"                            # 워크러너에 있는 파일
+          target:   "/home/${{ secrets.EC2_SSH_USER }}/app/app.jar"  # EC2의 정확한 경로까지 파일명 지정
 
-      # 3) ssh-action 으로 원격 명령 실행
+      # 3) SSH로 배포 스크립트 실행
       - name: Restart Service on EC2
         uses: appleboy/ssh-action@v0.1.5
         with:
@@ -39,8 +38,6 @@ jobs:
           key:      ${{ secrets.EC2_SSH_KEY }}
           port:     22
           script: |
-            # 작업 디렉터리로 이동
-            mkdir -p ~/app
             cd ~/app
 
             # 이전 JAR 백업
@@ -48,11 +45,13 @@ jobs:
               mv app.jar app-$(date +'%Y%m%d%H%M%S').jar
             fi
 
-            # 복사된 JAR을 app.jar 로 이름 변경
-            mv ~/app/app.jar .
+            # 새 JAR은 이미 ~/app/app.jar 로 복사되어 있으므로 바로 실행 준비
+            chmod 644 app.jar
 
-            # 프로세스 종료 후 재실행
+            # 기존 프로세스 종료
             pkill -f 'java -jar .*app.jar' || true
-            nohup java -jar ./app.jar \
+
+            # 새 JAR 실행
+            nohup java -jar app.jar \
               --spring.profiles.active=secure \
-              >> ./deploy.log 2>&1 &
+              >> deploy.log 2>&1 &
