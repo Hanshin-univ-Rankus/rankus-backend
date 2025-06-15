@@ -1,81 +1,58 @@
-name: Build, Upload & Deploy to EC2
-
-on:
-  push:
-    branches: [ dev ]
-
 jobs:
   build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Build application Jar
-        run: |
-          cd rankus
-          ./gradlew clean bootJar
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ap-northeast-2
-
-      - name: Upload Jar to S3
-        run: |
-          aws s3 cp rankus/build/libs/app.jar s3://${{ secrets.S3_BUCKET }}/app.jar
+  # … (생략)
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download JAR from S3 to runner
-        run: |
-          aws s3 cp s3://rankus-dev/app.jar ./app.jar
+      # 1) 먼저 S3에서 JAR 내려받기
+      - name: Configure AWS credentials (for S3 download)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ap-northeast-2
 
-      - name: Copy JAR to EC2 and restart service
+      - name: Download JAR from S3
+        run: |
+          aws s3 cp s3://${{ secrets.S3_BUCKET }}/app.jar ./app.jar
+
+      # 2) scp-action 으로 EC2에 JAR 업로드
+      - name: Copy JAR to EC2
+        uses: appleboy/scp-action@v0.1.5
+        with:
+          host:     ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_SSH_USER }}
+          key:      ${{ secrets.EC2_SSH_KEY }}
+          port:     22
+          source:   "app.jar"                                   # 로컬 파일
+          target:   "/home/${{ secrets.EC2_SSH_USER }}/app/"     # EC2 경로 (폴더)
+
+      # 3) ssh-action 으로 원격 명령 실행
+      - name: Restart Service on EC2
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host:       ${{ secrets.EC2_HOST }}        # ex: 13.209.xx.xx
-          username:   ${{ secrets.EC2_SSH_USER }}    # ec2-user
-          key:        ${{ secrets.EC2_SSH_KEY }}     # PEM 파일 내용
-          port:       22
+          host:     ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_SSH_USER }}
+          key:      ${{ secrets.EC2_SSH_KEY }}
+          port:     22
           script: |
             # 작업 디렉터리로 이동
             mkdir -p ~/app
             cd ~/app
 
-            # 이전 JAR 백업 (선택)
+            # 이전 JAR 백업
             if [ -f app.jar ]; then
               mv app.jar app-$(date +'%Y%m%d%H%M%S').jar
             fi
 
-            # 새 JAR 덮어쓰기
-            cat << 'EOF' > deploy.sh
-            #!/bin/bash
-            # 이전 프로세스 종료
-            pkill -f 'java -jar .*app.jar' || true
-
-            # 새 JAR 실행 (백그라운드)
-            nohup java -jar ~/app/app.jar \
-              --spring.profiles.active=secure \
-              >> ~/app/deploy.log 2>&1 &
-            EOF
-
-            chmod +x deploy.sh
-
-            # 복사한 JAR을 ~/app/app.jar 로 이동
+            # 복사된 JAR을 app.jar 로 이름 변경
             mv ~/app/app.jar .
 
-            # 배포 스크립트 실행
-            ./deploy.sh
+            # 프로세스 종료 후 재실행
+            pkill -f 'java -jar .*app.jar' || true
+            nohup java -jar ./app.jar \
+              --spring.profiles.active=secure \
+              >> ./deploy.log 2>&1 &
