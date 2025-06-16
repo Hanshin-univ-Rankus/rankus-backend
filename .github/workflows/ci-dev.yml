@@ -78,28 +78,28 @@ jobs:
             ./app.jar \
             ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/app/app-new.jar
 
-      - name: SSH into EC2 & Restart Service
+      - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }} << 'EOSSH'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }} '
           set -e
           cd /home/ec2-user/app
           
           # 기존 프로세스 종료 (에러가 발생해도 계속 진행)
-          pkill -f 'java -jar app.jar' || true
+          pkill -f "java -jar app.jar" || true
           
           # 이전 JAR 백업 (있을 경우)
           if [ -f app.jar ]; then
-            mv app.jar app-backup-$(date +'%Y%m%d%H%M%S').jar
+            mv app.jar app-backup-$(date +"%Y%m%d%H%M%S").jar
           fi
           
           # 새 JAR 파일로 교체
           mv app-new.jar app.jar
           
           # 환경변수 설정
-          export SPRING_DATASOURCE_URL='${{ secrets.SPRING_DATASOURCE_URL }}'
-          export SPRING_DATASOURCE_USERNAME='${{ secrets.SPRING_DATASOURCE_USERNAME }}'
-          export SPRING_DATASOURCE_PASSWORD='${{ secrets.SPRING_DATASOURCE_PASSWORD }}'
-          export JWT_SECRET='${{ secrets.JWT_SECRET }}'
+          export SPRING_DATASOURCE_URL="${{ secrets.SPRING_DATASOURCE_URL }}"
+          export SPRING_DATASOURCE_USERNAME="${{ secrets.SPRING_DATASOURCE_USERNAME }}"
+          export SPRING_DATASOURCE_PASSWORD="${{ secrets.SPRING_DATASOURCE_PASSWORD }}"
+          export JWT_SECRET="${{ secrets.JWT_SECRET }}"
           
           # 새 JAR 실행
           nohup java -jar app.jar --spring.profiles.active=dev > deploy.log 2>&1 &
@@ -107,4 +107,4 @@ jobs:
           echo "애플리케이션 재시작 완료"
           sleep 5
           ps -ef | grep java
-          EOSSH
+          '
