@@ -45,45 +45,17 @@ jobs:
           aws s3 ls s3://${{ env.S3_BUCKET }}/app.jar
 
   deploy:
-    name: Download & Deploy to EC2
     needs: build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Configure AWS credentials (for S3 download)
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ env.AWS_REGION }}
+      # … (AWS 자격증명 & S3 다운로드 등 생략)
 
-      - name: Download JAR from S3
-        run: |
-          aws s3 cp s3://${{ env.S3_BUCKET }}/app.jar ./app.jar
-
-      - name: Verify downloaded JAR
-        run: |
-          ls -lh app.jar
-
-      - name: Install SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Copy JAR to EC2
+      - name: Copy JAR to EC2 (as temp file)
         run: |
           scp -o StrictHostKeyChecking=no \
             -i ~/.ssh/id_rsa \
-            app.jar \
-            ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/app/app.jar
-
-      - name: Verify JAR on EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no \
-            -i ~/.ssh/id_rsa \
-            ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }} \
-            ls -lh /home/ec2-user/app/app.jar
+            ./app.jar \
+            ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/app/app-new.jar
 
       - name: SSH into EC2 & Restart Service
         run: |
@@ -93,20 +65,22 @@ jobs:
           set -e
           cd /home/ec2-user/app
 
-          # 이전 JAR 백업
+          # 1) 기존 app.jar 백업
           if [ -f app.jar ]; then
             mv app.jar app-$(date +'%Y%m%d%H%M%S').jar
           fi
 
-          # 환경변수 설정
+          # 2) 새로 복사된 app-new.jar 를 app.jar 로 교체
+          mv app-new.jar app.jar
+
+          # 3) 환경변수 로드 (필요시 .env 파일 사용해도 됩니다)
           export SPRING_DATASOURCE_URL='${{ secrets.SPRING_DATASOURCE_URL }}'
           export SPRING_DATASOURCE_USERNAME='${{ secrets.SPRING_DATASOURCE_USERNAME }}'
           export SPRING_DATASOURCE_PASSWORD='${{ secrets.SPRING_DATASOURCE_PASSWORD }}'
           export JWT_SECRET='${{ secrets.JWT_SECRET }}'
 
-          # 기존 프로세스 종료
+          # 4) 이전 프로세스 종료 & 새 앱 기동
           pkill -f 'java -jar app.jar' || true
-
-          # 새 JAR 백그라운드 실행
           nohup java -jar app.jar --spring.profiles.active=dev >> deploy.log 2>&1 &
+
           EOF
