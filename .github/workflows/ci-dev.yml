@@ -87,24 +87,24 @@ jobs:
 
       - name: SSH into EC2 & Restart Service
         run: |
-          ssh -o StrictHostKeyChecking=no \
+          ssh -t -o StrictHostKeyChecking=no \
             -i ~/.ssh/id_rsa \
             ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }} <<EOF
-            set -e
-            cd /home/ec2-user/app
+          set -e
+          cd /home/ec2-user/app
 
-            # 백업
-            if [ -f app.jar ]; then
-              mv app.jar app-\$(date +'%Y%m%d%H%M%S').jar
-            fi
+          # 이전 JAR 백업
+          if [ -f app.jar ]; then
+            mv app.jar app-\$(date +'%Y%m%d%H%M%S').jar
+          fi
 
-            # 환경변수
-            export SPRING_DATASOURCE_URL='${{ secrets.SPRING_DATASOURCE_URL }}'
-            export SPRING_DATASOURCE_USERNAME='${{ secrets.SPRING_DATASOURCE_USERNAME }}'
-            export SPRING_DATASOURCE_PASSWORD='${{ secrets.SPRING_DATASOURCE_PASSWORD }}'
-            export JWT_SECRET='${{ secrets.JWT_SECRET }}'
+          # 환경변수 설정
+          export SPRING_DATASOURCE_URL='${{ secrets.SPRING_DATASOURCE_URL }}'
+          export SPRING_DATASOURCE_USERNAME='${{ secrets.SPRING_DATASOURCE_USERNAME }}'
+          export SPRING_DATASOURCE_PASSWORD='${{ secrets.SPRING_DATASOURCE_PASSWORD }}'
+          export JWT_SECRET='${{ secrets.JWT_SECRET }}'
 
-            # 프로세스 재시작
-            pkill -f 'java -jar app.jar' || true
-            nohup java -jar app.jar --spring.profiles.active=dev >> deploy.log 2>&1 &
-            EOF
+          # 프로세스 재시작
+          pkill -f 'java -jar app.jar' || true
+          nohup java -jar app.jar --spring.profiles.active=dev >> deploy.log 2>&1 &
+EOF
