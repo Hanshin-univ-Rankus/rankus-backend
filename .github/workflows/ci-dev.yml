@@ -98,7 +98,7 @@ jobs:
           export JWT_SECRET="${{ secrets.JWT_SECRET }}"
           
           # 새 JAR 실행
-          nohup java -jar app.jar --spring.profiles.active=dev >> deploy.log 2>&1 &
+          nohup java -jar app.jar --spring.profiles.active=aws >> deploy.log 2>&1 &
           
           echo "애플리케이션 재시작 완료"
           sleep 5
