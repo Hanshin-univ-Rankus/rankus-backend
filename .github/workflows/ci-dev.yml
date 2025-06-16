@@ -1,18 +1,17 @@
-name: CI Dev Build & Deploy to AWS
+# .github/workflows/ci-aws.yml
+name: CI AWS Build & Deploy to EC2
 
-# dev 브랜치에 푸시될 때 실행
 on:
   push:
     branches: [ aws ]
 
 env:
-  AWS_REGION:       ap-northeast-2
-  S3_BUCKET:        ${{ secrets.S3_BUCKET }}
-  EC2_HOST:         ${{ secrets.EC2_HOST }}
-  EC2_USER:         ${{ secrets.EC2_SSH_USER }}
-  LOCAL_JAR_PATH:   rankus/build/libs/app.jar
-  REMOTE_APP_DIR:   /home/${{ env.EC2_USER }}/app
-  JAR_NAME:         app.jar
+  AWS_REGION:      ap-northeast-2
+  S3_BUCKET:       ${{ secrets.S3_BUCKET }}
+  EC2_HOST:        ${{ secrets.EC2_HOST }}
+  EC2_USER:        ${{ secrets.EC2_SSH_USER }}
+  LOCAL_JAR_PATH:  rankus/build/libs/app.jar
+  JAR_NAME:        app.jar
 
 jobs:
   build-upload:
@@ -55,11 +54,12 @@ jobs:
     needs: build-upload
     runs-on: ubuntu-latest
     steps:
-      - name: Install SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+      - name: Configure AWS Credentials (for S3 download)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
 
       - name: Download JAR from S3
         run: |
@@ -70,41 +70,48 @@ jobs:
         run: |
           ls -lh ${{ env.JAR_NAME }}
 
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
       - name: Copy JAR to EC2 (as app-new.jar)
         run: |
           scp -o StrictHostKeyChecking=no \
             -i ~/.ssh/id_rsa \
             ${{ env.JAR_NAME }} \
-            ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:${{ env.REMOTE_APP_DIR }}/app-new.jar
+            ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/home/${{ env.EC2_USER }}/app/app-new.jar
 
-      - name: SSH into EC2 & Deploy
+      - name: SSH into EC2 & Redeploy
         run: |
           ssh -o StrictHostKeyChecking=no \
             -i ~/.ssh/id_rsa \
-            ${{ env.EC2_USER }}@${{ env.EC2_HOST }} << 'EOF'
+            ${{ env.EC2_USER }}@${{ env.EC2_HOST }} << EOF
           set -e
 
-          cd $REMOTE_APP_DIR
+          # 작업 디렉토리로 이동
+          cd /home/${{ env.EC2_USER }}/app
 
-          # 1) 기존 프로세스 종료 (에러 발생해도 계속)
-          pkill -f "java -jar $JAR_NAME" || true
+          # 1) 기존 애플리케이션 종료 (에러 무시)
+          pkill -f "java -jar ${{ env.JAR_NAME }}" || true
 
-          # 2) 이전 JAR 백업
-          if [ -f $JAR_NAME ]; then
-            mv $JAR_NAME ${JAR_NAME%.jar}-backup-$(date +"%Y%m%d%H%M%S").jar
+          # 2) 기존 JAR 백업
+          if [ -f ${{ env.JAR_NAME }} ]; then
+            mv ${{ env.JAR_NAME }} "${{ env.JAR_NAME }}-backup-$(date +'%Y%m%d%H%M%S').jar"
           fi
 
           # 3) 새 JAR 교체
-          mv app-new.jar $JAR_NAME
+          mv app-new.jar ${{ env.JAR_NAME }}
 
-          # 4) 환경변수 설정
+          # 4) 환경 변수 설정
           export SPRING_DATASOURCE_URL="${{ secrets.SPRING_DATASOURCE_URL }}"
           export SPRING_DATASOURCE_USERNAME="${{ secrets.SPRING_DATASOURCE_USERNAME }}"
           export SPRING_DATASOURCE_PASSWORD="${{ secrets.SPRING_DATASOURCE_PASSWORD }}"
           export JWT_SECRET="${{ secrets.JWT_SECRET }}"
 
-          # 5) 애플리케이션 시작 (백그라운드)
-          nohup java -jar $JAR_NAME --spring.profiles.active=aws \
+          # 5) 애플리케이션 실행 (백그라운드)
+          nohup java -jar ${{ env.JAR_NAME }} --spring.profiles.active=aws \
             >> deploy.log 2>&1 &
 
           echo "✅ Deployment completed at $(date)"
