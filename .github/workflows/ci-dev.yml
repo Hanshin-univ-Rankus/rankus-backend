@@ -13,10 +13,8 @@ jobs:
   build:
     name: Build & Upload to S3
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -33,17 +31,15 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region:            ${{ env.AWS_REGION }}
 
       - name: Upload JAR to S3
-        run: |
-          aws s3 cp rankus/build/libs/app.jar s3://${{ env.S3_BUCKET }}/app.jar
+        run: aws s3 cp rankus/build/libs/app.jar s3://${{ env.S3_BUCKET }}/app.jar
 
       - name: Verify S3 upload
-        run: |
-          aws s3 ls s3://${{ env.S3_BUCKET }}/app.jar
+        run: aws s3 ls s3://${{ env.S3_BUCKET }}/app.jar
 
   deploy:
     name: Download & Deploy to EC2
@@ -53,17 +49,15 @@ jobs:
       - name: Configure AWS credentials (for S3 download)
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region:            ${{ env.AWS_REGION }}
 
       - name: Download JAR from S3
-        run: |
-          aws s3 cp s3://${{ env.S3_BUCKET }}/app.jar ./app.jar
+        run: aws s3 cp s3://${{ env.S3_BUCKET }}/app.jar ./app.jar
 
       - name: Verify downloaded JAR
-        run: |
-          ls -lh app.jar
+        run: ls -lh app.jar
 
       - name: Install SSH key
         run: |
@@ -75,12 +69,14 @@ jobs:
         run: |
           scp -o StrictHostKeyChecking=no \
             -i ~/.ssh/id_rsa \
-            ./app.jar \
+            app.jar \
             ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/app/app-new.jar
 
-      - name: Deploy to EC2
+      - name: SSH into EC2 & Restart Service
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }} '
+          ssh -t -o StrictHostKeyChecking=no \
+            -i ~/.ssh/id_rsa \
+            ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           set -e
           cd /home/ec2-user/app
           
@@ -89,7 +85,7 @@ jobs:
           
           # 이전 JAR 백업 (있을 경우)
           if [ -f app.jar ]; then
-            mv app.jar app-backup-$(date +"%Y%m%d%H%M%S").jar
+          mv app.jar app-backup-$(date +"%Y%m%d%H%M%S").jar
           fi
           
           # 새 JAR 파일로 교체
@@ -102,9 +98,9 @@ jobs:
           export JWT_SECRET="${{ secrets.JWT_SECRET }}"
           
           # 새 JAR 실행
-          nohup java -jar app.jar --spring.profiles.active=dev > deploy.log 2>&1 &
+          nohup java -jar app.jar --spring.profiles.active=dev >> deploy.log 2>&1 &
           
           echo "애플리케이션 재시작 완료"
           sleep 5
           ps -ef | grep java
-          '
+          EOF
