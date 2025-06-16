@@ -3,7 +3,7 @@ name: CI Dev Build & Deploy to AWS
 # dev 브랜치에 푸시될 때 실행
 on:
   push:
-    branches: [ dev ]
+    branches: [ aws ]
 
 env:
   AWS_REGION:       ap-northeast-2
