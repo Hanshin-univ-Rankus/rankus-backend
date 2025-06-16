@@ -89,13 +89,13 @@ jobs:
         run: |
           ssh -t -o StrictHostKeyChecking=no \
             -i ~/.ssh/id_rsa \
-            ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }} <<EOF
+            ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           set -e
           cd /home/ec2-user/app
 
           # 이전 JAR 백업
           if [ -f app.jar ]; then
-            mv app.jar app-\$(date +'%Y%m%d%H%M%S').jar
+            mv app.jar app-$(date +'%Y%m%d%H%M%S').jar
           fi
 
           # 환경변수 설정
@@ -104,7 +104,9 @@ jobs:
           export SPRING_DATASOURCE_PASSWORD='${{ secrets.SPRING_DATASOURCE_PASSWORD }}'
           export JWT_SECRET='${{ secrets.JWT_SECRET }}'
 
-          # 프로세스 재시작
+          # 기존 프로세스 종료
           pkill -f 'java -jar app.jar' || true
+
+          # 새 JAR 백그라운드 실행
           nohup java -jar app.jar --spring.profiles.active=dev >> deploy.log 2>&1 &
-EOF
+          EOF
