@@ -1,5 +1,10 @@
 package org.univ.rankus.adapter.in.web.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +32,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/labs/{labId}/images")
+@Tag(name = "LabImage", description = "랩실 이미지 관리 API")
 public class LabImageController {
 
     private final LabImageCommandUseCase commandUseCase;
@@ -39,6 +45,20 @@ public class LabImageController {
      */
     @PostMapping
     @PreAuthorize("hasPermission(#labId, 'LabImage', 'create')")
+    @Operation(summary = "이미지 등록", description = "새로운 랩실 이미지를 등록합니다. (랩 리더·매니저만)")
+    @ApiResponses({
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode="201", description="이미지 등록 성공",
+        content = @Content(mediaType="application/json",
+          schema=@Schema(allOf={ApiResponse.class, LabImageResponseDto.class})
+        )
+      ),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode="400", description="입력값 검증 실패",
+        content=@Content(schema=@Schema(allOf={ApiResponse.class}))
+      ),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode="403", description="권한 없음",
+        content=@Content(schema=@Schema(allOf={ApiResponse.class}))
+      )
+    })
     public ResponseEntity<ApiResponse<LabImageResponseDto>> addImage(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다.") Long labId,
             @RequestBody @Valid LabImageRequestDto requestDto
@@ -80,6 +100,17 @@ public class LabImageController {
      * - 200 OK + ApiResponse<List<LabImageResponseDto>> 반환
      */
     @GetMapping
+    @Operation(summary = "이미지 목록 조회", description = "특정 랩실에 속한 모든 이미지를 조회합니다. (모두 접근 가능)")
+    @ApiResponses({
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode="200", description="이미지 목록 조회 성공",
+        content = @Content(mediaType="application/json",
+          schema=@Schema(allOf={ApiResponse.class, List.class, LabImageResponseDto.class})
+        )
+      ),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode="400", description="입력값 검증 실패",
+        content=@Content(schema=@Schema(allOf={ApiResponse.class}))
+      )
+    })
     public ResponseEntity<ApiResponse<List<LabImageResponseDto>>> listImages(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다.") Long labId
     ) {
@@ -108,6 +139,17 @@ public class LabImageController {
      * - 200 OK + ApiResponse<LabImageResponseDto> 반환 (모두 접근 가능)
      */
     @GetMapping("/{imageId}")
+    @Operation(summary = "이미지 조회", description = "특정 랩실 이미지 정보를 조회합니다. (모두 접근 가능)")
+    @ApiResponses({
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode="200", description="이미지 조회 성공",
+        content = @Content(mediaType="application/json",
+          schema=@Schema(allOf={ApiResponse.class, LabImageResponseDto.class})
+        )
+      ),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode="400", description="입력값 검증 실패",
+        content=@Content(schema=@Schema(allOf={ApiResponse.class}))
+      )
+    })
     public ResponseEntity<ApiResponse<LabImageResponseDto>> getImage(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다.") Long labId,
             @PathVariable @Positive(message = "이미지 ID는 양수여야 합니다.") Long imageId
@@ -137,6 +179,11 @@ public class LabImageController {
      */
     @DeleteMapping("/{imageId}")
     @PreAuthorize("hasPermission(#imageId, 'LabImage', 'delete')")
+    @Operation(summary = "이미지 삭제", description = "랩실 이미지를 삭제합니다.")
+    @ApiResponses({
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode="204", description="삭제 성공", content=@Content),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode="403", description="권한 없음", content=@Content)
+    })
     public ResponseEntity<Void> deleteImage(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다.") Long labId,
             @PathVariable @Positive(message = "이미지 ID는 양수여야 합니다.") Long imageId

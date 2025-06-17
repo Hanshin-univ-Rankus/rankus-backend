@@ -13,6 +13,13 @@ import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.user.User;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Tag(name = "User", description = "사용자 정보 조회 API")
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +32,18 @@ public class UserController {
      * GET /api/v1/users/me
      * - 인증된 사용자의 정보를 조회하여 반환
      */
+    @Operation(summary = "내 정보 조회", description = "인증된 사용자의 정보를 조회합니다.")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200", description = "사용자 정보 조회 성공",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(allOf = { ApiResponse.class, UserResponseDto.class })
+            )
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "401", description = "인증되지 않음", content = @Content
+        )
+    })
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponseDto>> getMyInfo(
             @AuthenticationPrincipal CustomUserDetails principal

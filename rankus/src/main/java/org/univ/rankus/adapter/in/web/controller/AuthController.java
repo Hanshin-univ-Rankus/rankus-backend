@@ -1,5 +1,10 @@
 package org.univ.rankus.adapter.in.web.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;          // Swagger @ApiResponses
+import io.swagger.v3.oas.annotations.media.Content;                    // Swagger @Content
+import io.swagger.v3.oas.annotations.media.Schema;                     // Swagger @Schema
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -9,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.univ.rankus.adapter.in.web.dto.request.UserLoginRequestDto;
 import org.univ.rankus.adapter.in.web.dto.request.UserRegisterRequestDto;
-import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;
+import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;         // DTO 래퍼 클래스
 import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
 import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
@@ -21,6 +26,7 @@ import java.net.URI;
 /**
  * 인증(회원가입·로그인) 관련 REST API 컨트롤러
  */
+@Tag(name = "Auth", description = "인증 API (회원가입·로그인)")
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -30,71 +36,109 @@ public class AuthController {
     private final AuthUseCase authUseCase;
     private final UserQueryUseCase userQueryUseCase;
 
-    /**
-     * POST /api/v1/auth/signup
-     * - 새로운 회원 가입
-     * - 201 Created + Location 헤더 + ApiResponse<UserResponseDto> 반환
-     */
+    @Operation(
+            summary     = "회원가입",
+            description = "새로운 사용자를 가입 처리하고, ApiResponse<UserResponseDto> 형태로 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "201",
+                    description  = "회원가입 성공",
+                    content      = @Content(
+                            mediaType = "application/json",
+                            schema    = @Schema(allOf = { ApiResponse.class, UserResponseDto.class })
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description  = "입력값 검증 실패",
+                    content      = @Content(
+                            mediaType = "application/json",
+                            schema    = @Schema(allOf = { ApiResponse.class })
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "409",
+                    description  = "이메일 중복 등 회원가입 실패",
+                    content      = @Content(
+                            mediaType = "application/json",
+                            schema    = @Schema(allOf = { ApiResponse.class })
+                    )
+            )
+    })
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<UserResponseDto>> signup(
             @RequestBody @Valid UserRegisterRequestDto requestDto
     ) {
-        // 1) 회원 가입 처리
         User created = authUseCase.signUp(
                 requestDto.getName(),
                 requestDto.getEmail(),
                 requestDto.getPassword()
         );
-
-        // 2) UserResponseDto 로 변환
         UserResponseDto dto = UserResponseDto.from(created);
-
-        // 3) ApiResponse 래핑
         ApiResponse<UserResponseDto> body = ApiResponse.<UserResponseDto>builder()
                 .status(HttpStatus.CREATED.value())
                 .message("회원가입 성공")
                 .data(dto)
                 .build();
-
-        // 4) Location 헤더 설정 (새로 생성된 리소스 URI)
         URI location = URI.create("/api/v1/users/" + created.getId());
-
-        // 5) 201 Created + Location + ApiResponse 바디 반환
         return ResponseEntity
                 .created(location)
-                .header(HttpHeaders.CACHE_CONTROL, "no-store")  // (선택) 캐시 방지 헤더
+                .header(HttpHeaders.CACHE_CONTROL, "no-store")
                 .body(body);
     }
 
-    /**
-     * POST /api/v1/auth/login
-     * - 이메일/비밀번호로 로그인 → JWT 토큰 + 유저 정보 반환
-     * - 200 OK + ApiResponse<AuthResponseDto> 반환
-     */
+    @Operation(
+            summary     = "로그인",
+            description = "이메일과 비밀번호로 로그인하여 JWT 토큰 및 유저 정보를 ApiResponse<AuthResponseDto>로 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description  = "로그인 성공",
+                    content      = @Content(
+                            mediaType = "application/json",
+                            schema    = @Schema(allOf = { ApiResponse.class, AuthResponseDto.class })
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description  = "입력값 검증 실패",
+                    content      = @Content(
+                            mediaType = "application/json",
+                            schema    = @Schema(allOf = { ApiResponse.class })
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description  = "인증 실패(잘못된 이메일/비밀번호)",
+                    content      = @Content(
+                            mediaType = "application/json",
+                            schema    = @Schema(allOf = { ApiResponse.class })
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description  = "사용자 정보 없음",
+                    content      = @Content(
+                            mediaType = "application/json",
+                            schema    = @Schema(allOf = { ApiResponse.class })
+                    )
+            )
+    })
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponseDto>> login(
             @RequestBody @Valid UserLoginRequestDto dto
     ) {
-        // 1) 인증 처리: 토큰 발급
         String token = authUseCase.login(dto.getEmail(), dto.getPassword());
-
-        // 2) 토큰 발급된 사용자 정보 조회 후 DTO 변환
         User user = userQueryUseCase.getUserByEmail(dto.getEmail());
         UserResponseDto userDto = UserResponseDto.from(user);
-
-        // 3) AuthResponseDto 생성 (token + userDto)
         AuthResponseDto authDto = AuthResponseDto.from(token, userDto);
-
-        // 4) ApiResponse 래핑
         ApiResponse<AuthResponseDto> body = ApiResponse.<AuthResponseDto>builder()
                 .status(HttpStatus.OK.value())
                 .message("로그인 성공")
                 .data(authDto)
                 .build();
-
-        // 5) 200 OK + ApiResponse 바디 반환
-        return ResponseEntity
-                .ok()
-                .body(body);
+        return ResponseEntity.ok().body(body);
     }
 }

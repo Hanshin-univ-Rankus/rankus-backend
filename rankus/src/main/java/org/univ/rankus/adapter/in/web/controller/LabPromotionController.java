@@ -14,6 +14,12 @@ import org.univ.rankus.domain.model.lab.Lab;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Lab 관련 REST API 컨트롤러
  *
@@ -24,6 +30,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/labs")
+@Tag(name = "LabPromotion", description = "랩실 홍보 API")
 public class LabPromotionController {
 
     // 읽기 전용 Query 인터페이스 주입
@@ -33,6 +40,15 @@ public class LabPromotionController {
      * GET /api/v1/labs
      * - 모든 랩실을 랭킹 내림차순으로 조회합니다.
      */
+    @Operation(summary = "랩실 목록 조회", description = "모든 랩실을 랭킹 내림차순으로 조회합니다.")
+    @ApiResponses({
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200", description = "랩실 목록 조회 성공",
+        content = @Content(mediaType = "application/json",
+          schema = @Schema(allOf = { ApiResponse.class, List.class, LabResponseDto.class })
+        )
+      )
+    })
     @GetMapping
     public ResponseEntity<ApiResponse<List<LabResponseDto>>> listLabs() {
         // 1) 도메인에서 데이터 조회
@@ -59,6 +75,18 @@ public class LabPromotionController {
      * GET /api/v1/labs/{labId}
      * - ID로 특정 랩실을 조회합니다.
      */
+    @Operation(summary = "랩실 단건 조회", description = "ID로 특정 랩실을 조회합니다.")
+    @ApiResponses({
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200", description = "랩실 정보 조회 성공",
+        content = @Content(mediaType = "application/json",
+          schema = @Schema(allOf = { ApiResponse.class, LabResponseDto.class })
+        )
+      ),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "404", description = "랩실 정보 없음", content = @Content
+      )
+    })
     @GetMapping("/{labId}")
     public ResponseEntity<ApiResponse<LabResponseDto>> getLab(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다.") Long labId
