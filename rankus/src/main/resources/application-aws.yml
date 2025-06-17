@@ -3,14 +3,8 @@ spring:
     activate:
       on-profile: aws
 
-  http:
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
-
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
+    url: ${SPRING_DATASOURCE_URL}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -25,9 +19,17 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+        connection.characterEncoding: UTF-8
+        connection.CharSet: UTF-8
+        connection.useUnicode: true
 
 server:
   port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 security:
   jwt:
