@@ -1,6 +1,7 @@
 package org.univ.rankus.adapter.in.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,6 +46,7 @@ public class LabImageController {
      */
     @PostMapping
     @PreAuthorize("hasPermission(#labId, 'LabImage', 'create')")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "이미지 등록", description = "새로운 랩실 이미지를 등록합니다. (랩 리더·매니저만)")
     @ApiResponses({
       @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode="201", description="이미지 등록 성공",
@@ -179,6 +181,7 @@ public class LabImageController {
      */
     @DeleteMapping("/{imageId}")
     @PreAuthorize("hasPermission(#imageId, 'LabImage', 'delete')")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "이미지 삭제", description = "랩실 이미지를 삭제합니다.")
     @ApiResponses({
       @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode="204", description="삭제 성공", content=@Content),

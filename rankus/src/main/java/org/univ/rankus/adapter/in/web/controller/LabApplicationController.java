@@ -1,6 +1,7 @@
 package org.univ.rankus.adapter.in.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -58,6 +59,8 @@ public class LabApplicationController {
             )
     })
     @PostMapping
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<LabApplicationResponseDto>> applyToLab(
             @PathVariable @Positive Long labId,
             @AuthenticationPrincipal CustomUserDetails principal,
@@ -89,6 +92,7 @@ public class LabApplicationController {
     })
     @DeleteMapping("/{appId}")
     @PreAuthorize("hasPermission(#appId, 'LabApplication', 'cancel')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> cancelApplication(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long appId,
@@ -109,6 +113,7 @@ public class LabApplicationController {
     })
     @GetMapping
     @PreAuthorize("hasPermission(#labId, 'LabApplication', 'view')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ApiResponse<List<LabApplicationResponseDto>>> listApplications(
             @PathVariable @Positive Long labId
     ) {
@@ -137,6 +142,7 @@ public class LabApplicationController {
     })
     @GetMapping("/{appId}")
     @PreAuthorize("hasPermission(#labId, 'LabApplication', 'view')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ApiResponse<LabApplicationResponseDto>> getApplication(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long appId
@@ -161,6 +167,7 @@ public class LabApplicationController {
     })
     @PutMapping("/{appId}/approve")
     @PreAuthorize("hasPermission(#appId, 'LabApplication', 'approve')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> approveApplication(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long appId
@@ -180,6 +187,7 @@ public class LabApplicationController {
     })
     @PutMapping("/{appId}/reject")
     @PreAuthorize("hasPermission(#appId, 'LabApplication', 'reject')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> rejectApplication(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long appId

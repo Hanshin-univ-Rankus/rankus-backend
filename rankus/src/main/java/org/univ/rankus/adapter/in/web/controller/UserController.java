@@ -1,5 +1,6 @@
 package org.univ.rankus.adapter.in.web.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -45,6 +46,7 @@ public class UserController {
         )
     })
     @GetMapping("/me")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ApiResponse<UserResponseDto>> getMyInfo(
             @AuthenticationPrincipal CustomUserDetails principal
     ) {
