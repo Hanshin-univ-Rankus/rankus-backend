@@ -3,6 +3,12 @@ spring:
     activate:
       on-profile: aws
 
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
