@@ -7,13 +7,13 @@ VALUES
 -- 2. users
 INSERT INTO users (id, name, email, password_hash, role, lab_id, created_at, updated_at)
 VALUES
-    (1, '학생1', 'user1@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'STUDENT', NULL, NOW(), NOW()),
-    (2, '랩장1', 'leader1@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'LAB_LEADER', 1, NOW(), NOW()),
-    (3, '교수', 'prof@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'PROFESSOR', 2, NOW(), NOW()),
-    (4, '학생2', 'user2@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'STUDENT', NULL, NOW(), NOW()),
-    (5, '학생3', 'user3@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'STUDENT', 1, NOW(), NOW()),
-    (6, '랩장2', 'leader2@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'LAB_LEADER', 2, NOW(), NOW()),
-    (7, '관리자', 'admin@example.com', '$2a$10$hCPmBsUxHI.Q0Z2hVKN5QOQGfDzfWkZ0vbUAn5O7gWyPXCxvOAKZ.', 'ADMIN', NULL, NOW(), NOW());
+    (1, '학생1', 'user1@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'STUDENT', NULL, NOW(), NOW()),
+    (2, '랩장1', 'leader1@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy.', 'LAB_LEADER', 1, NOW(), NOW()),
+    (3, '교수', 'prof@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'PROFESSOR', 2, NOW(), NOW()),
+    (4, '학생2', 'user2@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'STUDENT', NULL, NOW(), NOW()),
+    (5, '학생3', 'user3@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'STUDENT', 1, NOW(), NOW()),
+    (6, '랩장2', 'leader2@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'LAB_LEADER', 2, NOW(), NOW()),
+    (7, '관리자', 'admin@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL, NOW(), NOW());
 
 -- 3. lab_images
 INSERT INTO lab_images (id, lab_id, image_url, type)

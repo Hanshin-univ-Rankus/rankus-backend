@@ -2,25 +2,22 @@ spring:
   config:
     activate:
       on-profile: default
-
   datasource:
     url: jdbc:mysql://localhost:3306/rankus?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true
     username: root
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     defer-datasource-initialization: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         hbm2ddl:
-          charset_name: UTF-8       # DDL에 DEFAULT CHARSET=UTF-8을 붙여줌
+          charset_name: UTF-8
           connection:
-            charSet: UTF-8            # Hibernate 내부 커넥션에도 UTF-8 사용
-
+            charSet: UTF-8
   sql:
     init:
       mode: always
@@ -35,5 +32,5 @@ server:
 
 security:
   jwt:
-    secret: default-jwt-secret
-    expiration-ms: 3600000  # 1시간 (밀리초 단위)
+    secret: yDeGly34tDXIxkjo6MQKgBNCI+2iMFLdT0i8zD2JZuE=
+    expiration-ms: 3600000
