@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -77,8 +78,10 @@ public class LabApplicationController {
                 .message("가입 신청 성공")
                 .data(respDto)
                 .build();
-        URI location = URI.create("/api/v1/labs/" + labId + "/applications/" + created.getId());
-        return ResponseEntity.created(location).body(body);
+        URI location = URI.create("/api/labs/" + labId + "/applications/" + created.getId());
+        return ResponseEntity.created(location)
+                .cacheControl(CacheControl.noStore())
+                .body(body);
     }
 
     @Operation(summary = "가입 신청 취소", description = "자신의 가입 신청서를 취소합니다.")

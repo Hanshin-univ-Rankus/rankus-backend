@@ -55,6 +55,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 토큰에서 인증 정보 추출 및 SecurityContext에 저장
                 Authentication auth = tokenProvider.getAuthentication(token, userDetailsService);
                 SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
+                // 토큰이 유효하지 않으면 SecurityContext 초기화
+                SecurityContextHolder.clearContext();
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\":\"Invalid JWT token\"}");
+                response.getWriter().flush();
+                return; // 필터 체인 중단
             }
         }
         // 다음 필터로 요청 전달

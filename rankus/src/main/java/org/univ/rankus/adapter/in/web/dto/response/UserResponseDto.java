@@ -17,7 +17,7 @@ public class UserResponseDto {
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
-                .role(user.getRole().name())
+                .role(user.getRole() != null ? user.getRole().name() : null)
                 .build();
     }
 }

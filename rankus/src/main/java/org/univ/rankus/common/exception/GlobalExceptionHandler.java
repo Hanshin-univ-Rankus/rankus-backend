@@ -164,6 +164,7 @@ public class GlobalExceptionHandler {
                 .body(errorResponse);
     }
 
+
     /**
      * 7) 그 외 모든 예외 (예측하지 못한 서버 오류) 처리 (500 Internal Server Error)
      */

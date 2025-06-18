@@ -27,19 +27,18 @@ public class LabApplicationPermissionHandler implements DomainPermissionEvaluato
         if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long)) {
             return false;
         }
-        Long userId = ((CustomUserDetails) principalObj).getUserId();
-        LabApplication app = queryUseCase.getApplicationById((Long) targetId);
-        User user = userQueryUseCase.getUserById(userId);
 
-        switch (permission) {
-            case "cancel":
-                return app.isOwnedBy(userId);
-            case "approve":
-            case "reject":
-            case "view":
-                return user.isLabLeaderOrLabManagerInLab(app.getLab());
-            default:
-                return false;
-        }
+        Long userId = ((CustomUserDetails) principalObj).getUserId();
+        User user = userQueryUseCase.getUserById(userId);
+        Long id = (Long) targetId;
+
+        // 모든 권한에 대해 applicationId로 처리
+        LabApplication app = queryUseCase.getApplicationById(id);
+
+        return switch (permission) {
+            case "cancel" -> app.isOwnedBy(userId);
+            case "approve", "reject", "view" -> user.isLabLeaderOrLabManagerInLab(app.getLab());
+            default -> false;
+        };
     }
 }
