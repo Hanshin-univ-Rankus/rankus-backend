@@ -3,6 +3,7 @@ package org.univ.rankus.adapter.in.web.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class UserController {
     private final UserQueryUseCase userQueryUseCase;
 
     /**
-     * GET /api/v1/users/me
+     * GET /api/users/me
      * - 인증된 사용자의 정보를 조회하여 반환
      */
     @Operation(summary = "내 정보 조회", description = "인증된 사용자의 정보를 조회합니다.")
@@ -47,6 +48,7 @@ public class UserController {
     })
     @GetMapping("/me")
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<UserResponseDto>> getMyInfo(
             @AuthenticationPrincipal CustomUserDetails principal
     ) {

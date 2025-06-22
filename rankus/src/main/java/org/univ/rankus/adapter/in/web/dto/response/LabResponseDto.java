@@ -10,13 +10,17 @@ public class LabResponseDto {
     private final String  name;
     private final String  description;
     private final Integer ranking;
+    private final String  professorName;
+    private final String createdAt;
 
-    public static LabResponseDto from(Long id, String name, String description, Integer ranking) {
+    public static LabResponseDto from(Long id, String name, String description, Integer ranking, String professorName, String createdAt) {
         return LabResponseDto.builder()
                 .id(id)
                 .name(name)
                 .description(description)
                 .ranking(ranking)
+                .professorName(professorName)
+                .createdAt(createdAt)
                 .build();
     }
 
@@ -26,6 +30,8 @@ public class LabResponseDto {
                 .name(lab.getName())
                 .description(lab.getDescription())
                 .ranking(lab.getRanking())
+                .professorName(lab.getProfessorName())
+                .createdAt(lab.getCreatedAt().toString()) // Assuming createdAt is a LocalDateTime
                 .build();
     }
 }
