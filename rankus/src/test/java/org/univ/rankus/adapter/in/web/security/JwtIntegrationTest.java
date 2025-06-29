@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.univ.rankus.adapter.in.web.controller.AuthController;
 import org.univ.rankus.adapter.in.web.controller.UserController;
+import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
+import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.common.security.CustomAccessDeniedHandler;
@@ -79,7 +81,20 @@ class JwtIntegrationTest {
         String email = "user@example.com";
         String rawPassword = "password";
         String fakeToken = "fake-jwt-token";
-        given(authUseCase.login(email, rawPassword)).willReturn(fakeToken);
+        
+        UserResponseDto userDto = UserResponseDto.builder()
+                .id(1L)
+                .name("테스트사용자")
+                .email(email)
+                .role("STUDENT")
+                .build();
+        
+        AuthResponseDto authDto = AuthResponseDto.builder()
+                .token(fakeToken)
+                .user(userDto)
+                .build();
+        
+        given(authUseCase.login(email, rawPassword)).willReturn(authDto);
 
         // 로그인 응답 사용자 모킹
         User mockUser = org.mockito.Mockito.mock(User.class);

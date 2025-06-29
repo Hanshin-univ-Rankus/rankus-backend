@@ -40,12 +40,12 @@ public class LabImageController {
     private final LabImageQueryUseCase queryUseCase;
 
     /**
-     * POST /api/v1/labs/{labId}/images
+     * POST /api/labs/{labId}/images
      * - 새로운 이미지를 등록합니다. (랩 리더·매니저만)
      * - 201 Created + Location 헤더 + ApiResponse<LabImageResponseDto> 반환
      */
     @PostMapping
-    @PreAuthorize("hasPermission(#labId, 'LabImage', 'create')")
+    @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #labId, 'LabImage', 'CREATE')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "이미지 등록", description = "새로운 랩실 이미지를 등록합니다. (랩 리더·매니저만)")
     @ApiResponses({
@@ -88,7 +88,7 @@ public class LabImageController {
                 .build();
 
         // 4) Location 헤더
-        URI location = URI.create("/api/v1/labs/" + labId + "/images/" + saved.getId());
+        URI location = URI.create("/api/labs/" + labId + "/images/" + saved.getId());
 
         return ResponseEntity
                 .created(location)
@@ -97,7 +97,7 @@ public class LabImageController {
     }
 
     /**
-     * GET /api/v1/labs/{labId}/images
+     * GET /api/labs/{labId}/images
      * - 특정 랩실에 속한 모든 이미지를 조회합니다. (모두 접근 가능)
      * - 200 OK + ApiResponse<List<LabImageResponseDto>> 반환
      */
@@ -137,7 +137,7 @@ public class LabImageController {
     }
 
     /**
-     * GET /api/v1/labs/{labId}/images/{imageId}
+     * GET /api/labs/{labId}/images/{imageId}
      * - 200 OK + ApiResponse<LabImageResponseDto> 반환 (모두 접근 가능)
      */
     @GetMapping("/{imageId}")
@@ -175,12 +175,12 @@ public class LabImageController {
     }
 
     /**
-     * DELETE /api/v1/labs/{labId}/images/{imageId}
+     * DELETE /api/labs/{labId}/images/{imageId}
      * - 특정 이미지를 삭제합니다. (랩 리더·매니저만)
      * - 204 No Content 반환
      */
     @DeleteMapping("/{imageId}")
-    @PreAuthorize("hasPermission(#imageId, 'LabImage', 'delete')")
+    @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #imageId, 'LabImage', 'DELETE')")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "이미지 삭제", description = "랩실 이미지를 삭제합니다.")
     @ApiResponses({

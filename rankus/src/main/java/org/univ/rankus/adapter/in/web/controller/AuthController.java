@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;                     // Swagge
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,6 @@ import org.univ.rankus.adapter.in.web.dto.request.UserRegisterRequestDto;
 import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;         // DTO 래퍼 클래스
 import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
 import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
-import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
 import org.univ.rankus.domain.model.user.User;
 
@@ -34,7 +32,6 @@ import java.net.URI;
 public class AuthController {
 
     private final AuthUseCase authUseCase;
-    private final UserQueryUseCase userQueryUseCase;
 
     @Operation(
             summary     = "회원가입",
@@ -68,20 +65,17 @@ public class AuthController {
     })
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<UserResponseDto>> signup(
-            @RequestBody @Valid UserRegisterRequestDto requestDto
+            @Valid @RequestBody UserRegisterRequestDto requestDto
     ) {
         User created = authUseCase.signUp(
                 requestDto.getName(),
                 requestDto.getEmail(),
-                requestDto.getPassword()
+                requestDto.getPassword(),
+                requestDto.getRole()
         );
         UserResponseDto dto = UserResponseDto.from(created);
-        ApiResponse<UserResponseDto> body = ApiResponse.<UserResponseDto>builder()
-                .status(HttpStatus.CREATED.value())
-                .message("회원가입 성공")
-                .data(dto)
-                .build();
-        URI location = URI.create("/api/v1/users/" + created.getId());
+        ApiResponse<UserResponseDto> body = ApiResponse.created(dto, "회원가입 성공");
+        URI location = URI.create("/api/users/" + created.getId());
         return ResponseEntity
                 .created(location)
                 .header(HttpHeaders.CACHE_CONTROL, "no-store")
@@ -128,17 +122,10 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponseDto>> login(
-            @RequestBody @Valid UserLoginRequestDto dto
+            @Valid @RequestBody UserLoginRequestDto dto
     ) {
-        String token = authUseCase.login(dto.getEmail(), dto.getPassword());
-        User user = userQueryUseCase.getUserByEmail(dto.getEmail());
-        UserResponseDto userDto = UserResponseDto.from(user);
-        AuthResponseDto authDto = AuthResponseDto.from(token, userDto);
-        ApiResponse<AuthResponseDto> body = ApiResponse.<AuthResponseDto>builder()
-                .status(HttpStatus.OK.value())
-                .message("로그인 성공")
-                .data(authDto)
-                .build();
+        AuthResponseDto authDto = authUseCase.login(dto.getEmail(), dto.getPassword());
+        ApiResponse<AuthResponseDto> body = ApiResponse.success(authDto, "로그인 성공");
         return ResponseEntity.ok().body(body);
     }
 }

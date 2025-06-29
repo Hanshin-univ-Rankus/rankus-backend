@@ -1,11 +1,11 @@
 package org.univ.rankus.testutil.factory.domain;
 
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.univ.rankus.domain.model.user.Password;
+import org.univ.rankus.domain.model.user.PasswordEncoder;
 import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
+import org.univ.rankus.testutil.mock.TestPasswordEncoder;
 
 import java.util.UUID;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
  * 외부 의존(JPA, Repository 등) 없이 User 엔티티 생성 메서드만 제공합니다.
  */
 public final class DomainUserFactory {
-    private static final PasswordEncoder ENCODER = new BCryptPasswordEncoder();
+    private static final PasswordEncoder ENCODER = new TestPasswordEncoder();
     private DomainUserFactory() {}
 
     public static User buildValidUser() {

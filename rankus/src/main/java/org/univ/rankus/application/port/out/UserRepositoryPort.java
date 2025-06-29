@@ -41,4 +41,11 @@ public interface UserRepositoryPort {
      * @return 이미 존재하면 true
      */
     boolean existsByEmail(String email);
+
+    /**
+     * ID로 User를 삭제합니다.
+     *
+     * @param id 삭제할 User ID
+     */
+    void deleteById(Long id);
 }

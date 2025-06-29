@@ -2,13 +2,15 @@ package org.univ.rankus.application.service.auth;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
+import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
 import org.univ.rankus.application.port.out.AuthTokenPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
-import org.univ.rankus.domain.model.user.Password;
+import org.univ.rankus.domain.model.user.PasswordEncoder;
+import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
@@ -25,28 +27,30 @@ public class AuthService implements AuthUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public String login(String email, String rawPassword) {
+    public AuthResponseDto login(String email, String rawPassword) {
         // 1) 이메일로 조회 → 없으면 404
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
         // 2) 비밀번호 검증 → 틀리면 401
-        if (!user.checkPassword(rawPassword, passwordEncoder)) {
+        if (!user.getPassword().matches(rawPassword, passwordEncoder)) {
             throw new UserValidationException(UserErrorCode.INVALID_CREDENTIALS);
         }
-        // 3) 토큰 생성 후 반환
-        return authTokenPort.generateToken(user);
+        // 3) 토큰 생성
+        String token = authTokenPort.generateToken(user);
+        // 4) 사용자 정보를 DTO로 변환
+        UserResponseDto userDto = UserResponseDto.from(user);
+        // 5) AuthResponseDto로 반환
+        return AuthResponseDto.from(token, userDto);
     }
 
     @Override
-    public User signUp(String name, String email, String rawPassword) {
+    public User signUp(String name, String email, String rawPassword, Role role) {
         // 1) 이메일 중복 검증 → 중복 시 400
         if (userRepo.existsByEmail(email)) {
             throw new UserValidationException(UserErrorCode.EMAIL_DUPLICATED);
         }
-        // 2) Password 도메인에서 검증 & 암호화
-        Password password = Password.fromRaw(rawPassword, passwordEncoder);
-        // 3) 엔티티 생성·저장
-        User newUser = new User(name, email, password);
+        // 2) 엔티티 생성·저장 (Password 검증 & 암호화 포함)
+        User newUser = User.create(name, email, rawPassword, role, passwordEncoder);
         return userRepo.save(newUser);
     }
 }

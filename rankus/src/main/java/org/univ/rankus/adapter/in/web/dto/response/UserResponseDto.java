@@ -4,6 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import org.univ.rankus.domain.model.user.User;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter
 @Builder
 public class UserResponseDto {
@@ -19,5 +22,11 @@ public class UserResponseDto {
                 .email(user.getEmail())
                 .role(user.getRole() != null ? user.getRole().name() : null)
                 .build();
+    }
+
+    public static List<UserResponseDto> fromList(List<User> users) {
+        return users.stream()
+                .map(UserResponseDto::from)
+                .collect(Collectors.toList());
     }
 }

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.univ.rankus.domain.model.user.PasswordEncoder;
 import org.univ.rankus.application.port.out.AuthTokenPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
 import org.univ.rankus.domain.model.user.User;
@@ -15,6 +15,7 @@ import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
 import org.univ.rankus.domain.model.user.exception.UserValidationException;
 import org.univ.rankus.testutil.mock.AuthMockUtil;
+import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -49,12 +50,14 @@ class AuthServiceTest {
             AuthMockUtil.configureToken(authTokenPort, user);
 
             // when: 서비스 호출
-            String token = authService.login(AuthMockUtil.VALID_EMAIL, AuthMockUtil.RAW_PASSWORD);
+            AuthResponseDto response = authService.login(AuthMockUtil.VALID_EMAIL, AuthMockUtil.RAW_PASSWORD);
 
-            // then: 토큰 리턴 및 포트 호출 검증
-            assertThat(token).isEqualTo(AuthMockUtil.TOKEN);
+            // then: AuthResponseDto 리턴 및 포트 호출 검증
+            assertThat(response.getToken()).isEqualTo(AuthMockUtil.TOKEN);
+            assertThat(response.getUser().getName()).isEqualTo(user.getName());
+            assertThat(response.getUser().getEmail()).isEqualTo(user.getEmail());
             verify(userRepo).findByEmail(AuthMockUtil.VALID_EMAIL);
-            verify(user).checkPassword(AuthMockUtil.RAW_PASSWORD, passwordEncoder);
+            verify(user).getPassword();
             verify(authTokenPort).generateToken(user);
         }
 
@@ -110,23 +113,18 @@ class AuthServiceTest {
             when(passwordEncoder.encode(AuthMockUtil.RAW_PASSWORD))
                     .thenReturn(hashed);
 
-            // matches 동작도 stub 처리 (rawPassword, hashedSecret 일치할 때 true 반환)
-            when(passwordEncoder.matches(AuthMockUtil.RAW_PASSWORD, hashed))
-                    .thenReturn(true);
-
             // save 호출 시 전달된 User 엔티티 그대로 반환
             when(userRepo.save(any(User.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
             // when: 서비스 호출
-            User saved = authService.signUp(name, email, AuthMockUtil.RAW_PASSWORD);
+            User saved = authService.signUp(name, email, AuthMockUtil.RAW_PASSWORD, org.univ.rankus.domain.model.user.Role.STUDENT);
 
             // then: 반환된 User 필드 검증 및 포트 호출 검증
             assertThat(saved.getName()).isEqualTo(name);
             assertThat(saved.getEmail()).isEqualTo(email);
-            // Password VO에서 해시 값을 꺼내 비교
-            assertThat(saved.checkPassword(AuthMockUtil.RAW_PASSWORD, passwordEncoder))
-                    .isTrue();
+            // Password VO에서 해시 값을 꺼내 비교는 별도 Password 테스트에서 확인
+            assertThat(saved.getPassword()).isNotNull();
 
             verify(userRepo).existsByEmail(email);
             verify(passwordEncoder).encode(AuthMockUtil.RAW_PASSWORD);
@@ -142,7 +140,7 @@ class AuthServiceTest {
 
             // when & then: 예외 및 에러코드 검증
             assertThatThrownBy(() ->
-                    authService.signUp("anyName", email, AuthMockUtil.RAW_PASSWORD))
+                    authService.signUp("anyName", email, AuthMockUtil.RAW_PASSWORD, org.univ.rankus.domain.model.user.Role.STUDENT))
                     .isInstanceOf(UserValidationException.class)
                     .satisfies(ex -> {
                         UserValidationException e = (UserValidationException) ex;

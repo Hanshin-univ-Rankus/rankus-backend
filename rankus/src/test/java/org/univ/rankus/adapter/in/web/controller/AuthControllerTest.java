@@ -11,8 +11,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
+import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
-import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
@@ -39,9 +40,6 @@ class AuthControllerTest {
     @MockitoBean
     private AuthUseCase authUseCase;
 
-    @MockitoBean
-    private UserQueryUseCase userQueryUseCase;
-
     @Nested
     @DisplayName("POST /api/auth/signup")
     class SignupTests {
@@ -49,15 +47,16 @@ class AuthControllerTest {
         @Test
         @DisplayName("정상 요청 → 201 Created + Location, Cache-Control 헤더 + ApiResponse body")
         void signupSuccess() throws Exception {
-            Map<String, String> req = Map.of(
+            Map<String, Object> req = Map.of(
                     "name",     "홍길동",
                     "email",    "new@example.com",
-                    "password", "password123"
+                    "password", "password123",
+                    "role",     "STUDENT"
             );
             String json = objectMapper.writeValueAsString(req);
 
             User mockUser = mock(User.class);
-            given(authUseCase.signUp("홍길동", "new@example.com", "password123"))
+            given(authUseCase.signUp("홍길동", "new@example.com", "password123", Role.STUDENT))
                     .willReturn(mockUser);
             given(mockUser.getId()).willReturn(123L);
             given(mockUser.getName()).willReturn("홍길동");
@@ -68,7 +67,7 @@ class AuthControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(json))
                     .andExpect(status().isCreated())
-                    .andExpect(header().string(HttpHeaders.LOCATION, "/api/v1/users/123"))
+                    .andExpect(header().string(HttpHeaders.LOCATION, "/api/users/123"))
                     .andExpect(header().string(HttpHeaders.CACHE_CONTROL, "no-store"))
                     .andExpect(jsonPath("$.status").value(201))
                     .andExpect(jsonPath("$.message").value("회원가입 성공"))
@@ -81,14 +80,15 @@ class AuthControllerTest {
         @Test
         @DisplayName("이메일 중복 시 UserValidationException → 409 Conflict + ErrorResponse body")
         void signupDuplicateEmail() throws Exception {
-            Map<String, String> req = Map.of(
+            Map<String, Object> req = Map.of(
                     "name",     "홍길동",
                     "email",    "exist@example.com",
-                    "password", "password123"
+                    "password", "password123",
+                    "role",     "STUDENT"
             );
             String json = objectMapper.writeValueAsString(req);
 
-            given(authUseCase.signUp(anyString(), eq("exist@example.com"), anyString()))
+            given(authUseCase.signUp(anyString(), eq("exist@example.com"), anyString(), any(Role.class)))
                     .willThrow(new UserValidationException(UserErrorCode.EMAIL_DUPLICATED));
 
             mockMvc.perform(post("/api/auth/signup")
@@ -104,11 +104,12 @@ class AuthControllerTest {
         @Test
         @DisplayName("DTO 검증 실패 (빈 필드) → 400 Bad Request")
         void signupValidationError() throws Exception {
-            // name이 빈 문자열, email 형식 불일치, password 너무 짧음
-            Map<String, String> req = Map.of(
+            // name이 빈 문자열, email 형식 불일치, password 너무 짧음, role이 null
+            Map<String, Object> req = Map.of(
                     "name",     "",
                     "email",    "bad-email",
                     "password", "123"
+                    // role 필드를 빠뜨려서 null로 만듦
             );
             String json = objectMapper.writeValueAsString(req);
 
@@ -118,7 +119,7 @@ class AuthControllerTest {
                     .andExpect(status().isBadRequest())
                     // 검증 오류 메시지가 JSON 배열로 반환됨
                     .andExpect(jsonPath("$.errors").isArray())
-                    .andExpect(jsonPath("$.errors.length()").value(3));
+                    .andExpect(jsonPath("$.errors.length()").value(4)); // name, email, password, role 총 4개 에러
         }
     }
 
@@ -135,17 +136,20 @@ class AuthControllerTest {
             );
             String json = objectMapper.writeValueAsString(req);
 
-            String token = "jwt-token";
+            UserResponseDto userDto = UserResponseDto.builder()
+                    .id(10L)
+                    .name("테스터")
+                    .email("user@example.com")
+                    .role("ADMIN")
+                    .build();
+            
+            AuthResponseDto authDto = AuthResponseDto.builder()
+                    .token("jwt-token")
+                    .user(userDto)
+                    .build();
+            
             given(authUseCase.login("user@example.com", "password"))
-                    .willReturn(token);
-
-            User mockUser = mock(User.class);
-            given(userQueryUseCase.getUserByEmail("user@example.com"))
-                    .willReturn(mockUser);
-            given(mockUser.getId()).willReturn(10L);
-            given(mockUser.getName()).willReturn("테스터");
-            given(mockUser.getEmail()).willReturn("user@example.com");
-            given(mockUser.getRole()).willReturn(Role.ADMIN);
+                    .willReturn(authDto);
 
             mockMvc.perform(post("/api/auth/login")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -153,7 +157,7 @@ class AuthControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.status").value(200))
                     .andExpect(jsonPath("$.message").value("로그인 성공"))
-                    .andExpect(jsonPath("$.data.token").value(token))
+                    .andExpect(jsonPath("$.data.token").value("jwt-token"))
                     .andExpect(jsonPath("$.data.user.id").value(10))
                     .andExpect(jsonPath("$.data.user.name").value("테스터"))
                     .andExpect(jsonPath("$.data.user.email").value("user@example.com"))

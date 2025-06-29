@@ -2,7 +2,6 @@ package org.univ.rankus.adapter.in.web.controller;
 
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,6 @@ import org.univ.rankus.application.port.in.query.LabPromotionQueryUseCase;
 import org.univ.rankus.domain.model.lab.Lab;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,20 +53,13 @@ public class LabPromotionController {
         List<Lab> labs = labPromotionQueryUseCase.listLabs();
 
         // 2) DTO 변환
-        List<LabResponseDto> dtoList = labs.stream()
-                .map(LabResponseDto::from)
-                .collect(Collectors.toList());
+        List<LabResponseDto> dtoList = LabResponseDto.fromList(labs);
 
         // 3) ApiResponse 빌드
-        ApiResponse<List<LabResponseDto>> body = ApiResponse.<List<LabResponseDto>>builder()
-                .status(HttpStatus.OK.value())
-                .message("랩실 목록 조회 성공")
-                .data(dtoList)
-                .build();
+        ApiResponse<List<LabResponseDto>> body = ApiResponse.success(dtoList, "랩실 목록 조회 성공");
 
         // 4) 200 OK + ApiResponse 바디 반환
-        return ResponseEntity
-                .ok(body);
+        return ResponseEntity.ok(body);
     }
 
     /**
@@ -98,14 +89,9 @@ public class LabPromotionController {
         LabResponseDto dto = LabResponseDto.from(lab);
 
         // 3) ApiResponse 빌드
-        ApiResponse<LabResponseDto> body = ApiResponse.<LabResponseDto>builder()
-                .status(HttpStatus.OK.value())
-                .message("랩실 정보 조회 성공")
-                .data(dto)
-                .build();
+        ApiResponse<LabResponseDto> body = ApiResponse.success(dto, "랩실 정보 조회 성공");
 
         // 4) 200 OK + ApiResponse 바디 반환
-        return ResponseEntity
-                .ok(body);
+        return ResponseEntity.ok(body);
     }
 }

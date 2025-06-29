@@ -37,4 +37,9 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     public boolean existsByEmail(String email) {
         return springDataUserRepository.existsByEmail(email);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        springDataUserRepository.deleteById(id);
+    }
 }

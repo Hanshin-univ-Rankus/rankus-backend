@@ -2,13 +2,13 @@ package org.univ.rankus.testutil.mock;
 
 import org.univ.rankus.application.port.out.UserRepositoryPort;
 import org.univ.rankus.application.port.out.AuthTokenPort;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.univ.rankus.domain.model.user.Password;
+import org.univ.rankus.domain.model.user.PasswordEncoder;
 import org.univ.rankus.domain.model.user.User;
 
 import java.util.Optional;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * AuthService 관련 공통 테스트 유틸리티 클래스입니다.
@@ -21,7 +21,7 @@ public class AuthMockUtil {
     public static final String TOKEN = "jwt-token";
 
     /**
-     * findByEmail(), checkPassword() 설정을 통해 mock User를 준비합니다.
+     * findByEmail(), getPassword().matches() 설정을 통해 mock User를 준비합니다.
      *
      * @param userRepo UserRepositoryPort mock
      * @param passwordEncoder PasswordEncoder mock
@@ -32,8 +32,12 @@ public class AuthMockUtil {
                                         PasswordEncoder passwordEncoder,
                                         boolean passwordMatches) {
         User mockUser = mock(User.class);
+        Password mockPassword = mock(Password.class);
+        
         when(userRepo.findByEmail(VALID_EMAIL)).thenReturn(Optional.of(mockUser));
-        when(mockUser.checkPassword(RAW_PASSWORD, passwordEncoder)).thenReturn(passwordMatches);
+        when(mockUser.getPassword()).thenReturn(mockPassword);
+        when(mockPassword.matches(eq(RAW_PASSWORD), eq(passwordEncoder))).thenReturn(passwordMatches);
+        
         return mockUser;
     }
 

@@ -2,8 +2,10 @@ package org.univ.rankus.adapter.in.web.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import org.univ.rankus.domain.model.user.Role;
 
 /**
  * 회원 가입 요청을 받을 때 사용하는 DTO
@@ -12,7 +14,7 @@ import lombok.Getter;
 public class UserRegisterRequestDto {
 
     @NotBlank(message = "이름은 필수입니다.")
-    @Size(max = 50, message = "이름은 50자 이하여야 합니다.")
+    @Size(max = 30, message = "이름은 30자 이하여야 합니다.")
     private String name;
 
     @NotBlank(message = "이메일은 필수입니다.")
@@ -21,6 +23,9 @@ public class UserRegisterRequestDto {
     private String email;
 
     @NotBlank(message = "비밀번호는 필수입니다.")
-    @Size(min = 8, message = "비밀번호는 8자 이상이어야 합니다.")
+    @Size(min = 8, max = 255, message = "비밀번호는 8자 이상 255자 이하여야 합니다.")
     private String password;
+
+    @NotNull(message = "역할은 필수입니다.")
+    private Role role;
 }

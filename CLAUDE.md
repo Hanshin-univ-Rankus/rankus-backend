@@ -1,0 +1,81 @@
+# Rankus 프로젝트
+
+> 대학 내 랩실 정보 불균형 해소와 랩실 운영 효율화를 위한 종합 플랫폼
+
+## 🏗️ 프로젝트 개요
+
+### 핵심 목표
+- **랩실 홍보**: 연구실 정보 투명화 및 접근성 향상
+- **지원 관리**: 체계적인 랩실 지원 및 선발 프로세스
+- **운영 효율화**: QR 출석, 캘린더, 공지 등 통합 관리
+- **동기 부여**: 랭킹 시스템을 통한 활동 촉진
+
+### 기술 스택
+- **Backend**: Java 17, Spring Boot 3.4.5, Spring Security, JPA/Hibernate
+- **Database**: MySQL 8.0 (개발용 Docker Compose 환경)
+- **Authentication**: JWT 기반 Stateless 인증
+- **API Documentation**: SpringDoc OpenAPI 3.0 (Swagger UI)
+- **Architecture**: 헥사고날 아키텍처 (Ports & Adapters)
+
+## ⚙️ 빠른 시작
+
+### 로컬 개발 환경 설정
+```bash
+# 1. 데이터베이스 컨테이너 실행
+docker-compose up -d
+
+# 2. 애플리케이션 실행 (기본 프로파일)
+./gradlew bootRun
+
+# 3. API 문서 확인
+# http://localhost:8080/swagger-ui.html
+```
+
+### Spring Profiles
+- **`default`**: 로컬 개발용, 보안 비활성화, SQL 로깅 활성화
+- **`secure`**: 로컬 보안 테스트용, 실제 JWT 인증 적용  
+- **`aws`**: 배포용, 환경변수 기반 설정
+
+### 데이터베이스 구성
+- **개발용**: `localhost:3306/rankus` (docker-compose)
+- **테스트용**: `localhost:3308/rankus_test` (통합 테스트 격리)
+
+## 📚 상세 문서
+
+프로젝트의 상세한 아키텍처, 도메인 모델, API 정보는 각 계층별 컨텍스트 파일을 참조하세요:
+
+- **소스코드 구조**: @rankus/src/main/java/org/univ/rankus/CLAUDE.md
+- **도메인 모델**: @rankus/src/main/java/org/univ/rankus/domain/CLAUDE.md  
+- **애플리케이션 계층**: @rankus/src/main/java/org/univ/rankus/application/CLAUDE.md
+- **어댑터 계층**: @rankus/src/main/java/org/univ/rankus/adapter/CLAUDE.md
+- **공통 컴포넌트**: @rankus/src/main/java/org/univ/rankus/common/CLAUDE.md
+- **설정 관리**: @rankus/src/main/java/org/univ/rankus/config/CLAUDE.md
+
+## 🎯 현재 구현 상태 (약 40%)
+
+### ✅ 완료된 기능
+- 회원 관리 (가입, JWT 로그인)
+- 랩실 홍보 (목록, 상세, 이미지 관리)
+- 랩실 지원 (신청, 승인/거부)
+
+### 🔄 다음 개발 우선순위
+1. **랭킹 시스템**: 점수 관리 및 승인 프로세스
+2. **공지사항 관리**: 랩실 운영 필수 기능
+3. **QR 출석 시스템**: 실용적 운영 도구
+4. **캘린더 기능**: 일정 관리 통합
+
+## 🛠️ 개발 가이드
+
+### 테스트 실행
+```bash
+# 전체 테스트
+./gradlew test
+
+# 특정 테스트
+./gradlew test --tests UserCommandServiceTest
+```
+
+### 배포
+- **플랫폼**: AWS EC2
+- **CI/CD**: GitHub Actions (`aws` 브랜치 push 시 자동 배포)
+- **데이터베이스**: AWS RDS MySQL

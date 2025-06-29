@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.univ.rankus.common.BaseTimeEntity;
 import org.univ.rankus.domain.model.lab.Lab;
@@ -56,6 +55,16 @@ public class User extends BaseTimeEntity {
         this.email = validateEmail(email);
         this.password = password;
         this.role = Role.STUDENT;  // 기본값 설정
+    }
+
+    /**
+     * 사용자 생성을 위한 정적 팩토리 메서드
+     */
+    public static User create(String name, String email, String rawPassword, Role role, PasswordEncoder encoder) {
+        Password password = Password.fromRaw(rawPassword, encoder);
+        User user = new User(name, email, password);
+        user.role = role;
+        return user;
     }
 
     /**
@@ -136,6 +145,14 @@ public class User extends BaseTimeEntity {
      */
     public void changeName(String newName) {
         this.name = validateName(newName);
+    }
+
+    /**
+     * 이메일 변경
+     * @param newEmail 새 이메일
+     */
+    public void changeEmail(String newEmail) {
+        this.email = validateEmail(newEmail);
     }
 
     public boolean isLabLeaderOrLabManagerInLab(Lab lab) {

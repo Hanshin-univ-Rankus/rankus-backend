@@ -4,6 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import org.univ.rankus.domain.model.lab.Lab;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter @Builder
 public class LabResponseDto {
     private final Long    id;
@@ -33,5 +36,11 @@ public class LabResponseDto {
                 .professorName(lab.getProfessorName())
                 .createdAt(lab.getCreatedAt().toString()) // Assuming createdAt is a LocalDateTime
                 .build();
+    }
+    
+    public static List<LabResponseDto> fromList(List<Lab> labs) {
+        return labs.stream()
+                .map(LabResponseDto::from)
+                .collect(Collectors.toList());
     }
 }

@@ -1,22 +1,21 @@
 spring:
-  prifiles: test
+  config:
+    activate:
+      on-profile: test
 
   datasource:
     url: jdbc:mysql://localhost:3308/rankus_test?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
-    username: rankus_test_user # 테스트용 DB 사용자 이름 (실제 환경에 맞게 변경 필요)
-    password: test_password # 테스트용 DB 비밀번호 (실제 환경에 맞게 변경 필요)
+    username: rankus_test_user
+    password: test_password
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: create-drop
     database-platform: org.hibernate.dialect.MySQLDialect
-    # show-sql: true # SQL 로깅이 필요하면 주석 해제
-    # properties:
-    #   hibernate:
-    #     format_sql: true # SQL 로깅 포맷팅
+    show-sql: false
 
   sql:
     init:
-      mode: never # 테스트에서는 data.sql을 사용하지 않음
+      mode: never
 

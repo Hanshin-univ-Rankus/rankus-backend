@@ -38,9 +38,9 @@ class SpringDataLabRepositoryTest extends BaseRepositoryTest {
         Lab lab2 = IntegrationLabFactory.persistCustomLab(labRepo, "LabB", LabCategory.IOT, "desc2", "Prof2");
         Lab lab3 = IntegrationLabFactory.persistCustomLab(labRepo, "LabC", LabCategory.CV, "desc3", "Prof3");
         // ranking 직접 수정
-        lab1.setRanking(20);
-        lab2.setRanking(50);
-        lab3.setRanking(10);
+        lab1.updateRanking(20);
+        lab2.updateRanking(50);
+        lab3.updateRanking(10);
         labRepo.save(lab1);
         labRepo.save(lab2);
         labRepo.save(lab3);

@@ -3,6 +3,10 @@ package org.univ.rankus.adapter.in.web.dto.response;
 import lombok.Builder;
 import lombok.Getter;
 import org.univ.rankus.domain.model.lab.ImageType;
+import org.univ.rankus.domain.model.lab.LabImage;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter @Builder
 public class LabImageResponseDto {
@@ -18,5 +22,20 @@ public class LabImageResponseDto {
                 .imageUrl(imageUrl)
                 .type(type)
                 .build();
+    }
+
+    public static LabImageResponseDto from(LabImage labImage) {
+        return LabImageResponseDto.builder()
+                .id(labImage.getId())
+                .labId(labImage.getLab().getId())
+                .imageUrl(labImage.getImageUrl())
+                .type(labImage.getType())
+                .build();
+    }
+
+    public static List<LabImageResponseDto> fromList(List<LabImage> labImages) {
+        return labImages.stream()
+                .map(LabImageResponseDto::from)
+                .collect(Collectors.toList());
     }
 }

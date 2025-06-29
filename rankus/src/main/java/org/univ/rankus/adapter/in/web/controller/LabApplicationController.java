@@ -94,7 +94,7 @@ public class LabApplicationController {
             )
     })
     @DeleteMapping("/{appId}")
-    @PreAuthorize("hasPermission(#appId, 'LabApplication', 'cancel')")
+    @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #appId, 'LabApplication', 'DELETE')")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> cancelApplication(
             @PathVariable @Positive Long labId,
@@ -115,7 +115,7 @@ public class LabApplicationController {
             )
     })
     @GetMapping
-    @PreAuthorize("hasPermission(#labId, 'LabApplication', 'view')")
+    @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #labId, 'LabApplication', 'VIEW')")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ApiResponse<List<LabApplicationResponseDto>>> listApplications(
             @PathVariable @Positive Long labId
@@ -144,7 +144,7 @@ public class LabApplicationController {
             )
     })
     @GetMapping("/{appId}")
-    @PreAuthorize("hasPermission(#labId, 'LabApplication', 'view')")
+    @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #appId, 'LabApplication', 'VIEW')")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ApiResponse<LabApplicationResponseDto>> getApplication(
             @PathVariable @Positive Long labId,
@@ -169,7 +169,7 @@ public class LabApplicationController {
             )
     })
     @PutMapping("/{appId}/approve")
-    @PreAuthorize("hasPermission(#appId, 'LabApplication', 'approve')")
+    @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #appId, 'LabApplication', 'APPROVE')")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> approveApplication(
             @PathVariable @Positive Long labId,
@@ -189,7 +189,7 @@ public class LabApplicationController {
             )
     })
     @PutMapping("/{appId}/reject")
-    @PreAuthorize("hasPermission(#appId, 'LabApplication', 'reject')")
+    @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #appId, 'LabApplication', 'REJECT')")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> rejectApplication(
             @PathVariable @Positive Long labId,

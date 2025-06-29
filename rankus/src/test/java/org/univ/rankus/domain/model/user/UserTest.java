@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.univ.rankus.testutil.mock.TestPasswordEncoder;
 import org.univ.rankus.domain.model.user.exception.UserValidationException;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
@@ -43,7 +43,7 @@ class UserTest {
         @DisplayName("이름이 null 또는 blank일 때 NAME_REQUIRED 예외 발생")
         void constructor_nullOrBlankName_throwsNameRequired(String name) {
             // given
-            Password pwd = Password.fromRaw("Password!23", new BCryptPasswordEncoder());
+            Password pwd = Password.fromRaw("Password!23", new TestPasswordEncoder());
 
             // when & then
             UserValidationException ex = assertThrows(
@@ -58,7 +58,7 @@ class UserTest {
         void constructor_nameTooLong_throwsNameTooLong() {
             // given
             String longName = "a".repeat(31);
-            Password pwd = Password.fromRaw("Password!23", new BCryptPasswordEncoder());
+            Password pwd = Password.fromRaw("Password!23", new TestPasswordEncoder());
 
             // when & then
             UserValidationException ex = assertThrows(
@@ -74,7 +74,7 @@ class UserTest {
         @DisplayName("이메일이 null 또는 blank일 때 EMAIL_REQUIRED 예외 발생")
         void constructor_nullOrBlankEmail_throwsEmailRequired(String email) {
             // given
-            Password pwd = Password.fromRaw("Password!23", new BCryptPasswordEncoder());
+            Password pwd = Password.fromRaw("Password!23", new TestPasswordEncoder());
 
             // when & then
             UserValidationException ex = assertThrows(
@@ -101,7 +101,7 @@ class UserTest {
             // given
             String name = " 홍길동 ";
             String email = " test@univ.ac.kr ";
-            Password pwd = Password.fromRaw("Password!23", new BCryptPasswordEncoder());
+            Password pwd = Password.fromRaw("Password!23", new TestPasswordEncoder());
 
             // when
             User user = new User(name, email, pwd);
@@ -111,7 +111,7 @@ class UserTest {
             assertEquals("홍길동", user.getName());
             assertEquals("test@univ.ac.kr", user.getEmail());
             assertEquals(Role.STUDENT, user.getRole());
-            assertTrue(user.checkPassword("Password!23", new BCryptPasswordEncoder()));
+            assertTrue(user.checkPassword("Password!23", new TestPasswordEncoder()));
         }
     }
 
@@ -128,7 +128,7 @@ class UserTest {
             User user = DomainUserFactory.buildValidUser();
 
             // when
-            boolean result = user.checkPassword(raw, new BCryptPasswordEncoder());
+            boolean result = user.checkPassword(raw, new TestPasswordEncoder());
 
             // then
             assertFalse(result);
@@ -142,7 +142,7 @@ class UserTest {
             String raw = "Password!23";
 
             // when
-            boolean result = user.checkPassword(raw, new BCryptPasswordEncoder());
+            boolean result = user.checkPassword(raw, new TestPasswordEncoder());
 
             // then
             assertTrue(result);
@@ -155,7 +155,7 @@ class UserTest {
             User user = DomainUserFactory.buildValidUser();
 
             // when
-            boolean result = user.checkPassword("WrongPass", new BCryptPasswordEncoder());
+            boolean result = user.checkPassword("WrongPass", new TestPasswordEncoder());
 
             // then
             assertFalse(result);

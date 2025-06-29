@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.univ.rankus.testutil.mock.TestPasswordEncoder;
 import org.univ.rankus.domain.model.user.exception.PasswordValidationException;
 import org.univ.rankus.domain.model.user.exception.PasswordErrorCode;
 
@@ -15,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Password 값 객체 단위 테스트")
 class PasswordTest {
 
-    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final org.univ.rankus.domain.model.user.PasswordEncoder encoder = new TestPasswordEncoder();
 
     @Nested
     @DisplayName("fromRaw() 예외 검증")

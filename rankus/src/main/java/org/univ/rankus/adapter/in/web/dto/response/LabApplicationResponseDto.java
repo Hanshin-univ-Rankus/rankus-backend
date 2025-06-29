@@ -5,6 +5,8 @@ import lombok.Getter;
 import org.univ.rankus.domain.model.lab.LabApplication;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter @Builder
 public class LabApplicationResponseDto {
@@ -32,5 +34,11 @@ public class LabApplicationResponseDto {
                 labApplication.getInterviewTime(),
                 labApplication.getStatus().name()
         );
+    }
+
+    public static List<LabApplicationResponseDto> fromList(List<LabApplication> labApplications) {
+        return labApplications.stream()
+                .map(LabApplicationResponseDto::from)
+                .collect(Collectors.toList());
     }
 }

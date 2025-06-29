@@ -82,7 +82,7 @@ class LabImageControllerTest {
                             .content(json))
                     .andExpect(status().isCreated())
                     .andExpect(header().string(HttpHeaders.LOCATION,
-                            "/api/v1/labs/" + LAB_ID + "/images/" + IMAGE_ID))
+                            "/api/labs/" + LAB_ID + "/images/" + IMAGE_ID))
                     .andExpect(header().string(HttpHeaders.CACHE_CONTROL, "no-store"))
                     .andExpect(jsonPath("$.status").value(201))
                     .andExpect(jsonPath("$.message").value("이미지 등록 성공"))

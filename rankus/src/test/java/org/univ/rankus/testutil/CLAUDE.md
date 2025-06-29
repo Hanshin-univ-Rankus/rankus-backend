@@ -1,0 +1,745 @@
+# TestUtil 가이드
+
+> 테스트 작성을 위한 유틸리티, 팩토리, Mock 헬퍼 클래스 활용 가이드
+
+## 🧰 TestUtil 개요
+
+### 핵심 목표
+- **테스트 코드 재사용**: 공통 테스트 로직 및 데이터 생성 패턴 표준화
+- **테스트 작성 효율성**: 반복적인 테스트 설정 및 데이터 생성 자동화
+- **일관된 테스트 품질**: 표준화된 테스트 헬퍼를 통한 테스트 품질 향상
+- **유지보수성**: 테스트 데이터 변경 시 중앙화된 관리 지점 제공
+
+### 구성 요소
+- **Factory 패턴**: 도메인 객체 및 통합 테스트 데이터 생성
+- **Mock 유틸리티**: 인증, 쿼리 등 공통 Mock 설정
+- **Base 테스트 클래스**: 계층별 테스트 공통 설정
+- **테스트 헬퍼**: 반복적인 테스트 로직 추상화
+
+## 📁 TestUtil 구조
+
+### 현재 구현된 구조
+```
+src/test/java/org/univ/rankus/testutil/
+├── CLAUDE.md                              # 이 파일
+├── config/                                # 테스트 설정 베이스 클래스
+│   ├── BaseRepositoryTest.java            # Repository 테스트 베이스
+│   ├── BaseServiceTest.java               # Service 테스트 베이스  
+│   └── BaseWebTest.java                   # Controller 테스트 베이스
+├── factory/                               # 테스트 데이터 팩토리
+│   ├── domain/                           # 도메인 객체 팩토리
+│   │   ├── DomainLabApplicationFactory.java
+│   │   ├── DomainLabFactory.java
+│   │   ├── DomainLabImageFactory.java
+│   │   └── DomainUserFactory.java
+│   └── integration/                      # 통합 테스트 팩토리
+│       ├── IntegrationLabApplicationFactory.java
+│       ├── IntegrationLabFactory.java
+│       ├── IntegrationLabImageFactory.java
+│       └── IntegrationUserFactory.java
+└── mock/                                 # Mock 유틸리티
+    ├── AuthMockUtil.java                 # 인증 Mock 헬퍼
+    └── QueryMockUtil.java                # 쿼리 Mock 헬퍼
+```
+
+## 🏭 Factory 패턴 활용
+
+### 1. Domain Factory 패턴
+**목표**: 순수 도메인 객체 생성을 위한 정적 팩토리 메서드
+
+```java
+public class DomainUserFactory {
+    
+    // 기본 학생 사용자 생성
+    public static User createStudent() {
+        return User.create(
+            "홍길동",
+            "student@test.com", 
+            "password123!",
+            Role.STUDENT
+        );
+    }
+    
+    // 특정 역할의 사용자 생성
+    public static User createWithRole(Role role) {
+        return User.create(
+            getNameByRole(role),
+            getEmailByRole(role),
+            "password123!",
+            role
+        );
+    }
+    
+    // 랩장 생성
+    public static User createLabLeader() {
+        return createWithRole(Role.LAB_LEADER);
+    }
+    
+    // 교수 생성
+    public static User createProfessor() {
+        return createWithRole(Role.PROFESSOR);
+    }
+    
+    // 커스텀 데이터로 사용자 생성
+    public static User createWithEmail(String email) {
+        return User.create(
+            "테스트사용자",
+            email,
+            "password123!",
+            Role.STUDENT
+        );
+    }
+    
+    // ID가 설정된 사용자 생성 (테스트용)
+    public static User createWithId(Long id) {
+        User user = createStudent();
+        user.setId(id);
+        return user;
+    }
+    
+    // 빌더 패턴 활용
+    public static UserBuilder builder() {
+        return new UserBuilder();
+    }
+    
+    public static class UserBuilder {
+        private String name = "테스트사용자";
+        private String email = "test@example.com";
+        private String password = "password123!";
+        private Role role = Role.STUDENT;
+        private Long id;
+        
+        public UserBuilder name(String name) {
+            this.name = name;
+            return this;
+        }
+        
+        public UserBuilder email(String email) {
+            this.email = email;
+            return this;
+        }
+        
+        public UserBuilder role(Role role) {
+            this.role = role;
+            return this;
+        }
+        
+        public UserBuilder id(Long id) {
+            this.id = id;
+            return this;
+        }
+        
+        public User build() {
+            User user = User.create(name, email, password, role);
+            if (id != null) {
+                user.setId(id);
+            }
+            return user;
+        }
+    }
+    
+    // 역할별 기본 정보 매핑
+    private static String getNameByRole(Role role) {
+        return switch (role) {
+            case STUDENT -> "학생";
+            case LAB_MEMBER -> "랩멤버";
+            case LAB_MANAGER -> "랩관리자";
+            case LAB_LEADER -> "랩장";
+            case PROFESSOR -> "교수";
+            case ADMIN -> "관리자";
+        };
+    }
+    
+    private static String getEmailByRole(Role role) {
+        return role.name().toLowerCase() + "@test.com";
+    }
+}
+```
+
+### 2. Domain Lab Factory
+```java
+public class DomainLabFactory {
+    
+    public static Lab createAiLab() {
+        return Lab.create(
+            "AI랩",
+            LabCategory.AI,
+            "인공지능 연구실"
+        );
+    }
+    
+    public static Lab createDbLab() {
+        return Lab.create(
+            "DB랩", 
+            LabCategory.DB,
+            "데이터베이스 연구실"
+        );
+    }
+    
+    public static Lab createWithCategory(LabCategory category) {
+        return Lab.create(
+            category.getKoreanName() + "랩",
+            category,
+            category.getKoreanName() + " 연구실"
+        );
+    }
+    
+    public static Lab createWithProfessor(String professorName) {
+        Lab lab = createAiLab();
+        lab.setProfessorName(professorName);
+        return lab;
+    }
+    
+    // 빌더 패턴
+    public static LabBuilder builder() {
+        return new LabBuilder();
+    }
+    
+    public static class LabBuilder {
+        private String name = "테스트랩";
+        private LabCategory category = LabCategory.COMPUTER_SCIENCE;
+        private String description = "테스트용 연구실";
+        private String professorName;
+        private Integer ranking = 0;
+        private Long id;
+        
+        public LabBuilder name(String name) {
+            this.name = name;
+            return this;
+        }
+        
+        public LabBuilder category(LabCategory category) {
+            this.category = category;
+            return this;
+        }
+        
+        public LabBuilder description(String description) {
+            this.description = description;
+            return this;
+        }
+        
+        public LabBuilder professorName(String professorName) {
+            this.professorName = professorName;
+            return this;
+        }
+        
+        public LabBuilder ranking(Integer ranking) {
+            this.ranking = ranking;
+            return this;
+        }
+        
+        public LabBuilder id(Long id) {
+            this.id = id;
+            return this;
+        }
+        
+        public Lab build() {
+            Lab lab = Lab.create(name, category, description);
+            if (professorName != null) {
+                lab.setProfessorName(professorName);
+            }
+            if (ranking != null) {
+                lab.setRanking(ranking);
+            }
+            if (id != null) {
+                lab.setId(id);
+            }
+            return lab;
+        }
+    }
+}
+```
+
+### 3. Domain LabApplication Factory
+```java
+public class DomainLabApplicationFactory {
+    
+    public static LabApplication createPending() {
+        User user = DomainUserFactory.createStudent();
+        Lab lab = DomainLabFactory.createAiLab();
+        return createPending(lab, user);
+    }
+    
+    public static LabApplication createPending(Lab lab, User user) {
+        return LabApplication.create(
+            lab != null ? lab : DomainLabFactory.createAiLab(),
+            user != null ? user : DomainUserFactory.createStudent(),
+            LocalDateTime.now().plusDays(1)  // 내일 면접
+        );
+    }
+    
+    public static LabApplication createApproved() {
+        LabApplication application = createPending();
+        application.approve();
+        return application;
+    }
+    
+    public static LabApplication createRejected() {
+        LabApplication application = createPending();
+        application.reject();
+        return application;
+    }
+    
+    public static LabApplication createWithStatus(ApplicationStatus status) {
+        LabApplication application = createPending();
+        switch (status) {
+            case APPROVED -> application.approve();
+            case REJECTED -> application.reject();
+            // PENDING는 기본 상태이므로 변경 없음
+        }
+        return application;
+    }
+    
+    public static LabApplication createWithInterviewTime(LocalDateTime interviewTime) {
+        User user = DomainUserFactory.createStudent();
+        Lab lab = DomainLabFactory.createAiLab();
+        return LabApplication.create(lab, user, interviewTime);
+    }
+}
+```
+
+## 🔧 Integration Factory 패턴
+
+### 실제 데이터베이스와 연동하는 통합 테스트용 팩토리
+
+```java
+@Component
+public class IntegrationUserFactory {
+    
+    @Autowired
+    private UserRepositoryPort userRepositoryPort;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
+    public User createAndSaveStudent() {
+        User user = DomainUserFactory.createStudent();
+        return userRepositoryPort.save(user);
+    }
+    
+    public User createAndSaveWithRole(Role role) {
+        User user = DomainUserFactory.createWithRole(role);
+        return userRepositoryPort.save(user);
+    }
+    
+    public User createAndSaveWithEmail(String email) {
+        User user = DomainUserFactory.createWithEmail(email);
+        return userRepositoryPort.save(user);
+    }
+    
+    public List<User> createAndSaveMultipleStudents(int count) {
+        List<User> users = new ArrayList<>();
+        for (int i = 1; i <= count; i++) {
+            User user = DomainUserFactory.builder()
+                .name("학생" + i)
+                .email("student" + i + "@test.com")
+                .build();
+            users.add(userRepositoryPort.save(user));
+        }
+        return users;
+    }
+    
+    public User createAndSaveLabMember(Lab lab) {
+        User user = DomainUserFactory.createWithRole(Role.LAB_MEMBER);
+        user.assignLab(lab);
+        return userRepositoryPort.save(user);
+    }
+}
+```
+
+```java
+@Component
+public class IntegrationLabFactory {
+    
+    @Autowired
+    private LabRepositoryPort labRepositoryPort;
+    
+    @Autowired
+    private IntegrationUserFactory userFactory;
+    
+    public Lab createAndSaveAiLab() {
+        Lab lab = DomainLabFactory.createAiLab();
+        return labRepositoryPort.save(lab);
+    }
+    
+    public Lab createAndSaveWithProfessor() {
+        Lab lab = DomainLabFactory.createAiLab();
+        User professor = userFactory.createAndSaveWithRole(Role.PROFESSOR);
+        lab.autoAssignProfessorIfMatches(professor);
+        return labRepositoryPort.save(lab);
+    }
+    
+    public Lab createLabWithMembers(int memberCount) {
+        Lab lab = createAndSaveAiLab();
+        
+        for (int i = 0; i < memberCount; i++) {
+            userFactory.createAndSaveLabMember(lab);
+        }
+        
+        return lab;
+    }
+}
+```
+
+## 🎭 Mock 유틸리티
+
+### 1. AuthMockUtil - 인증 관련 Mock 헬퍼
+
+```java
+public class AuthMockUtil {
+    
+    public static Authentication createMockAuthentication(User user) {
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        return new UsernamePasswordAuthenticationToken(
+            userDetails, null, userDetails.getAuthorities());
+    }
+    
+    public static Authentication createStudentAuthentication() {
+        User student = DomainUserFactory.createStudent();
+        return createMockAuthentication(student);
+    }
+    
+    public static Authentication createLabLeaderAuthentication(Lab lab) {
+        User labLeader = DomainUserFactory.createLabLeader();
+        labLeader.assignLab(lab);
+        return createMockAuthentication(labLeader);
+    }
+    
+    public static Authentication createProfessorAuthentication() {
+        User professor = DomainUserFactory.createProfessor();
+        return createMockAuthentication(professor);
+    }
+    
+    public static Authentication createAdminAuthentication() {
+        User admin = DomainUserFactory.createWithRole(Role.ADMIN);
+        return createMockAuthentication(admin);
+    }
+    
+    // SecurityContext에 인증 정보 설정
+    public static void setSecurityContext(User user) {
+        Authentication authentication = createMockAuthentication(user);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+    
+    public static void setSecurityContextAsStudent() {
+        setSecurityContext(DomainUserFactory.createStudent());
+    }
+    
+    public static void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
+    
+    // JWT 토큰 관련 Mock 설정
+    public static void mockJwtToken(JwtTokenProvider jwtTokenProvider, User user) {
+        String token = "mock.jwt.token";
+        when(jwtTokenProvider.createToken(user.getEmail(), user.getRole()))
+            .thenReturn(token);
+        when(jwtTokenProvider.validateToken(token)).thenReturn(true);
+        when(jwtTokenProvider.getEmail(token)).thenReturn(user.getEmail());
+    }
+}
+```
+
+### 2. QueryMockUtil - 쿼리 관련 Mock 헬퍼
+
+```java
+public class QueryMockUtil {
+    
+    // Repository Mock 설정 헬퍼
+    public static void mockUserRepositoryFindById(UserRepositoryPort repository, User user) {
+        when(repository.findById(user.getId())).thenReturn(Optional.of(user));
+    }
+    
+    public static void mockUserRepositoryFindByEmail(UserRepositoryPort repository, User user) {
+        when(repository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+    }
+    
+    public static void mockUserRepositoryNotFound(UserRepositoryPort repository, Long userId) {
+        when(repository.findById(userId)).thenReturn(Optional.empty());
+    }
+    
+    public static void mockLabRepositoryFindById(LabRepositoryPort repository, Lab lab) {
+        when(repository.findById(lab.getId())).thenReturn(Optional.of(lab));
+    }
+    
+    public static void mockLabApplicationRepository(
+            LabApplicationRepositoryPort repository, 
+            LabApplication application) {
+        when(repository.findById(application.getId()))
+            .thenReturn(Optional.of(application));
+        when(repository.save(any(LabApplication.class)))
+            .thenReturn(application);
+    }
+    
+    // 페이징 쿼리 Mock
+    public static <T> Page<T> mockPage(List<T> content, Pageable pageable) {
+        return new PageImpl<>(content, pageable, content.size());
+    }
+    
+    public static void mockUserRepositoryFindAll(UserRepositoryPort repository, 
+                                                List<User> users, 
+                                                Pageable pageable) {
+        Page<User> page = mockPage(users, pageable);
+        when(repository.findAll(pageable)).thenReturn(page);
+    }
+    
+    // 존재 여부 검증 Mock
+    public static void mockExistsByEmail(UserRepositoryPort repository, 
+                                       String email, 
+                                       boolean exists) {
+        when(repository.existsByEmail(email)).thenReturn(exists);
+    }
+    
+    public static void mockDuplicateApplication(LabApplicationRepositoryPort repository,
+                                              Long labId,
+                                              Long userId,
+                                              boolean exists) {
+        when(repository.existsByLabIdAndUserId(labId, userId)).thenReturn(exists);
+    }
+}
+```
+
+## 🏗️ Base 테스트 클래스
+
+### 1. BaseRepositoryTest
+
+```java
+@DataJpaTest
+@Import({TestDataConfig.class, IntegrationUserFactory.class, IntegrationLabFactory.class})
+public abstract class BaseRepositoryTest {
+    
+    @Autowired
+    protected TestEntityManager entityManager;
+    
+    @Autowired
+    protected IntegrationUserFactory userFactory;
+    
+    @Autowired
+    protected IntegrationLabFactory labFactory;
+    
+    protected void flushAndClear() {
+        entityManager.flush();
+        entityManager.clear();
+    }
+    
+    protected <T> T persistAndFlush(T entity) {
+        entityManager.persist(entity);
+        entityManager.flush();
+        return entity;
+    }
+    
+    protected <T> T merge(T entity) {
+        return entityManager.merge(entity);
+    }
+    
+    // 공통 데이터 생성 헬퍼
+    protected User createPersistedUser() {
+        return userFactory.createAndSaveStudent();
+    }
+    
+    protected Lab createPersistedLab() {
+        return labFactory.createAndSaveAiLab();
+    }
+}
+```
+
+### 2. BaseServiceTest
+
+```java
+@ExtendWith(MockitoExtension.class)
+public abstract class BaseServiceTest {
+    
+    protected void verifyNoMoreInteractions(Object... mocks) {
+        Mockito.verifyNoMoreInteractions(mocks);
+    }
+    
+    protected <T> ArgumentCaptor<T> captor(Class<T> clazz) {
+        return ArgumentCaptor.forClass(clazz);
+    }
+    
+    // 공통 Mock 설정
+    protected void setupMockSecurityContext(User user) {
+        AuthMockUtil.setSecurityContext(user);
+    }
+    
+    @AfterEach
+    void tearDown() {
+        AuthMockUtil.clearSecurityContext();
+    }
+    
+    // 공통 검증 메서드
+    protected void assertUserResponseDto(UserResponseDto response, User user) {
+        assertThat(response.getId()).isEqualTo(user.getId());
+        assertThat(response.getName()).isEqualTo(user.getName());
+        assertThat(response.getEmail()).isEqualTo(user.getEmail());
+        assertThat(response.getRole()).isEqualTo(user.getRole());
+    }
+    
+    protected void assertLabResponseDto(LabResponseDto response, Lab lab) {
+        assertThat(response.getId()).isEqualTo(lab.getId());
+        assertThat(response.getName()).isEqualTo(lab.getName());
+        assertThat(response.getCategory()).isEqualTo(lab.getCategory());
+        assertThat(response.getDescription()).isEqualTo(lab.getDescription());
+    }
+}
+```
+
+### 3. BaseWebTest
+
+```java
+@WebMvcTest
+@Import({TestSecurityConfig.class, GlobalExceptionHandler.class})
+public abstract class BaseWebTest {
+    
+    @Autowired
+    protected MockMvc mockMvc;
+    
+    @Autowired
+    protected ObjectMapper objectMapper;
+    
+    // 공통 테스트 헬퍼
+    protected ResultActions performGet(String url, Object... params) throws Exception {
+        return mockMvc.perform(get(url, params));
+    }
+    
+    protected ResultActions performPost(String url, Object requestBody) throws Exception {
+        return mockMvc.perform(post(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(requestBody)));
+    }
+    
+    protected ResultActions performPut(String url, Object requestBody) throws Exception {
+        return mockMvc.perform(put(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(requestBody)));
+    }
+    
+    protected ResultActions performDelete(String url, Object... params) throws Exception {
+        return mockMvc.perform(delete(url, params));
+    }
+    
+    // 인증된 요청 헬퍼
+    protected ResultActions performAuthenticatedGet(String url, User user) throws Exception {
+        return mockMvc.perform(get(url)
+            .with(authentication(AuthMockUtil.createMockAuthentication(user))));
+    }
+    
+    protected ResultActions performAuthenticatedPost(String url, Object requestBody, User user) 
+            throws Exception {
+        return mockMvc.perform(post(url)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(requestBody))
+            .with(authentication(AuthMockUtil.createMockAuthentication(user))));
+    }
+    
+    // 공통 검증 메서드
+    protected void assertSuccessResponse(ResultActions result) throws Exception {
+        result.andExpect(status().isOk())
+             .andExpect(jsonPath("$.status").value(200));
+    }
+    
+    protected void assertErrorResponse(ResultActions result, int expectedStatus, String expectedCode) 
+            throws Exception {
+        result.andExpect(status().is(expectedStatus))
+             .andExpect(jsonPath("$.status").value(expectedStatus))
+             .andExpect(jsonPath("$.code").value(expectedCode));
+    }
+}
+```
+
+## 🎯 TestUtil 활용 베스트 프랙티스
+
+### 1. Factory 사용 원칙
+- **도메인 Factory**: 순수 객체 생성, 외부 의존성 없음
+- **Integration Factory**: 실제 DB 연동, @Component로 Spring 관리
+- **빌더 패턴**: 복잡한 객체 생성 시 가독성 향상
+- **메서드 체이닝**: 유연한 테스트 데이터 생성
+
+### 2. Mock 활용 지침
+```java
+// 좋은 예: 명확한 Mock 설정
+@Test
+void 사용자_조회_성공() {
+    // given
+    User user = DomainUserFactory.createStudent();
+    QueryMockUtil.mockUserRepositoryFindById(userRepository, user);
+    
+    // when & then
+    // 테스트 로직
+}
+
+// 나쁜 예: 복잡한 Mock 설정을 테스트마다 반복
+@Test
+void 사용자_조회_성공() {
+    // given - 매번 동일한 Mock 설정 반복
+    User user = User.create(...);
+    when(userRepository.findById(any())).thenReturn(Optional.of(user));
+    when(userRepository.save(any())).thenReturn(user);
+    // ...
+}
+```
+
+### 3. Base 클래스 상속 활용
+```java
+// Repository 테스트
+class UserRepositoryTest extends BaseRepositoryTest {
+    
+    @Autowired
+    private SpringDataUserRepository userRepository;
+    
+    @Test
+    void 이메일로_사용자_조회() {
+        // given
+        User user = createPersistedUser();  // Base 클래스 헬퍼 활용
+        
+        // when & then
+        Optional<User> found = userRepository.findByEmail(user.getEmail());
+        assertThat(found).isPresent();
+    }
+}
+```
+
+### 4. 테스트 데이터 관리
+```java
+// 테스트 클래스별 공통 데이터
+class UserCommandServiceTest extends BaseServiceTest {
+    
+    private User testUser;
+    private UserCreateRequestDto validRequest;
+    
+    @BeforeEach
+    void setUpTestData() {
+        testUser = DomainUserFactory.createStudent();
+        validRequest = UserCreateRequestDto.builder()
+            .name(testUser.getName())
+            .email(testUser.getEmail())
+            .password("password123!")
+            .role(testUser.getRole())
+            .build();
+    }
+    
+    @Test
+    void 유효한_데이터로_사용자_생성() {
+        // testUser, validRequest 활용
+    }
+}
+```
+
+## 📊 TestUtil 품질 지표
+
+### 재사용성 메트릭
+- **Factory 메서드 사용률**: 90% 이상
+- **중복 코드 감소**: 50% 이상
+- **테스트 작성 시간**: 30% 단축
+
+### 유지보수성 지표
+- **테스트 데이터 변경**: 중앙화된 Factory에서만 수정
+- **Mock 설정 표준화**: 공통 패턴 적용
+- **Base 클래스 활용도**: 80% 이상
+
+## 🔗 관련 가이드
+
+- **테스트 전략**: `@test/CLAUDE.md`
+- **Domain 테스트**: `@domain/CLAUDE.md`
+- **Application 테스트**: `@application/CLAUDE.md`
+- **Adapter 테스트**: `@adapter/CLAUDE.md`
