@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.univ.rankus.application.port.in.command.UserCommandUseCase;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
 import org.univ.rankus.adapter.in.web.dto.request.*;
+import org.univ.rankus.domain.model.user.Password;
 import org.univ.rankus.domain.model.user.PasswordEncoder;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
@@ -34,7 +35,11 @@ public class UserCommandService implements UserCommandUseCase {
         }
         
         // 2. 도메인 객체 생성
-        User user = User.create(request.getName(), request.getEmail(), request.getPassword(), request.getRole(), passwordEncoder);
+        User user = new User(
+                request.getName(),
+                request.getEmail(),
+                Password.fromRaw(request.getPassword(), passwordEncoder)
+        );
         
         // 3. 저장
         return userRepositoryPort.save(user);

@@ -10,6 +10,7 @@ import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
 import org.univ.rankus.application.port.out.AuthTokenPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
+import org.univ.rankus.domain.model.user.Password;
 import org.univ.rankus.domain.model.user.PasswordEncoder;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
@@ -50,7 +51,11 @@ public class AuthService implements AuthUseCase {
             throw new UserValidationException(UserErrorCode.EMAIL_DUPLICATED);
         }
         // 2) 엔티티 생성·저장 (Password 검증 & 암호화 포함)
-        User newUser = User.create(request.getName(), request.getEmail(), request.getPassword(), request.getRole(), passwordEncoder);
+        User newUser = new User(
+                request.getName(),
+                request.getEmail(),
+                Password.fromRaw(request.getPassword(), passwordEncoder)
+        );
         return userRepo.save(newUser);
     }
 }
