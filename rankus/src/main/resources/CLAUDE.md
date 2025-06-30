@@ -31,8 +31,8 @@ src/main/resources/
 ## ⚙️ 설정 파일 구조
 
 ### 1. application.yml (기본 환경)
-**프로파일**: `default`
-**용도**: 로컬 개발 환경, 보안 비활성화
+**프로파일**: 기본 (프로파일 없음)
+**용도**: 로컬 개발 환경, JWT 보안 활성화
 
 ```yaml
 spring:
@@ -59,31 +59,42 @@ security:
 
 **특징**:
 - 매번 데이터베이스 스키마 재생성 (`create`)
-- `DevSecurityConfig`로 보안 비활성화
+- `SecurityConfig`로 JWT 보안 활성화
 - 개발용 고정 JWT 시크릿 키 사용
 - SQL 로깅 활성화
 
-### 2. application-secure.yml (로컬 보안 테스트)
-**프로파일**: `secure`
-**용도**: 로컬에서 실제 보안 설정 테스트
+### 2. application-dev.yml (빠른 개발 환경)
+**프로파일**: `dev`
+**용도**: 보안 비활성화로 빠른 개발 및 테스트
 
 ```yaml
 spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://localhost:3306/rankus
+    username: root
+    password: password
   jpa:
     hibernate:
-      ddl-auto: validate  # 스키마 검증만 수행
-    show-sql: false
+      ddl-auto: create
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
 
-jwt:
-  secret-key: ${JWT_SECRET_KEY}
-  expiration-time: ${JWT_EXPIRATION_TIME:86400000}
+security:
+  jwt:
+    secret: yDeGly34tDXIxkjo6MQKgBNCI+2iMFLdT0i8zD2JZuE=
+    expiration-ms: 3600000
 ```
 
 **특징**:
-- `SecurityConfig` 활성화 (실제 JWT 인증)
-- 환경변수 기반 JWT 설정
-- SQL 로깅 비활성화
-- 스키마 검증만 수행
+- `DevSecurityConfig` 활성화 (보안 비활성화)
+- 모든 엔드포인트 접근 허용
+- 빠른 개발 및 테스트에 최적화
+- 스키마 재생성 및 초기 데이터 로드
 
 ### 3. application-aws.yml (배포 환경)
 **프로파일**: `aws`
@@ -157,22 +168,21 @@ VALUES
 
 ## 📊 환경별 설정 비교
 
-| 설정 항목 | default | secure | aws |
-|-----------|---------|--------|-----|
-| **보안** | 비활성화 | 활성화 | 활성화 |
-| **DDL** | create | validate | validate |
-| **데이터 초기화** | data.sql | 없음 | 없음 |
-| **JWT 시크릿** | 고정값 | 환경변수 | 환경변수 |
-| **로깅** | DEBUG | WARN | INFO |
-| **SQL 로깅** | 활성화 | 비활성화 | 비활성화 |
+| 설정 항목 | 기본 | dev | aws |
+|-----------|------|-----|-----|
+| **보안** | 활성화 | 비활성화 | 활성화 |
+| **DDL** | create | create | validate |
+| **데이터 초기화** | data.sql | data.sql | 없음 |
+| **JWT 시크릿** | 고정값 | 고정값 | 환경변수 |
+| **로깅** | INFO | DEBUG | INFO |
+| **SQL 로깅** | 활성화 | 활성화 | 비활성화 |
 
 ## 🔐 보안 설정 관리
 
 ### 환경변수 설정 예시
 ```bash
-# 로컬 보안 테스트 (secure 프로파일)
-export JWT_SECRET_KEY="your-32-character-secret-key-here"
-export JWT_EXPIRATION_TIME=86400000
+# 빠른 개발 환경 (dev 프로파일)
+./gradlew bootRun --args='--spring.profiles.active=dev'
 
 # AWS 배포 환경 (aws 프로파일)
 export DB_URL="jdbc:mysql://your-rds-endpoint:3306/rankus"

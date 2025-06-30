@@ -1,9 +1,6 @@
 spring:
-  config:
-    activate:
-      on-profile: default
   datasource:
-    url: jdbc:mysql://localhost:3306/rankus?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true
+    url: jdbc:mysql://localhost:3306/rankus?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     username: root
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -14,21 +11,14 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-        hbm2ddl:
-          charset_name: UTF-8
-          connection:
-            charSet: UTF-8
+        format_sql: true
+        show_sql: true
   sql:
     init:
       mode: always
 
 server:
   port: 8080
-  servlet:
-    encoding:
-      charset: UTF-8
-      force: true
-      enabled: true
 
 security:
   jwt:

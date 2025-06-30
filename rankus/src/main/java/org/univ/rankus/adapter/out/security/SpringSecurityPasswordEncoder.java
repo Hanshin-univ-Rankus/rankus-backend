@@ -2,8 +2,7 @@ package org.univ.rankus.adapter.out.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.univ.rankus.domain.model.user.PasswordEncoder;
-
+import org.univ.rankus.domain.model.user.PasswordEncoder ;
 /**
  * Spring Security의 PasswordEncoder를 도메인 인터페이스로 어댑팅하는 구현체
  *
@@ -14,7 +13,7 @@ import org.univ.rankus.domain.model.user.PasswordEncoder;
 @RequiredArgsConstructor
 public class SpringSecurityPasswordEncoder implements PasswordEncoder {
 
-    private final PasswordEncoder springPasswordEncoder;
+    private final org.springframework.security.crypto.password.PasswordEncoder springPasswordEncoder;
 
     @Override
     public String encode(String rawPassword) {

@@ -12,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -43,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({AuthController.class, UserController.class})
 @AutoConfigureMockMvc
 @Import({SecurityConfig.class, JwtAuthenticationFilter.class, MethodSecurityConfig.class})
-@ActiveProfiles("secure")
+// Default profile now uses JWT authentication
 class JwtIntegrationTest {
 
     @Autowired

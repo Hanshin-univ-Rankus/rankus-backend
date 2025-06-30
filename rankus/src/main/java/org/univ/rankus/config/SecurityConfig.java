@@ -31,7 +31,7 @@ import org.univ.rankus.common.security.jwt.JwtTokenProvider;
  */
 
 
-@Profile({"aws", "secure"})
+@Profile({"aws", "!dev"})
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor

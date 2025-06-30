@@ -10,8 +10,8 @@
 ### 책임 매트릭스
 | Config 클래스 | 역할 | 프로파일 |
 |------------|------|----------|
-| SecurityConfig | Spring Security | !default |
-| DevSecurityConfig | 개발용 보안 비활성화 | default |
+| SecurityConfig | Spring Security | !dev |
+| DevSecurityConfig | 개발용 보안 비활성화 | dev |
 | SwaggerConfig | API 문서 | 전체 |
 | CorsConfig | CORS 설정 | 전체 |
 | JacksonConfig | JSON 직렬화 | 전체 |
@@ -35,20 +35,20 @@
 ### 프로파일 매트릭스
 | 프로파일 | 용도 | 데이터베이스 | 보안 | 로깅 |
 |---------|------|------------|------|---------|
-| default | 개발 | localhost:3306 | 비활성화 | DEBUG |
-| secure | 로컬 보안 테스트 | localhost:3306 | JWT 활성화 | WARN |
+| 기본 | 개발 | localhost:3306 | JWT 활성화 | INFO |
+| dev | 빠른 개발 | localhost:3306 | 비활성화 | DEBUG |
 | aws | 배포 | 환경변수 | JWT 활성화 | INFO |
 
 ### 주요 설정 항목
 ```yaml
 # application.yml (기본)
 spring:
-  profiles.active: default
-  jpa.hibernate.ddl-auto: create-drop
+  jpa.hibernate.ddl-auto: create
   datasource.url: jdbc:mysql://localhost:3306/rankus
-jwt:
-  secret-key: "development-only-key"
-  expiration-time: 86400000
+security:
+  jwt:
+    secret: "yDeGly34tDXIxkjo6MQKgBNCI+2iMFLdT0i8zD2JZuE="
+    expiration-ms: 3600000
 
 # application-aws.yml (배포)
 spring:
@@ -95,8 +95,8 @@ jwt.secret-key: ${JWT_SECRET_KEY}
 
 ## 🎯 주요 규칙 요약
 
-1. **프로파일 분리**: default(개발), secure(로컬테스트), aws(배포)
-2. **보안 전략**: 개발용 보안 비활성화, 운영용 보안 강화
+1. **프로파일 분리**: 기본(개발), dev(빠른개발), aws(배포)
+2. **보안 전략**: 기본적으로 보안 활성화, dev 프로파일에서만 비활성화
 3. **환경변수**: 민감정보 환경변수 분리
 4. **Bean 조건**: @ConditionalOnMissingBean, @Profile 활용
 5. **설정 검증**: @PostConstruct로 필수 설정 검증

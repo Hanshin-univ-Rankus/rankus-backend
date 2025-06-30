@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(LabApplicationController.class)
 @AutoConfigureMockMvc
-@ActiveProfiles("default")  // DevSecurityConfig 적용
+@ActiveProfiles("dev")  // DevSecurityConfig 적용
 class LabApplicationControllerSecurityTest {
 
     @Autowired
