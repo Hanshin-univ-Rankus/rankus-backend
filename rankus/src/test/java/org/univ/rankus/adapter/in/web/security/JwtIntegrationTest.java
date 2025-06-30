@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.univ.rankus.adapter.in.web.controller.AuthController;
 import org.univ.rankus.adapter.in.web.controller.UserController;
+import org.univ.rankus.adapter.in.web.dto.request.UserLoginRequestDto;
 import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
 import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
@@ -33,6 +34,7 @@ import org.univ.rankus.config.MethodSecurityConfig;
 import org.univ.rankus.config.SecurityConfig;
 import org.univ.rankus.domain.model.user.User;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -94,7 +96,11 @@ class JwtIntegrationTest {
                 .user(userDto)
                 .build();
         
-        given(authUseCase.login(email, rawPassword)).willReturn(authDto);
+        UserLoginRequestDto loginRequest = UserLoginRequestDto.builder()
+                .email(email)
+                .password(rawPassword)
+                .build();
+        given(authUseCase.login(any(UserLoginRequestDto.class))).willReturn(authDto);
 
         // 로그인 응답 사용자 모킹
         User mockUser = org.mockito.Mockito.mock(User.class);

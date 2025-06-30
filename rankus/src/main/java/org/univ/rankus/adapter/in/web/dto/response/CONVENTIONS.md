@@ -1,265 +1,69 @@
-# Response DTO 코딩 컨벤션
+# Response DTO 컨벤션
 
-> HTTP 응답 데이터를 제공하는 Response DTO 클래스의 네이밍, 구조, 변환 패턴
+> 📋 **네이밍 규칙**: @core/conventions.md#dto  
+> 🏗️ **기본 패턴**: @core/patterns.md#response-템플릿
 
-## 📛 네이밍 컨벤션
+## 🎯 핵심 규칙
 
-### 클래스 네이밍
-- **기본 패턴**: `{Domain}ResponseDto`
-- **단일 응답**: `UserResponseDto`, `LabResponseDto`
-- **인증 응답**: `AuthResponseDto` (토큰 + 사용자 정보)
-- **페이징 응답**: `PageResponse<T>` (제네릭 활용)
-- **공통 응답**: `ApiResponse<T>` (모든 응답의 래퍼)
+### 네이밍 매트릭스
+| 타입 | 패턴 | 예시 |
+|------|------|------|
+| 기본 | `{Domain}ResponseDto` | `UserResponseDto`, `LabResponseDto` |
+| 인증 | `AuthResponseDto` | 토큰 + 사용자 정보 |
+| 페이징 | `PageResponse<T>` | 제네릭 활용 |
+| 공통 | `ApiResponse<T>` | 모든 응답 래퍼 |
 
-### 필드 네이밍
-- **camelCase 사용**: `firstName`, `lastName`, `createdAt`
-- **boolean 필드**: `isActive`, `hasPermission`
-- **시간 필드**: `createdAt`, `updatedAt` (ISO 8601 형식)
-- **관계 필드**: `labId`, `labName` (필요한 정보만 포함)
+### 필드 패턴
+| 타입 | 네이밍 | 예시 |
+|------|--------|------|
+| 기본 | camelCase | `firstName`, `lastName` |
+| 시간 | `{verb}At` | `createdAt`, `updatedAt` |
+| 관계 | `{domain}Id`, `{domain}Name` | `labId`, `labName` |
+| Boolean | `isActive`, `hasPermission` | 상태 표현 |
 
-## 🏗️ 클래스 구조 패턴
+## 🏗️ 구조 패턴
 
-### 기본 Response DTO 구조
+### 기본 ResponseDto 템플릿
 ```java
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class {Domain}ResponseDto {
-    
-    // 1. 기본 식별자
+    // 1. 식별자 + 2. 비즈니스 데이터 + 3. 관계 데이터 + 4. 메타데이터
     private Long id;
-    
-    // 2. 주요 비즈니스 데이터
     private String name;
-    private String email;
-    private Role role;
-    
-    // 3. 관계 데이터 (필요한 정보만)
-    private Long labId;
-    private String labName;
-    
-    // 4. 메타데이터
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    
-    // 5. 도메인 객체에서 DTO 생성하는 팩토리 메서드
-    public static {Domain}ResponseDto from({Domain} {domain}) {
-        {Domain}ResponseDtoBuilder builder = {Domain}ResponseDto.builder()
-            .id({domain}.getId())
-            .name({domain}.getName())
-            .email({domain}.getEmail())
-            .role({domain}.getRole())
-            .createdAt({domain}.getCreatedAt())
-            .updatedAt({domain}.getUpdatedAt());
-            
-        // 관계 정보 포함 (null 체크)
-        if ({domain}.getLab() != null) {
-            builder.labId({domain}.getLab().getId())
-                   .labName({domain}.getLab().getName());
-        }
-        
-        return builder.build();
-    }
-    
-    // 6. 리스트 변환을 위한 정적 메서드
-    public static List<{Domain}ResponseDto> fromList(List<{Domain}> {domain}List) {
-        return {domain}List.stream()
-            .map({Domain}ResponseDto::from)
-            .collect(Collectors.toList());
-    }
-}
-```
-
-### 간단한 Response DTO 구조
-```java
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class LabImageResponseDto {
-    
-    private Long id;
-    private String imageUrl;
-    private ImageType type;
     private LocalDateTime createdAt;
     
-    public static LabImageResponseDto from(LabImage labImage) {
-        return LabImageResponseDto.builder()
-            .id(labImage.getId())
-            .imageUrl(labImage.getImageUrl())
-            .type(labImage.getType())
-            .createdAt(labImage.getCreatedAt())
-            .build();
+    // 팩토리 메서드 (필수)
+    public static {Domain}ResponseDto from({Domain} domain) {
+        // null 체크 포함한 변환 로직
     }
     
-    public static List<LabImageResponseDto> fromList(List<LabImage> images) {
-        return images.stream()
-            .map(LabImageResponseDto::from)
-            .collect(Collectors.toList());
+    public static List<{Domain}ResponseDto> fromList(List<{Domain}> list) {
+        return list.stream().map({Domain}ResponseDto::from).collect(toList());
     }
 }
 ```
 
-## 🎁 공통 응답 래퍼 패턴
+## 🎁 공통 래퍼 패턴
 
-### ApiResponse 표준화된 구조
-```java
-@Data
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Schema(description = "API 공통 응답 래퍼")
-public class ApiResponse<T> {
-    
-    @Schema(description = "HTTP 상태 코드", example = "200")
-    private int status;
-    
-    @Schema(description = "응답 메시지", example = "요청이 성공적으로 처리되었습니다.")
-    private String message;
-    
-    @Schema(description = "응답 데이터", nullable = true)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private T data;
-    
-    @Schema(description = "에러 상세 정보(검증 실패 등)", nullable = true)
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Object errors;
-    
-    @Schema(description = "응답 발생 시각", example = "2025-06-17T07:30:15.123Z")
-    @Builder.Default
-    private Instant timestamp = Instant.now();
-
-    // === 정적 팩토리 메서드들 ===
-    
-    /**
-     * 성공 응답 (200 OK, 데이터 있음)
-     */
-    public static <T> ApiResponse<T> success(T data) {
-        return ApiResponse.<T>builder()
-                .status(200)
-                .message("요청이 성공적으로 처리되었습니다.")
-                .data(data)
-                .build();
-    }
-    
-    /**
-     * 성공 응답 (200 OK, 커스텀 메시지)
-     */
-    public static <T> ApiResponse<T> success(T data, String message) {
-        return ApiResponse.<T>builder()
-                .status(200)
-                .message(message)
-                .data(data)
-                .build();
-    }
-    
-    /**
-     * 생성 성공 응답 (201 Created)
-     */
-    public static <T> ApiResponse<T> created(T data) {
-        return ApiResponse.<T>builder()
-                .status(201)
-                .message("리소스가 성공적으로 생성되었습니다.")
-                .data(data)
-                .build();
-    }
-    
-    /**
-     * 생성 성공 응답 (201 Created, 커스텀 메시지)
-     */
-    public static <T> ApiResponse<T> created(T data, String message) {
-        return ApiResponse.<T>builder()
-                .status(201)
-                .message(message)
-                .data(data)
-                .build();
-    }
-    
-    /**
-     * 삭제 성공 응답 (200 OK, 데이터 없음)
-     */
-    public static <T> ApiResponse<T> deleted() {
-        return ApiResponse.<T>builder()
-                .status(200)
-                .message("리소스가 성공적으로 삭제되었습니다.")
-                .build();
-    }
-    
-    /**
-     * 에러 응답 (커스텀 상태코드)
-     */
-    public static <T> ApiResponse<T> error(int status, String message) {
-        return ApiResponse.<T>builder()
-                .status(status)
-                .message(message)
-                .build();
-    }
-    
-    /**
-     * 에러 응답 (커스텀 상태코드, 에러 상세정보 포함)
-     */
-    public static <T> ApiResponse<T> error(int status, String message, Object errors) {
-        return ApiResponse.<T>builder()
-                .status(status)
-                .message(message)
-                .errors(errors)
-                .build();
-    }
-}
-```
+### ApiResponse 팩토리 메서드 매트릭스
+| 상황 | 메서드 | 상태코드 | 사용 케이스 |
+|------|--------|----------|-------------|
+| 성공 | `success(data)` | 200 | 조회/수정 성공 |
+| 생성 | `created(data)` | 201 | 리소스 생성 |
+| 삭제 | `deleted()` | 200 | 삭제 완료 |
+| 에러 | `error(status, message)` | 4xx/5xx | 예외 응답 |
 
 ### PageResponse 구조
 ```java
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class PageResponse<T> {
-    
     private List<T> content;
-    private int page;
-    private int size;
+    private int page, size, totalPages;
     private long totalElements;
-    private int totalPages;
-    private boolean first;
-    private boolean last;
-    private boolean hasNext;
-    private boolean hasPrevious;
+    private boolean first, last, hasNext, hasPrevious;
     
-    public static <T> PageResponse<T> of(Page<T> page) {
-        return PageResponse.<T>builder()
-            .content(page.getContent())
-            .page(page.getNumber())
-            .size(page.getSize())
-            .totalElements(page.getTotalElements())
-            .totalPages(page.getTotalPages())
-            .first(page.isFirst())
-            .last(page.isLast())
-            .hasNext(page.hasNext())
-            .hasPrevious(page.hasPrevious())
-            .build();
-    }
-    
-    // DTO 변환과 함께 페이징 응답 생성
-    public static <T, R> PageResponse<R> of(Page<T> page, Function<T, R> converter) {
-        List<R> convertedContent = page.getContent().stream()
-            .map(converter)
-            .collect(Collectors.toList());
-            
-        return PageResponse.<R>builder()
-            .content(convertedContent)
-            .page(page.getNumber())
-            .size(page.getSize())
-            .totalElements(page.getTotalElements())
-            .totalPages(page.getTotalPages())
-            .first(page.isFirst())
-            .last(page.isLast())
-            .hasNext(page.hasNext())
-            .hasPrevious(page.hasPrevious())
-            .build();
-    }
+    public static <T> PageResponse<T> of(Page<T> page) { /* 구현 */ }
+    public static <T,R> PageResponse<R> of(Page<T> page, Function<T,R> converter) { /* 구현 */ }
 }
 ```
 

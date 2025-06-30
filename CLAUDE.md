@@ -42,14 +42,31 @@ docker-compose up -d
 
 ## 📚 상세 문서
 
-프로젝트의 상세한 아키텍처, 도메인 모델, API 정보는 각 계층별 컨텍스트 파일을 참조하세요:
+### 경로 별칭 시스템
+```
+@src = rankus/src/main/java/org/univ/rankus
+@core = @src/_core
+@domain = @src/domain  
+@app = @src/application
+@adapter = @src/adapter
+@common = @src/common
+@config = @src/config
+@test = rankus/src/test/java/org/univ/rankus
+```
 
-- **소스코드 구조**: @rankus/src/main/java/org/univ/rankus/CLAUDE.md
-- **도메인 모델**: @rankus/src/main/java/org/univ/rankus/domain/CLAUDE.md  
-- **애플리케이션 계층**: @rankus/src/main/java/org/univ/rankus/application/CLAUDE.md
-- **어댑터 계층**: @rankus/src/main/java/org/univ/rankus/adapter/CLAUDE.md
-- **공통 컴포넌트**: @rankus/src/main/java/org/univ/rankus/common/CLAUDE.md
-- **설정 관리**: @rankus/src/main/java/org/univ/rankus/config/CLAUDE.md
+### 공통 패턴 (모든 개발자 필독)
+- **코딩 패턴**: @core/patterns.md
+- **네이밍 규칙**: @core/conventions.md  
+- **테스트 가이드**: @core/testing.md
+- **HTTP/권한 매트릭스**: @core/http-matrix.md
+
+### 계층별 가이드
+- **소스코드 구조**: @src/CLAUDE.md
+- **도메인 모델**: @domain/CLAUDE.md  
+- **애플리케이션 계층**: @app/CLAUDE.md
+- **어댑터 계층**: @adapter/CLAUDE.md
+- **공통 컴포넌트**: @common/CLAUDE.md
+- **설정 관리**: @config/CLAUDE.md
 
 ## 🎯 현재 구현 상태 (약 40%)
 

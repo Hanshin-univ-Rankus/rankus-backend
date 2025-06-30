@@ -54,11 +54,7 @@ public class UserController {
     ) {
         User user = userQueryUseCase.getUserById(principal.getUserId());
         UserResponseDto dto = UserResponseDto.from(user);
-        ApiResponse<UserResponseDto> body = ApiResponse.<UserResponseDto>builder()
-                .status(200)
-                .message("사용자 정보 조회 성공")
-                .data(dto)
-                .build();
+        ApiResponse<UserResponseDto> body = ApiResponse.success(dto, "사용자 정보 조회 성공");
         return ResponseEntity.ok(body);
     }
 }

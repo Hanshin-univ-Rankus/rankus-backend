@@ -11,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.univ.rankus.adapter.in.web.dto.request.UserLoginRequestDto;
+import org.univ.rankus.adapter.in.web.dto.request.UserRegisterRequestDto;
 import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
 import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
@@ -56,7 +58,13 @@ class AuthControllerTest {
             String json = objectMapper.writeValueAsString(req);
 
             User mockUser = mock(User.class);
-            given(authUseCase.signUp("홍길동", "new@example.com", "password123", Role.STUDENT))
+            UserRegisterRequestDto signUpRequest = UserRegisterRequestDto.builder()
+                    .name("홍길동")
+                    .email("new@example.com")
+                    .password("password123")
+                    .role(Role.STUDENT)
+                    .build();
+            given(authUseCase.signUp(any(UserRegisterRequestDto.class)))
                     .willReturn(mockUser);
             given(mockUser.getId()).willReturn(123L);
             given(mockUser.getName()).willReturn("홍길동");
@@ -88,7 +96,7 @@ class AuthControllerTest {
             );
             String json = objectMapper.writeValueAsString(req);
 
-            given(authUseCase.signUp(anyString(), eq("exist@example.com"), anyString(), any(Role.class)))
+            given(authUseCase.signUp(any(UserRegisterRequestDto.class)))
                     .willThrow(new UserValidationException(UserErrorCode.EMAIL_DUPLICATED));
 
             mockMvc.perform(post("/api/auth/signup")
@@ -148,7 +156,11 @@ class AuthControllerTest {
                     .user(userDto)
                     .build();
             
-            given(authUseCase.login("user@example.com", "password"))
+            UserLoginRequestDto loginRequest = UserLoginRequestDto.builder()
+                    .email("user@example.com")
+                    .password("password")
+                    .build();
+            given(authUseCase.login(any(UserLoginRequestDto.class)))
                     .willReturn(authDto);
 
             mockMvc.perform(post("/api/auth/login")
@@ -173,7 +185,7 @@ class AuthControllerTest {
             );
             String json = objectMapper.writeValueAsString(req);
 
-            given(authUseCase.login(anyString(), anyString()))
+            given(authUseCase.login(any(UserLoginRequestDto.class)))
                     .willThrow(new UserValidationException(UserErrorCode.INVALID_CREDENTIALS));
 
             mockMvc.perform(post("/api/auth/login")

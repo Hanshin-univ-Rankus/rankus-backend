@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 import org.univ.rankus.domain.model.user.Role;
 
 /**
- * 회원 가입 요청을 받을 때 사용하는 DTO
+ * 사용자 정보 수정 요청 DTO
  */
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRegisterRequestDto {
+public class UserUpdateRequestDto {
 
     @NotBlank(message = "이름은 필수입니다.")
     @Size(max = 30, message = "이름은 30자 이하여야 합니다.")
@@ -27,10 +27,6 @@ public class UserRegisterRequestDto {
     @Email(message = "이메일 형식이 올바르지 않습니다.")
     @Size(max = 100, message = "이메일은 100자 이하여야 합니다.")
     private String email;
-
-    @NotBlank(message = "비밀번호는 필수입니다.")
-    @Size(min = 8, max = 255, message = "비밀번호는 8자 이상 255자 이하여야 합니다.")
-    private String password;
 
     @NotNull(message = "역할은 필수입니다.")
     private Role role;

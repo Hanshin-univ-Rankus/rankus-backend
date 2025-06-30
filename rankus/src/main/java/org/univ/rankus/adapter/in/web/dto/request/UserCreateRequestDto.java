@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 import org.univ.rankus.domain.model.user.Role;
 
 /**
- * 회원 가입 요청을 받을 때 사용하는 DTO
+ * 사용자 생성 요청 DTO (관리자용)
  */
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRegisterRequestDto {
+public class UserCreateRequestDto {
 
     @NotBlank(message = "이름은 필수입니다.")
     @Size(max = 30, message = "이름은 30자 이하여야 합니다.")

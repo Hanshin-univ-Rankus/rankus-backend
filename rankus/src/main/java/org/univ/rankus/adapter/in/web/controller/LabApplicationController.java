@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.CacheControl;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -73,11 +72,7 @@ public class LabApplicationController {
                 dto.interviewTime()
         );
         LabApplicationResponseDto respDto = LabApplicationResponseDto.from(created);
-        ApiResponse<LabApplicationResponseDto> body = ApiResponse.<LabApplicationResponseDto>builder()
-                .status(HttpStatus.CREATED.value())
-                .message("가입 신청 성공")
-                .data(respDto)
-                .build();
+        ApiResponse<LabApplicationResponseDto> body = ApiResponse.created(respDto, "가입 신청 성공");
         URI location = URI.create("/api/labs/" + labId + "/applications/" + created.getId());
         return ResponseEntity.created(location)
                 .cacheControl(CacheControl.noStore())
@@ -123,11 +118,7 @@ public class LabApplicationController {
         List<LabApplicationResponseDto> dtos = queryUseCase.listApplicationsByLab(labId).stream()
                 .map(LabApplicationResponseDto::from)
                 .collect(Collectors.toList());
-        ApiResponse<List<LabApplicationResponseDto>> body = ApiResponse.<List<LabApplicationResponseDto>>builder()
-                .status(HttpStatus.OK.value())
-                .message("신청서 목록 조회 성공")
-                .data(dtos)
-                .build();
+        ApiResponse<List<LabApplicationResponseDto>> body = ApiResponse.success(dtos, "신청서 목록 조회 성공");
         return ResponseEntity.ok(body);
     }
 
@@ -151,11 +142,7 @@ public class LabApplicationController {
             @PathVariable @Positive Long appId
     ) {
         LabApplicationResponseDto dto = LabApplicationResponseDto.from(queryUseCase.getApplicationById(appId));
-        ApiResponse<LabApplicationResponseDto> body = ApiResponse.<LabApplicationResponseDto>builder()
-                .status(HttpStatus.OK.value())
-                .message("신청서 조회 성공")
-                .data(dto)
-                .build();
+        ApiResponse<LabApplicationResponseDto> body = ApiResponse.success(dto, "신청서 조회 성공");
         return ResponseEntity.ok(body);
     }
 

@@ -1,25 +1,29 @@
-# Controller 코딩 컨벤션
+# Controller 컨벤션
 
-> REST API Controller 클래스의 네이밍, 구조, 구현 패턴
+> 📋 **네이밍 규칙**: @core/conventions.md#controller  
+> 🏗️ **기본 패턴**: @core/patterns.md#controller-템플릿  
+> 📊 **HTTP 매트릭스**: @core/http-matrix.md
 
-## 📛 네이밍 컨벤션
+## 🎯 핵심 규칙
 
-### 클래스 네이밍
-- **Controller**: `{Domain}Controller` (예: `UserController`, `LabApplicationController`)
-- **매핑 패스**: `/api/{domain}` (예: `/api/users`, `/api/labs`)
-- **중첩 리소스**: `/api/{parent}/{parentId}/{child}` (예: `/api/labs/{labId}/applications`)
+### 네이밍 패턴
+| 타입 | 패턴 | 예시 |
+|------|------|------|
+| 클래스 | `{Domain}Controller` | `UserController`, `LabApplicationController` |
+| 경로 | `/api/{domain}` | `/api/users`, `/api/labs` |
+| 중첩 | `/api/{parent}/{parentId}/{child}` | `/api/labs/{labId}/applications` |
 
-### 메서드 네이밍
-- **HTTP 동사별**:
-  - GET: `get{Resource}()`, `get{Resource}List()`
-  - POST: `create{Resource}()`, `{action}{Resource}()`
-  - PUT: `update{Resource}()`, `{action}{Resource}()`
-  - DELETE: `delete{Resource}()`
-- **액션 기반**: `approve{Resource}()`, `reject{Resource}()`
+### 메서드 매트릭스
+| HTTP | 메서드 패턴 | 사용 케이스 |
+|------|-------------|-------------|
+| GET | `get{Resource}()` / `get{Resource}List()` | 조회 |
+| POST | `create{Resource}()` / `{action}{Resource}()` | 생성/액션 |
+| PUT | `update{Resource}()` / `{action}{Resource}()` | 수정/액션 |
+| DELETE | `delete{Resource}()` | 삭제 |
 
-## 🏗️ 클래스 구조 패턴
+## 🏗️ 구조 패턴
 
-### 기본 Controller 구조
+### 기본 Controller 템플릿
 ```java
 @RestController
 @RequestMapping("/api/{domain}")
@@ -27,316 +31,152 @@
 @Validated
 public class {Domain}Controller {
     
-    // 1. 의존성 주입 (private final)
-    private final {Domain}CommandUseCase {domain}CommandUseCase;
-    private final {Domain}QueryUseCase {domain}QueryUseCase;
+    private final {Domain}CommandUseCase commandUseCase;
+    private final {Domain}QueryUseCase queryUseCase;
     
-    // 2. POST 메서드 (생성)
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<{Domain}ResponseDto>> create{Domain}(
             @Valid @RequestBody {Domain}CreateRequestDto request) {
-        // 구현
-    }
-    
-    // 3. GET 메서드 (조회)
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<{Domain}ResponseDto>>> get{Domain}List() {
-        // 구현
+        // 구현: commandUseCase 호출 → ApiResponse.created() 반환
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<{Domain}ResponseDto>> get{Domain}(
-            @PathVariable Long id) {
-        // 구현
+    public ResponseEntity<ApiResponse<{Domain}ResponseDto>> get{Domain}(@PathVariable Long id) {
+        // 구현: queryUseCase 호출 → ApiResponse.success() 반환  
     }
     
-    // 4. PUT 메서드 (수정)
     @PutMapping("/{id}")
-    @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #id, '{Domain}', 'UPDATE')")
-    public ResponseEntity<ApiResponse<{Domain}ResponseDto>> update{Domain}(
-            @PathVariable Long id,
-            @Valid @RequestBody {Domain}UpdateRequestDto request) {
-        // 구현
-    }
-    
-    // 5. DELETE 메서드 (삭제)
-    @DeleteMapping("/{id}")
-    @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #id, '{Domain}', 'DELETE')")
-    public ResponseEntity<ApiResponse<Void>> delete{Domain}(@PathVariable Long id) {
-        // 구현
-    }
-    
-    // 6. 커스텀 액션 (필요시)
-    @PutMapping("/{id}/approve")
-    @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #id, '{Domain}', 'APPROVE')")
-    public ResponseEntity<ApiResponse<{Domain}ResponseDto>> approve{Domain}(@PathVariable Long id) {
-        // 구현
+    @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(...)")
+    public ResponseEntity<ApiResponse<{Domain}ResponseDto>> update{Domain}(...) {
+        // 구현: commandUseCase 호출 → ApiResponse.success() 반환
     }
 }
 ```
 
-### 중첩 리소스 Controller 구조
-```java
-@RestController
-@RequestMapping("/api/{parent}/{parentId}/{child}")
-@RequiredArgsConstructor
-@Validated
-public class {Child}Controller {
-    
-    private final {Child}CommandUseCase {child}CommandUseCase;
-    private final {Child}QueryUseCase {child}QueryUseCase;
-    
-    @PostMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<{Child}ResponseDto>> create{Child}(
-            @PathVariable Long {parent}Id,
-            @Valid @RequestBody {Child}CreateRequestDto request) {
-        
-        {Child}ResponseDto response = {child}CommandUseCase.create{Child}({parent}Id, request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ApiResponse.success(response, "{Child} 생성이 완료되었습니다"));
-    }
-    
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<{Child}ResponseDto>>> get{Child}List(
-            @PathVariable Long {parent}Id) {
-        
-        List<{Child}ResponseDto> response = {child}QueryUseCase.find{Child}By{Parent}({parent}Id);
-        return ResponseEntity.ok(ApiResponse.success(response));
-    }
-}
-```
+## 🎮 어노테이션 매트릭스
 
-## 🎮 어노테이션 패턴
+> 📋 **권한 매트릭스**: @core/http-matrix.md#preauthorize-패턴-매트릭스
 
 ### 보안 어노테이션
-```java
-// 인증만 필요한 경우
-@PreAuthorize("isAuthenticated()")
-
-// 권한 검증이 필요한 경우
-@PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #resourceId, 'ResourceType', 'ACTION')")
-
-// 역할 기반 접근 제어
-@PreAuthorize("hasRole('ADMIN') or hasRole('LAB_LEADER')")
-
-// 복합 조건
-@PreAuthorize("isAuthenticated() and (@unifiedPermissionEvaluator.hasPermission(authentication, #labId, 'Lab', 'MANAGE') or hasRole('ADMIN'))")
-```
+| 권한 타입 | 패턴 | 사용 케이스 |
+|-----------|------|-------------|
+| 인증만 | `@PreAuthorize("isAuthenticated()")` | 기본 CRUD |
+| 역할 기반 | `@PreAuthorize("hasRole('ADMIN')")` | 관리 기능 |
+| 소유권 | `@PreAuthorize("@permissionEvaluator.hasPermission(...)")` | 개인 리소스 |
 
 ### 매핑 어노테이션
-```java
-// 기본 CRUD
-@GetMapping                           // 목록 조회
-@GetMapping("/{id}")                 // 단일 조회
-@PostMapping                         // 생성
-@PutMapping("/{id}")                 // 전체 수정
-@PatchMapping("/{id}")               // 부분 수정
-@DeleteMapping("/{id}")              // 삭제
-
-// 커스텀 액션
-@PutMapping("/{id}/approve")         // 승인
-@PutMapping("/{id}/reject")          // 거부
-@PostMapping("/{id}/restore")        // 복원
-@PatchMapping("/{id}/status")        // 상태 변경
-```
+| HTTP | 매핑 | 용도 |
+|------|------|------|
+| GET | `@GetMapping` / `@GetMapping("/{id}")` | 목록/단일 조회 |
+| POST | `@PostMapping` / `@PostMapping("/{id}/action")` | 생성/액션 |
+| PUT | `@PutMapping("/{id}")` / `@PutMapping("/{id}/approve")` | 수정/상태변경 |
+| DELETE | `@DeleteMapping("/{id}")` | 삭제 |
 
 ### 검증 어노테이션
-```java
-// 클래스 레벨
-@Validated  // 메서드 파라미터 검증 활성화
+| 레벨 | 어노테이션 | 용도 |
+|------|------------|------|
+| 클래스 | `@Validated` | 파라미터 검증 활성화 |
+| Body | `@Valid @RequestBody` | Request Body 검증 |
+| Path | `@PathVariable @Min(1)` | Path Variable 검증 |
+| Param | `@RequestParam @NotBlank` | Request Parameter 검증 |
 
-// 파라미터 레벨
-@Valid @RequestBody RequestDto request        // Request Body 검증
-@PathVariable @Min(1) Long id                // Path Variable 검증
-@RequestParam @NotBlank String keyword       // Request Parameter 검증
+## 📊 응답 패턴
+
+> 📋 **상태코드 매트릭스**: @core/http-matrix.md#http-상태코드-매트릭스
+
+### 표준 ApiResponse 팩토리 메서드 사용 ✅
+
+| 상태 | ResponseEntity 패턴 | ApiResponse 메서드 | 사용 예시 |
+|------|---------------------|-------------------|-----------|
+| 200 | `ResponseEntity.ok()` | `ApiResponse.success(data)` | 조회 성공 |
+| 200 | `ResponseEntity.ok()` | `ApiResponse.success(data, message)` | 메시지 커스텀 |
+| 201 | `ResponseEntity.status(CREATED)` | `ApiResponse.created(data)` | 생성 성공 |
+| 201 | `ResponseEntity.status(CREATED)` | `ApiResponse.created(data, message)` | 생성 메시지 커스텀 |
+| 204 | `ResponseEntity.noContent()` | - | 삭제 성공 |
+
+### ❌ 사용 금지 패턴 (수정 완료)
+```java
+// ❌ 금지: 수동 빌더 패턴
+ApiResponse.builder()
+    .status(200)
+    .message("성공")
+    .data(data)
+    .build();
+
+// ❌ 금지: 하드코딩된 상태코드
+ApiResponse.builder()
+    .status(HttpStatus.OK.value())
+    .build();
 ```
 
-## 📊 HTTP 상태코드 규칙
-
-### 성공 응답
+### ✅ 표준 패턴 (현재 적용됨)
 ```java
-// 200 OK - 조회, 수정 성공
-return ResponseEntity.ok(ApiResponse.success(data));
-
-// 201 Created - 생성 성공
-return ResponseEntity.status(HttpStatus.CREATED)
-    .body(ApiResponse.success(data, "리소스가 생성되었습니다"));
-
-// 204 No Content - 삭제 성공
-return ResponseEntity.noContent().build();
-
-// 또는 삭제 성공 메시지 포함
-return ResponseEntity.ok(ApiResponse.success(null, "삭제가 완료되었습니다"));
+// ✅ 권장: 팩토리 메서드 사용
+ApiResponse.success(data, "조회 성공");
+ApiResponse.created(data, "생성 성공");
+ApiResponse.success(data); // 기본 메시지
 ```
 
-### 에러 응답 (GlobalExceptionHandler에서 처리)
-```java
-// 400 Bad Request - 잘못된 요청
-// 401 Unauthorized - 인증 필요
-// 403 Forbidden - 권한 없음
-// 404 Not Found - 리소스 없음
-// 409 Conflict - 충돌 (중복 등)
-// 500 Internal Server Error - 서버 오류
-```
+## 📦 처리 플로우
 
-## 📦 Request/Response 처리 패턴
-
-### Request 처리
+### Request → Response 플로우
 ```java
+// 1. 파라미터 주입 → 2. UseCase 호출 → 3. 응답 생성
 @PostMapping
 public ResponseEntity<ApiResponse<UserResponseDto>> createUser(
         @Valid @RequestBody UserCreateRequestDto request,
         @AuthenticationPrincipal CustomUserDetails currentUser) {
     
-    // 1. 현재 사용자 정보 활용 (필요시)
-    Long currentUserId = currentUser.getUser().getId();
-    
-    // 2. UseCase 호출
-    UserResponseDto response = userCommandUseCase.createUser(request);
-    
-    // 3. 응답 생성
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(ApiResponse.success(response, "사용자가 생성되었습니다"));
+    UserResponseDto response = commandUseCase.createUser(request);
+    return ResponseEntity.status(CREATED).body(ApiResponse.created(response));
 }
 ```
 
-### Response 생성
-```java
-// 성공 응답 (데이터 있음)
-ApiResponse<UserResponseDto> response = ApiResponse.success(userData);
-
-// 성공 응답 (메시지 포함)
-ApiResponse<UserResponseDto> response = ApiResponse.success(userData, "사용자 정보 조회 성공");
-
-// 성공 응답 (데이터 없음)
-ApiResponse<Void> response = ApiResponse.success(null, "삭제 완료");
-```
-
-## 🔍 페이징 처리 패턴
-
-### 페이징 파라미터
+### 페이징 파라미터 패턴
 ```java
 @GetMapping
 public ResponseEntity<ApiResponse<PageResponse<UserResponseDto>>> getUserList(
         @RequestParam(defaultValue = "0") @Min(0) int page,
         @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size,
-        @RequestParam(defaultValue = "createdAt") String sort,
-        @RequestParam(defaultValue = "desc") String direction) {
+        @RequestParam(defaultValue = "createdAt") String sort) {
     
-    Pageable pageable = PageRequest.of(page, size, 
-        Sort.Direction.fromString(direction), sort);
-    
-    PageResponse<UserResponseDto> response = userQueryUseCase.findUsers(pageable);
+    Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+    PageResponse<UserResponseDto> response = queryUseCase.findUsers(pageable);
     return ResponseEntity.ok(ApiResponse.success(response));
 }
 ```
 
-### PageResponse 구조
-```java
-public class PageResponse<T> {
-    private List<T> content;
-    private int page;
-    private int size;
-    private long totalElements;
-    private int totalPages;
-    private boolean first;
-    private boolean last;
-    
-    public static <T> PageResponse<T> of(Page<T> page) {
-        return PageResponse.<T>builder()
-            .content(page.getContent())
-            .page(page.getNumber())
-            .size(page.getSize())
-            .totalElements(page.getTotalElements())
-            .totalPages(page.getTotalPages())
-            .first(page.isFirst())
-            .last(page.isLast())
-            .build();
-    }
-}
-```
+## ⚠️ 예외 및 검증
 
-## ⚠️ 예외 처리 패턴
+### 예외 처리 원칙
+- Controller: 예외 처리 없음, UseCase 위임
+- 검증: `@Valid` 자동 검증 → GlobalExceptionHandler 처리
+- 권한: `@PreAuthorize` 실패 → 403 Forbidden
 
-### Controller 레벨 예외 처리
-```java
-// Controller에서는 예외를 잡지 않고 UseCase로 위임
-@PostMapping
-public ResponseEntity<ApiResponse<UserResponseDto>> createUser(
-        @Valid @RequestBody UserCreateRequestDto request) {
-    
-    // UseCase에서 발생하는 예외는 GlobalExceptionHandler에서 처리
-    UserResponseDto response = userCommandUseCase.createUser(request);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(ApiResponse.success(response));
-}
-```
+## 🧪 테스트 패턴
 
-### 파라미터 검증 실패
-```java
-// @Valid 어노테이션으로 자동 검증
-// 실패시 MethodArgumentNotValidException 발생
-// GlobalExceptionHandler에서 400 Bad Request로 처리
-```
+> 📋 **테스트 가이드**: @core/testing.md#controller-테스트
 
-## 🧪 Controller 테스트 패턴
-
-### WebMvcTest 활용
+### WebMvcTest 구조
 ```java
 @WebMvcTest(UserController.class)
 class UserControllerTest {
+    @Autowired private MockMvc mockMvc;
+    @MockBean private UserCommandUseCase commandUseCase;
+    @MockBean private UserQueryUseCase queryUseCase;
     
-    @Autowired
-    private MockMvc mockMvc;
-    
-    @MockBean
-    private UserCommandUseCase userCommandUseCase;
-    
-    @MockBean
-    private UserQueryUseCase userQueryUseCase;
-    
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    void 사용자_생성_API_테스트() throws Exception {
-        // given
-        UserCreateRequestDto request = UserCreateRequestDto.builder()
-            .name("홍길동")
-            .email("hong@example.com")
-            .password("password123!")
-            .role(Role.STUDENT)
-            .build();
-            
-        UserResponseDto response = UserResponseDto.builder()
-            .id(1L)
-            .name("홍길동")
-            .email("hong@example.com")
-            .role(Role.STUDENT)
-            .build();
-            
-        when(userCommandUseCase.createUser(any(UserCreateRequestDto.class)))
-            .thenReturn(response);
-        
-        // when & then
-        mockMvc.perform(post("/api/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpected(jsonPath("$.status").value(201))
-                .andExpected(jsonPath("$.data.name").value("홍길동"));
-                
-        verify(userCommandUseCase).createUser(any(UserCreateRequestDto.class));
-    }
+    @Test @WithMockUser
+    void API_테스트() { /* 구현 */ }
 }
 ```
 
-## 🎯 주요 규칙 요약
+## 🎯 핵심 규칙
 
-1. **단일 책임**: 각 Controller는 하나의 도메인 리소스만 담당
-2. **표준 매핑**: RESTful API 설계 원칙 준수
-3. **보안 우선**: 모든 엔드포인트에 적절한 보안 설정
-4. **검증 철저**: 입력값에 대한 충분한 검증
-5. **응답 일관성**: ApiResponse로 표준화된 응답 형식
-6. **예외 위임**: 비즈니스 예외는 GlobalExceptionHandler에 위임
-7. **테스트 가능**: MockMvc를 활용한 통합 테스트 작성
+1. **단일 책임**: 도메인별 Controller 분리
+2. **RESTful 설계**: 표준 HTTP 메서드 활용  
+3. **보안 우선**: 적절한 @PreAuthorize 설정
+4. **검증 철저**: @Valid + 파라미터 검증
+5. **응답 일관성**: ApiResponse 표준화
+6. **예외 위임**: GlobalExceptionHandler 활용
+7. **테스트 완비**: WebMvcTest + MockBean

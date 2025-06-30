@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.univ.rankus.adapter.in.web.dto.request.*;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
@@ -50,11 +51,14 @@ class UserCommandServiceTest {
             User mockUser = givenExistingUser(userId);
 
             // when
-            userService.changeName(userId, newName);
+            ChangeNameRequestDto request = ChangeNameRequestDto.builder()
+                .newName(newName)
+                .build();
+            userService.changeName(userId, request);
 
             // then
             verify(userRepo).findById(userId);
-            verify(mockUser).changeName(newName);
+            verify(mockUser).changeName(request.getNewName());
             verify(userRepo).save(mockUser);
         }
 
@@ -66,7 +70,10 @@ class UserCommandServiceTest {
             when(userRepo.findById(userId)).thenReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> userService.changeName(userId, "어느누구"))
+            ChangeNameRequestDto request = ChangeNameRequestDto.builder()
+                .newName("어느누구")
+                .build();
+            assertThatThrownBy(() -> userService.changeName(userId, request))
                     .isInstanceOf(UserNotFoundException.class)
                     .satisfies(ex -> {
                         UserNotFoundException e = (UserNotFoundException) ex;
@@ -90,7 +97,10 @@ class UserCommandServiceTest {
                     .when(mockUser).changeName(null);
 
             // when & then
-            assertThatThrownBy(() -> userService.changeName(userId, null))
+            ChangeNameRequestDto request = ChangeNameRequestDto.builder()
+                .newName(null)
+                .build();
+            assertThatThrownBy(() -> userService.changeName(userId, request))
                     .isInstanceOf(UserValidationException.class)
                     .satisfies(ex -> {
                         UserValidationException e = (UserValidationException) ex;
@@ -98,7 +108,7 @@ class UserCommandServiceTest {
                                 .isEqualTo(UserErrorCode.NAME_REQUIRED);
                     });
 
-            verify(mockUser).changeName(null);
+            verify(mockUser).changeName(request.getNewName());
             verify(userRepo, never()).save(any());
         }
 
@@ -114,7 +124,10 @@ class UserCommandServiceTest {
                     .when(mockUser).changeName(longName);
 
             // when & then
-            assertThatThrownBy(() -> userService.changeName(userId, longName))
+            ChangeNameRequestDto request = ChangeNameRequestDto.builder()
+                .newName(longName)
+                .build();
+            assertThatThrownBy(() -> userService.changeName(userId, request))
                     .isInstanceOf(UserValidationException.class)
                     .satisfies(ex -> {
                         UserValidationException e = (UserValidationException) ex;
@@ -122,7 +135,7 @@ class UserCommandServiceTest {
                                 .isEqualTo(UserErrorCode.NAME_TOO_LONG);
                     });
 
-            verify(mockUser).changeName(longName);
+            verify(mockUser).changeName(request.getNewName());
             verify(userRepo, never()).save(any());
         }
     }

@@ -1,168 +1,39 @@
 # Domain Model 상세 가이드
 
-> 엔티티, Value Object, Enum의 구체적인 구현 방법과 비즈니스 로직
+> 📋 **기본 패턴**: @core/patterns.md#entity-템플릿
 
-## 📊 엔티티 상세 분석
+## 📊 엔티티 매트릭스
 
-### User Entity 구현 분석
+### 핵심 엔티티 구조
+| 엔티티 | 테이블 | 주요 필드 | 비즈니스 메서드 |
+|--------|--------|-----------|-----------------|
+| **User** | `users` | name, email, password, role, lab | `checkPassword()`, `assignLab()`, `isLabLeaderOrLabManager()` |
+| **Lab** | `labs` | name, category, description, ranking | `autoAssignProfessor()`, `updateRanking()` |
+| **LabApplication** | `lab_application` | lab, user, interviewTime, status | `approve()`, `reject()`, `isOwnedBy()` |
+| **LabImage** | `lab_image` | lab, imageUrl, type | `setImageUrl()` |
 
-#### 핵심 필드
-```java
-@Entity
-@Table(name = "users")
-public class User extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = IDENTITY)
-    private Long id;
-    
-    @Column(length = 30, nullable = false)
-    private String name;
-    
-    @Column(length = 100, nullable = false, unique = true)
-    private String email;
-    
-    @Embedded
-    private Password password;
-    
-    @Enumerated(EnumType.STRING)
-    private Role role = Role.STUDENT;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lab_id")
-    private Lab lab;
-}
-```
+### 검증 규칙 매트릭스
+| 엔티티 | 필드 | 규칙 | 제약사항 |
+|--------|------|------|----------|
+| User | name | 필수, 최대 30자 | Not null |
+| User | email | 필수, 고유, 최대 100자 | Unique |
+| User | password | Password VO | 8자 이상 |
+| Lab | name | 필수, 최대 10자 | Not null |
+| Lab | ranking | 필수, 0 이상 | ≥ 0 |
+| LabApplication | interviewTime | 필수, 미래 | Future |
 
-#### 핵심 비즈니스 메서드
-- **`checkPassword(String rawPassword)`**: 로그인 시 비밀번호 검증
-- **`changePassword(String newRawPassword)`**: 비밀번호 변경 및 검증
-- **`assignLab(Lab lab)`**: 랩실 배정
-- **`isLabLeaderOrLabManagerInLab(Lab targetLab)`**: 특정 랩실에서의 권한 확인
+### 상태 전이 매트릭스
+| 엔티티 | 초기 상태 | 가능한 전이 | 비즈니스 규칙 |
+|--------|-----------|-------------|---------------|
+| LabApplication | PENDING | → APPROVED, REJECTED | PENDING에서만 변경 가능 |
+| User | STUDENT | → LAB_MEMBER → LAB_MANAGER → LAB_LEADER | 랩 배정 시 승급 |
 
-#### 검증 규칙
-- 이름: 필수, 최대 30자
-- 이메일: 필수, 유효한 형식, 고유값, 최대 100자
-- 비밀번호: Password Value Object로 검증
-- 역할: 기본값 STUDENT
-
-### Lab Entity 구현 분석
-
-#### 핵심 필드
-```java
-@Entity
-@Table(name = "lab")
-public class Lab extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = IDENTITY)
-    private Long id;
-    
-    @Column(length = 10, nullable = false)
-    private String name;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private LabCategory category;
-    
-    @Column(length = 255)
-    private String description;
-    
-    @Column(nullable = false)
-    private Integer ranking = 0;
-    
-    @Column(length = 10)
-    private String professorName;
-}
-```
-
-#### 핵심 비즈니스 메서드
-- **`autoAssignProfessorIfMatches(User user)`**: 사용자가 교수일 경우 자동 할당
-- **`setProfessorName(String name)`**: 교수명 설정 및 검증
-- **`updateRanking(Integer newRanking)`**: 랭킹 값 검증 후 업데이트
-- **`increaseRanking(Integer points)`**: 랭킹 점수 증가
-- **`decreaseRanking(Integer points)`**: 랭킹 점수 감소 (최소 0)
-
-#### 검증 규칙
-- 이름: 필수, 최대 10자, 공백 제거
-- 카테고리: 필수 enum 값
-- 설명: 선택, 최대 255자
-- 랭킹: 필수, 0 이상의 정수
-- 교수명: 선택, 최대 10자
-
-### LabApplication Entity 구현 분석
-
-#### 핵심 필드
-```java
-@Entity
-@Table(name = "lab_application", 
-       uniqueConstraints = @UniqueConstraint(columnNames = {"lab_id", "user_id"}))
-public class LabApplication extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = IDENTITY)
-    private Long id;
-    
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "lab_id")
-    private Lab lab;
-    
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
-    private User user;
-    
-    @Column(nullable = false)
-    private LocalDateTime interviewTime;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ApplicationStatus status = ApplicationStatus.PENDING;
-}
-```
-
-#### 핵심 비즈니스 메서드
-- **`approve()`**: 지원 승인 (PENDING → APPROVED)
-- **`reject()`**: 지원 거부 (PENDING → REJECTED)  
-- **`isOwnedBy(User user)`**: 지원서 소유권 확인
-
-#### 상태 전이 규칙
-```
-PENDING ──approve()──► APPROVED
-   │
-   └──reject()───► REJECTED
-```
-
-#### 검증 규칙
-- 랩실: 필수 참조
-- 사용자: 필수 참조
-- 면접시간: 필수, 미래 시점
-- 상태: 기본값 PENDING
-- 중복 지원 방지: (lab_id, user_id) 유니크 제약
-
-### LabImage Entity 구현 분석
-
-#### 핵심 필드
-```java
-@Entity
-@Table(name = "lab_image")
-public class LabImage {
-    @Id @GeneratedValue(strategy = IDENTITY)
-    private Long id;
-    
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "lab_id")
-    private Lab lab;
-    
-    @Column(length = 255, nullable = false)
-    private String imageUrl;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ImageType type;
-}
-```
-
-#### 핵심 비즈니스 메서드
-- **`setImageUrl(String url)`**: URL 형식 검증 후 설정
-
-#### 검증 규칙
-- 랩실: 필수 참조
-- 이미지 URL: 필수, 유효한 URL 형식, 최대 255자
-- 타입: 필수 enum 값 (REPRESENTATIVE/ADDITIONAL)
+### 연관관계 매트릭스
+| 관계 | 주인 | 대상 | 매핑 | 제약 |
+|------|------|------|------|------|
+| User ↔ Lab | User | Lab | @ManyToOne LAZY | 하나의 랩만 |
+| Lab ↔ LabApplication | LabApplication | Lab | @ManyToOne | 중복 지원 금지 |
+| Lab ↔ LabImage | LabImage | Lab | @ManyToOne | Cascade ALL |
 
 ## 💎 Value Object 상세 분석
 

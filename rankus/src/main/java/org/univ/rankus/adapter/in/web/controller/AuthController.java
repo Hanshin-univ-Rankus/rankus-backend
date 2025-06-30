@@ -67,12 +67,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<UserResponseDto>> signup(
             @Valid @RequestBody UserRegisterRequestDto requestDto
     ) {
-        User created = authUseCase.signUp(
-                requestDto.getName(),
-                requestDto.getEmail(),
-                requestDto.getPassword(),
-                requestDto.getRole()
-        );
+        User created = authUseCase.signUp(requestDto);
         UserResponseDto dto = UserResponseDto.from(created);
         ApiResponse<UserResponseDto> body = ApiResponse.created(dto, "회원가입 성공");
         URI location = URI.create("/api/users/" + created.getId());
@@ -124,7 +119,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponseDto>> login(
             @Valid @RequestBody UserLoginRequestDto dto
     ) {
-        AuthResponseDto authDto = authUseCase.login(dto.getEmail(), dto.getPassword());
+        AuthResponseDto authDto = authUseCase.login(dto);
         ApiResponse<AuthResponseDto> body = ApiResponse.success(authDto, "로그인 성공");
         return ResponseEntity.ok().body(body);
     }

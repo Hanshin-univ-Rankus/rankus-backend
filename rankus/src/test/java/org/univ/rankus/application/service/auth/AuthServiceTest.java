@@ -14,6 +14,7 @@ import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
 import org.univ.rankus.domain.model.user.exception.UserValidationException;
+import org.univ.rankus.adapter.in.web.dto.request.*;
 import org.univ.rankus.testutil.mock.AuthMockUtil;
 import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
 
@@ -50,7 +51,11 @@ class AuthServiceTest {
             AuthMockUtil.configureToken(authTokenPort, user);
 
             // when: 서비스 호출
-            AuthResponseDto response = authService.login(AuthMockUtil.VALID_EMAIL, AuthMockUtil.RAW_PASSWORD);
+            UserLoginRequestDto request = UserLoginRequestDto.builder()
+                .email(AuthMockUtil.VALID_EMAIL)
+                .password(AuthMockUtil.RAW_PASSWORD)
+                .build();
+            AuthResponseDto response = authService.login(request);
 
             // then: AuthResponseDto 리턴 및 포트 호출 검증
             assertThat(response.getToken()).isEqualTo(AuthMockUtil.TOKEN);
@@ -68,8 +73,12 @@ class AuthServiceTest {
             AuthMockUtil.mockUserNotFound(userRepo, "noone@example.com");
 
             // when & then: 예외 및 에러코드 검증
+            UserLoginRequestDto request = UserLoginRequestDto.builder()
+                .email("noone@example.com")
+                .password(AuthMockUtil.RAW_PASSWORD)
+                .build();
             assertThatThrownBy(() ->
-                    authService.login("noone@example.com", AuthMockUtil.RAW_PASSWORD))
+                    authService.login(request))
                     .isInstanceOf(UserNotFoundException.class)
                     .satisfies(ex -> {
                         UserNotFoundException e = (UserNotFoundException) ex;
@@ -85,8 +94,12 @@ class AuthServiceTest {
             AuthMockUtil.mockInvalidPassword(userRepo, passwordEncoder);
 
             // when & then: 예외 및 에러코드 검증
+            UserLoginRequestDto request = UserLoginRequestDto.builder()
+                .email(AuthMockUtil.VALID_EMAIL)
+                .password(AuthMockUtil.RAW_PASSWORD)
+                .build();
             assertThatThrownBy(() ->
-                    authService.login(AuthMockUtil.VALID_EMAIL, AuthMockUtil.RAW_PASSWORD))
+                    authService.login(request))
                     .isInstanceOf(UserValidationException.class)
                     .satisfies(ex -> {
                         UserValidationException e = (UserValidationException) ex;
@@ -118,7 +131,13 @@ class AuthServiceTest {
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
             // when: 서비스 호출
-            User saved = authService.signUp(name, email, AuthMockUtil.RAW_PASSWORD, org.univ.rankus.domain.model.user.Role.STUDENT);
+            UserRegisterRequestDto request = UserRegisterRequestDto.builder()
+                .name(name)
+                .email(email)
+                .password(AuthMockUtil.RAW_PASSWORD)
+                .role(org.univ.rankus.domain.model.user.Role.STUDENT)
+                .build();
+            User saved = authService.signUp(request);
 
             // then: 반환된 User 필드 검증 및 포트 호출 검증
             assertThat(saved.getName()).isEqualTo(name);
@@ -139,8 +158,14 @@ class AuthServiceTest {
             when(userRepo.existsByEmail(email)).thenReturn(true);
 
             // when & then: 예외 및 에러코드 검증
+            UserRegisterRequestDto request = UserRegisterRequestDto.builder()
+                .name("anyName")
+                .email(email)
+                .password(AuthMockUtil.RAW_PASSWORD)
+                .role(org.univ.rankus.domain.model.user.Role.STUDENT)
+                .build();
             assertThatThrownBy(() ->
-                    authService.signUp("anyName", email, AuthMockUtil.RAW_PASSWORD, org.univ.rankus.domain.model.user.Role.STUDENT))
+                    authService.signUp(request))
                     .isInstanceOf(UserValidationException.class)
                     .satisfies(ex -> {
                         UserValidationException e = (UserValidationException) ex;

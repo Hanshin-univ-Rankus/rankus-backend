@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -81,11 +80,7 @@ public class LabImageController {
         );
 
         // 3) ApiResponse 래핑
-        ApiResponse<LabImageResponseDto> body = ApiResponse.<LabImageResponseDto>builder()
-                .status(HttpStatus.CREATED.value())
-                .message("이미지 등록 성공")
-                .data(dto)
-                .build();
+        ApiResponse<LabImageResponseDto> body = ApiResponse.created(dto, "이미지 등록 성공");
 
         // 4) Location 헤더
         URI location = URI.create("/api/labs/" + labId + "/images/" + saved.getId());
@@ -127,11 +122,7 @@ public class LabImageController {
                 ))
                 .collect(Collectors.toList());
 
-        ApiResponse<List<LabImageResponseDto>> body = ApiResponse.<List<LabImageResponseDto>>builder()
-                .status(HttpStatus.OK.value())
-                .message("이미지 목록 조회 성공")
-                .data(dtos)
-                .build();
+        ApiResponse<List<LabImageResponseDto>> body = ApiResponse.success(dtos, "이미지 목록 조회 성공");
 
         return ResponseEntity.ok(body);
     }
@@ -165,11 +156,7 @@ public class LabImageController {
                 img.getType()
         );
 
-        ApiResponse<LabImageResponseDto> body = ApiResponse.<LabImageResponseDto>builder()
-                .status(HttpStatus.OK.value())
-                .message("이미지 조회 성공")
-                .data(dto)
-                .build();
+        ApiResponse<LabImageResponseDto> body = ApiResponse.success(dto, "이미지 조회 성공");
 
         return ResponseEntity.ok(body);
     }

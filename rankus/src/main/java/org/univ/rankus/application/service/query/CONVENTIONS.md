@@ -14,42 +14,39 @@ public class {Domain}QueryService implements {Domain}QueryUseCase {
     private final {Domain}RepositoryPort {domain}RepositoryPort;
     
     @Override
-    public {Domain}ResponseDto find{Domain}ById(Long id) {
-        {Domain} {domain} = {domain}RepositoryPort.findById(id)
+    public {Domain} find{Domain}ById(Long id) {
+        return {domain}RepositoryPort.findById(id)
             .orElseThrow(() -> new {Domain}NotFoundException());
-        return {Domain}ResponseDto.from({domain});
     }
     
     @Override
-    public List<{Domain}ResponseDto> findAll{Domain}s() {
-        List<{Domain}> {domain}s = {domain}RepositoryPort.findAll();
-        return {domain}s.stream()
-            .map({Domain}ResponseDto::from)
-            .collect(Collectors.toList());
+    public List<{Domain}> findAll{Domain}s() {
+        return {domain}RepositoryPort.findAll();
     }
 }
 ```
 
 ## 메서드 패턴
-- 단일 조회: `find{Domain}ById(Long) -> {ResponseDto}`
-- 목록 조회: `findAll{Domain}s() -> List<{ResponseDto}>`
-- 조건 조회: `find{Domain}sBy{Condition}({Params}) -> List<{ResponseDto}>`
-- 페이징 조회: `find{Domain}s(Pageable) -> Page<{ResponseDto}>`
+- 단일 조회: `find{Domain}ById(Long) -> {Domain}`
+- 목록 조회: `findAll{Domain}s() -> List<{Domain}>`
+- 조건 조회: `find{Domain}sBy{Condition}({Params}) -> List<{Domain}>`
+- 페이징 조회: `find{Domain}s(Pageable) -> Page<{Domain}>`
+
+## 반환값 규칙
+- **Domain Entity 반환**: 모든 public 메서드는 Domain Entity 또는 Value Object를 반환한다
+- **DTO 변환 위치**: Controller 계층에서 Entity → DTO 변환을 담당한다
+- **비즈니스 로직**: 도메인 객체 중심으로 처리
 
 ## 구현 규칙
 1. 모든 메서드에 `@Override` 어노테이션
-2. Repository에서 조회 후 DTO 변환
+2. Repository에서 조회 후 Domain Entity 반환
 3. 예외는 즉시 발생 (orElseThrow 사용)
-4. Stream API 활용한 변환
+4. 비즈니스 로직은 Domain Entity로 처리
 
 ## 트랜잭션
 - 클래스 레벨: `@Transactional(readOnly = true)`
 - 읽기 전용 트랜잭션으로 성능 최적화
 
-## DTO 변환
-- `{Domain}ResponseDto.from()` 정적 메서드 사용
-- 리스트 변환 시 Stream API 활용
-- 페이징 응답 시 `PageResponse.of()` 사용
 
 ## 예외 처리
 - 조회 실패 시 `{Domain}NotFoundException` 발생

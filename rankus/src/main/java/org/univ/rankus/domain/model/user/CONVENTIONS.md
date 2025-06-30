@@ -1,321 +1,160 @@
-# User Domain 코딩 컨벤션
+# User Domain 컨벤션
 
-> User 관련 도메인 객체의 네이밍, 구조, 구현 패턴
+## 📛 네이밍
+| 구분 | 패턴 | 예시 |
+|------|------|------|
+| Entity | Domain명 | `User` |
+| Value Object | 개념명 | `Password` |
+| Enum | 단수형 | `Role` |
+| Exception | `{Domain}{Type}Exception` | `UserValidationException` |
+| Method-조회 | `get{Property}()`, `is{Condition}()` | `getName()`, `isActive()` |
+| Method-검증 | `check{Condition}()`, `validate{Property}()` | `checkPassword()` |
+| Method-변경 | `change{Property}()`, `assign{Property}()` | `changePassword()` |
+| Field | camelCase / UPPER_SNAKE_CASE | `name` / `MAX_LENGTH` |
 
-## 📛 네이밍 컨벤션
+## 🏗️ 구조 패턴
 
-### 클래스 네이밍
-- **Entity**: `User` (도메인 개념 그대로)
-- **Value Object**: `Password` (도메인 개념 + 접미사 없음)
-- **Enum**: `Role` (단수형)
-- **Exception**: `User{Specific}Exception` (@exception/CONVENTIONS.md 참조)
-- **ErrorCode**: `UserErrorCode`, `PasswordErrorCode` (@exception/CONVENTIONS.md 참조)
-
-### 메서드 네이밍
-- **조회**: `get{Property}()`, `is{Condition}()`
-- **검증**: `check{Condition}()`, `validate{Property}()`
-- **상태변경**: `change{Property}()`, `assign{Property}()`
-- **권한확인**: `isLabLeaderOrLabManagerInLab()`
-
-### 필드 네이밍
-- **기본**: camelCase
-- **상수**: UPPER_SNAKE_CASE
-- **컬럼매핑**: snake_case (DB 컬럼명)
-
-## 🏗️ 클래스 구조 패턴
-
-### User Entity 구조
+### User Entity
 ```java
 @Entity
 @Table(name = "users")
 public class User extends BaseTimeEntity {
-    
-    // 1. 필드 (private, final 선호)
     @Id @GeneratedValue(strategy = IDENTITY)
     private Long id;
     
-    // 2. 생성자 (protected, 팩토리 메서드 활용)
-    protected User() {} // JPA 전용
+    protected User() {} // JPA
+    private User(...) { validate(); }
     
-    private User(String name, String email, Password password, Role role) {
-        // 검증 로직
-        // 필드 초기화
-    }
-    
-    // 3. 팩토리 메서드 (public static)
-    public static User create(String name, String email, String rawPassword, Role role, PasswordEncoder encoder) {
-        return new User(name, email, Password.fromRaw(rawPassword, encoder), role);
-    }
-    
-    // 4. 비즈니스 메서드 (public)
-    public void checkPassword(String rawPassword) { /* 구현 */ }
-    public void changePassword(String newRawPassword) { /* 구현 */ }
-    
-    // 5. 유틸리티 메서드 (public)
-    public boolean isLabLeaderOrLabManagerInLab(Lab lab) { /* 구현 */ }
-    
-    // 6. Getter (필요한 것만 public)
-    public Long getId() { return id; }
-    public String getName() { return name; }
-    
-    // 7. 검증 메서드 (private)
-    private void validateName(String name) { /* 구현 */ }
-    
-    // 8. equals/hashCode (id 기반)
-    @Override
-    public boolean equals(Object obj) { /* 구현 */ }
+    public static User create(...) { return new User(...); }
+    public void checkPassword(String raw) { ... }
+    public boolean isLabLeaderOrLabManagerInLab(Lab lab) { ... }
 }
 ```
 
-### Value Object 구조 (Password)
+### Password Value Object
 ```java
 @Embeddable
 public class Password {
-    
-    // 1. 필드 (private final)
     @Column(name = "password", length = 255, nullable = false)
     private final String value;
     
-    // 2. 생성자 (private)
-    private Password(String hashedPassword) {
-        this.value = hashedPassword;
+    private Password(String hashedPassword) { this.value = hashedPassword; }
+    
+    public static Password fromRaw(String raw, PasswordEncoder encoder) {
+        validate(raw); return new Password(encoder.encode(raw));
     }
     
-    // 3. 팩토리 메서드 (public static)
-    public static Password fromRaw(String rawPassword, PasswordEncoder encoder) {
-        validatePassword(rawPassword);
-        return new Password(encoder.encode(rawPassword));
-    }
-    
-    // 4. 비즈니스 메서드
-    public boolean matches(String rawPassword, PasswordEncoder encoder) { /* 구현 */ }
-    
-    // 5. 검증 메서드 (private static)
-    private static void validatePassword(String password) { /* 구현 */ }
-    
-    // 7. equals/hashCode (value 기반)
-    @Override
-    public boolean equals(Object obj) { /* 구현 */ }
+    public boolean matches(String raw, PasswordEncoder encoder) { ... }
 }
 ```
 
-## 🔒 검증 규칙 패턴
+## 🔒 검증 패턴
 
-### 엔티티 검증
+### 검증 매트릭스
+| 필드 | 필수 | 최소 | 최대 | 규칙 |
+|------|------|------|------|------|
+| name | Y | - | 30 | trim(), non-empty |
+| email | Y | - | 255 | 형식, 중복 검사 |
+| password | Y | 8 | 255 | 복잡도 |
+| role | Y | - | - | 열거형 |
+
+### 검증 구현
 ```java
-// 생성자 또는 setter에서 검증
-private User(String name, String email, Password password, Role role) {
-    validateName(name);
-    validateEmail(email);
-    Objects.requireNonNull(password, "비밀번호는 필수입니다");
-    Objects.requireNonNull(role, "역할은 필수입니다");
-    
-    this.name = name.trim();
-    this.email = email.toLowerCase().trim();
-    this.password = password;
-    this.role = role;
-}
-
 private void validateName(String name) {
-    if (name == null || name.trim().isEmpty()) {
-        throw new UserValidationException(UserErrorCode.INVALID_NAME);
-    }
-    if (name.length() > 30) {
-        throw new UserValidationException(UserErrorCode.NAME_TOO_LONG);
-    }
+    if (isNullOrEmpty(name)) throw ex(INVALID_NAME);
+    if (name.length() > 30) throw ex(NAME_TOO_LONG);
 }
 ```
 
-### Value Object 검증
-```java
-private static void validatePassword(String password) {
-    if (password == null || password.isEmpty()) {
-        throw new PasswordValidationException(PasswordErrorCode.PASSWORD_REQUIRED);
-    }
-    if (password.length() < 8) {
-        throw new PasswordValidationException(PasswordErrorCode.PASSWORD_TOO_SHORT);
-    }
-    if (password.length() > 255) {
-        throw new PasswordValidationException(PasswordErrorCode.PASSWORD_TOO_LONG);
-    }
-}
-```
+## ⚠️ 예외 처리
+상세: @exception/CONVENTIONS.md
 
-## ⚠️ 예외 처리 패턴
-
-User 도메인 예외 처리에 대한 상세 내용은 @exception/CONVENTIONS.md를 참조하세요.
-
-## 🎭 Enum 구현 패턴
-
-### Role Enum
+## 🎭 Role Enum
 ```java
 public enum Role {
-    STUDENT("학생"),
-    LAB_MEMBER("랩실 멤버"),
-    LAB_MANAGER("랩실 관리자"),
-    LAB_LEADER("랩장"),
-    PROFESSOR("교수"),
-    ADMIN("관리자");
+    STUDENT("학생"), LAB_MEMBER("랩실 멤버"), LAB_MANAGER("랩실 관리자"),
+    LAB_LEADER("랩장"), PROFESSOR("교수"), ADMIN("관리자");
     
     private final String description;
+    Role(String description) { this.description = description; }
     
-    Role(String description) {
-        this.description = description;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-    
-    // 권한 레벨 비교 메서드
     public boolean hasHigherOrEqualAuthorityThan(Role other) {
         return this.ordinal() >= other.ordinal();
     }
     
-    // 특정 권한 확인 메서드
     public boolean isLabManager() {
         return this == LAB_MANAGER || this == LAB_LEADER;
     }
 }
 ```
 
-## 🔗 연관관계 처리 패턴
-
-### ManyToOne 매핑 (User → Lab)
+## 🔗 연관관계
 ```java
 @ManyToOne(fetch = FetchType.LAZY)
 @JoinColumn(name = "lab_id")
 private Lab lab;
 
-// 연관관계 편의 메서드
 public void assignLab(Lab lab) {
-    // 기존 연관관계 해제
-    if (this.lab != null) {
-        this.lab.removeMember(this);
-    }
-    
-    // 새로운 연관관계 설정
+    if (this.lab != null) this.lab.removeMember(this);
     this.lab = lab;
-    if (lab != null) {
-        lab.addMember(this);
-    }
+    if (lab != null) lab.addMember(this);
 }
 
 public void leaveLab() {
-    if (this.lab != null) {
-        this.lab.removeMember(this);
-        this.lab = null;
-    }
+    if (this.lab != null) { this.lab.removeMember(this); this.lab = null; }
 }
 ```
 
-## 📋 비즈니스 로직 패턴
+## 📋 비즈니스 로직
 
-### 권한 확인 로직
+### 권한 확인
 ```java
 public boolean isLabLeaderOrLabManagerInLab(Lab targetLab) {
-    // null 체크
-    if (this.lab == null || targetLab == null) {
-        return false;
-    }
-    
-    // 소속 랩실 확인
-    if (!this.lab.equals(targetLab)) {
-        return false;
-    }
-    
-    // 권한 확인
-    return this.role == Role.LAB_LEADER || 
-           this.role == Role.LAB_MANAGER ||
-           this.role == Role.PROFESSOR;
+    return this.lab != null && this.lab.equals(targetLab) &&
+           (role == LAB_LEADER || role == LAB_MANAGER || role == PROFESSOR);
 }
 ```
 
-### 상태 변경 로직
+### 비밀번호 변경
 ```java
-public void changePassword(String newRawPassword) {
-    // 검증 (PasswordEncoder 주입 필요)
-    Password newPassword = Password.fromRaw(newRawPassword, encoder);
-    
-    // 기존 비밀번호와 동일한지 확인
-    if (this.password.matches(newRawPassword, encoder)) {
-        throw new UserValidationException(UserErrorCode.SAME_AS_CURRENT_PASSWORD);
-    }
-    
-    // 변경
+public void changePassword(String newRaw) {
+    Password newPassword = Password.fromRaw(newRaw, encoder);
+    if (this.password.matches(newRaw, encoder)) 
+        throw ex(SAME_AS_CURRENT_PASSWORD);
     this.password = newPassword;
 }
 ```
 
-## 🧪 테스트 작성 패턴
+## 🧪 테스트 패턴
 
-### 도메인 객체 테스트
+### User 테스트
 ```java
-class UserTest {
-    
-    @Test
-    void 사용자_생성시_유효한_정보로_생성된다() {
-        // given
-        String name = "홍길동";
-        String email = "hong@example.com";
-        String password = "password123!";
-        Role role = Role.STUDENT;
-        
-        // when
-        User user = User.create(name, email, password, role, mockEncoder);
-        
-        // then
-        assertThat(user.getName()).isEqualTo(name);
-        assertThat(user.getEmail()).isEqualTo(email);
-        assertThat(user.getRole()).isEqualTo(role);
-    }
-    
-    @Test
-    void 잘못된_이름으로_사용자_생성시_예외가_발생한다() {
-        // given
-        String invalidName = "";
-        
-        // when & then
-        assertThatThrownBy(() -> 
-            User.create(invalidName, "test@example.com", "password123!", Role.STUDENT, mockEncoder)
-        ).isInstanceOf(UserValidationException.class);
-    }
+@Test
+void 유효한_정보로_사용자_생성() {
+    User user = User.create("홍길동", "hong@example.com", "password123!", STUDENT, encoder);
+    assertThat(user.getName()).isEqualTo("홍길동");
+}
+
+@Test
+void 잘못된_이름_예외_발생() {
+    assertThatThrownBy(() -> User.create("", "test@example.com", "password123!", STUDENT, encoder))
+        .isInstanceOf(UserValidationException.class);
 }
 ```
 
-### Value Object 테스트
+### Password 테스트
 ```java
-class PasswordTest {
-    
-    @Test
-    void 유효한_비밀번호로_Password_객체를_생성할_수_있다() {
-        // given
-        String rawPassword = "password123!";
-        
-        // when
-        Password password = Password.fromRaw(rawPassword, mockEncoder);
-        
-        // then
-        assertThat(password.matches(rawPassword, mockEncoder)).isTrue();
-    }
-    
-    @Test
-    void 짧은_비밀번호로_생성시_예외가_발생한다() {
-        // given
-        String shortPassword = "123";
-        
-        // when & then
-        assertThatThrownBy(() -> Password.fromRaw(shortPassword, mockEncoder))
-            .isInstanceOf(PasswordValidationException.class);
-    }
+@Test
+void 비밀번호_생성_및_검증() {
+    Password password = Password.fromRaw("password123!", encoder);
+    assertThat(password.matches("password123!", encoder)).isTrue();
 }
 ```
 
-## 🎯 주요 규칙 요약
-
-1. **불변성 보장**: Value Object는 immutable로 설계
-2. **검증 우선**: 객체 생성 시점에 모든 검증 수행
-3. **예외 활용**: 도메인 규칙 위반 시 명확한 예외 발생
-4. **캡슐화**: 내부 구현은 private, 인터페이스만 public
-5. **팩토리 메서드**: 복잡한 생성 로직은 정적 팩토리 메서드 활용
-6. **연관관계 관리**: 양방향 연관관계는 편의 메서드로 일관성 보장
+## 🎯 핵심 규칙
+1. **불변성**: Value Object immutable 설계
+2. **검증 우선**: 생성시 모든 검증 완료
+3. **명확한 예외**: 구체적 ErrorCode 사용
+4. **캡슐화**: private 구현, public 인터페이스
+5. **팩토리 패턴**: 정적 메서드 생성
+6. **연관관계**: 편의 메서드로 일관성 보장

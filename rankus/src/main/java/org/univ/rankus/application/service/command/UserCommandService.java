@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.univ.rankus.application.port.in.command.UserCommandUseCase;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
+import org.univ.rankus.adapter.in.web.dto.request.*;
 import org.univ.rankus.domain.model.user.PasswordEncoder;
-import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
@@ -27,41 +27,41 @@ public class UserCommandService implements UserCommandUseCase {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User createUser(String name, String email, String rawPassword, Role role) {
+    public User createUser(UserCreateRequestDto request) {
         // 1. 이메일 중복 검증
-        if (userRepositoryPort.existsByEmail(email)) {
+        if (userRepositoryPort.existsByEmail(request.getEmail())) {
             throw new UserValidationException(UserErrorCode.EMAIL_DUPLICATED);
         }
         
         // 2. 도메인 객체 생성
-        User user = User.create(name, email, rawPassword, role, passwordEncoder);
+        User user = User.create(request.getName(), request.getEmail(), request.getPassword(), request.getRole(), passwordEncoder);
         
         // 3. 저장
         return userRepositoryPort.save(user);
     }
 
     @Override
-    public User updateUser(Long userId, String name, String email, Role role) {
+    public User updateUser(Long userId, UserUpdateRequestDto request) {
         // 1. 사용자 조회
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
         
         // 2. 이메일 변경시 중복 검증 (현재 사용자 제외)
-        if (email != null && !email.equals(user.getEmail())) {
-            if (userRepositoryPort.existsByEmail(email)) {
+        if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+            if (userRepositoryPort.existsByEmail(request.getEmail())) {
                 throw new UserValidationException(UserErrorCode.EMAIL_DUPLICATED);
             }
         }
         
         // 3. 도메인 메서드로 정보 변경
-        if (name != null) {
-            user.changeName(name);
+        if (request.getName() != null) {
+            user.changeName(request.getName());
         }
-        if (email != null) {
-            user.changeEmail(email);
+        if (request.getEmail() != null) {
+            user.changeEmail(request.getEmail());
         }
-        if (role != null) {
-            user.changeRole(role);
+        if (request.getRole() != null) {
+            user.changeRole(request.getRole());
         }
         
         // 4. 저장
@@ -69,29 +69,29 @@ public class UserCommandService implements UserCommandUseCase {
     }
 
     @Override
-    public void changeName(Long userId, String newName) {
+    public void changeName(Long userId, ChangeNameRequestDto request) {
         // 1. 사용자 조회 → 없으면 404
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
         // 2. 도메인 메서드로 이름 검증·변경
-        user.changeName(newName);
+        user.changeName(request.getNewName());
         // 3. 저장 (Dirty Checking 으로도 가능)
         userRepositoryPort.save(user);
     }
 
     @Override
-    public void changePassword(Long userId, String currentPassword, String newPassword) {
+    public void changePassword(Long userId, ChangePasswordRequestDto request) {
         // 1. 사용자 조회
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
         
         // 2. 현재 비밀번호 확인
-        if (!user.getPassword().matches(currentPassword, passwordEncoder)) {
+        if (!user.getPassword().matches(request.getCurrentPassword(), passwordEncoder)) {
             throw new UserValidationException(UserErrorCode.INVALID_CREDENTIALS);
         }
         
         // 3. 새 비밀번호로 변경
-        user.changePassword(newPassword, passwordEncoder);
+        user.changePassword(request.getNewPassword(), passwordEncoder);
         
         // 4. 저장
         userRepositoryPort.save(user);

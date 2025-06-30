@@ -1,37 +1,24 @@
-# Command UseCase 코딩 컨벤션
+# Command UseCase 컨벤션
 
-> 상태 변경 작업을 처리하는 Command UseCase 인터페이스의 네이밍, 구조, 메서드 정의 패턴
+## 📛 네이밍
+| 구분 | 패턴 | 예시 |
+|------|------|------|
+| Interface | `{Domain}CommandUseCase` | `UserCommandUseCase` |
+| 생성 | `create{Resource}()` | `createUser()`, `createLab()` |
+| 수정 | `update{Resource}()` | `updateUser()`, `updateLabInfo()` |
+| 삭제 | `delete{Resource}()` | `deleteUser()`, `deleteLab()` |
+| 상태변경 | `{action}{Resource}()` | `approveApplication()` |
+| 관계변경 | `assign{Resource}()`, `remove{Resource}()` | `assignUserToLab()` |
 
-## 📛 네이밍 컨벤션
+## 🏗️ 인터페이스 구조
 
-### 인터페이스 네이밍
-- **패턴**: `{Domain}CommandUseCase`
-- **예시**: `UserCommandUseCase`, `LabApplicationCommandUseCase`, `LabImageCommandUseCase`
-
-### 메서드 네이밍
-- **생성**: `create{Resource}()` - `createUser()`, `createLab()`
-- **수정**: `update{Resource}()` - `updateUser()`, `updateLabInfo()`
-- **삭제**: `delete{Resource}()` - `deleteUser()`, `deleteLab()`
-- **상태 변경**: `{action}{Resource}()` - `approveApplication()`, `rejectApplication()`
-- **관계 변경**: `assign{Resource}()`, `remove{Resource}()` - `assignUserToLab()`, `removeUserFromLab()`
-
-## 🏗️ 인터페이스 구조 패턴
-
-### 기본 Command UseCase 구조
+### 기본 패턴
 ```java
 public interface {Domain}CommandUseCase {
-    
-    // 1. 생성 메서드
     {Domain}ResponseDto create{Domain}({Domain}CreateRequestDto request);
-    
-    // 2. 수정 메서드
     {Domain}ResponseDto update{Domain}(Long id, {Domain}UpdateRequestDto request);
-    
-    // 3. 삭제 메서드
     void delete{Domain}(Long id);
-    
-    // 4. 상태 변경 메서드 (필요한 경우)
-    {Domain}ResponseDto {action}{Domain}(Long id);
+    {Domain}ResponseDto {action}{Domain}(Long id);  // 상태변경
 }
 ```
 
