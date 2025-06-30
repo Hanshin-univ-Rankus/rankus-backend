@@ -14,7 +14,7 @@ import org.univ.rankus.domain.model.user.PasswordEncoder;
 @RequiredArgsConstructor
 public class SpringSecurityPasswordEncoder implements PasswordEncoder {
 
-    private final org.springframework.security.crypto.password.PasswordEncoder springPasswordEncoder;
+    private final PasswordEncoder springPasswordEncoder;
 
     @Override
     public String encode(String rawPassword) {

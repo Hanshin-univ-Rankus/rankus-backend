@@ -15,7 +15,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
-import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
@@ -62,7 +61,6 @@ class UserControllerTest {
             given(mockUser.getId()).willReturn(userId);
             given(mockUser.getName()).willReturn("테스트유저");
             given(mockUser.getEmail()).willReturn("test@example.com");
-            given(mockUser.getRole()).willReturn(Role.STUDENT);
 
             // when & then
             mockMvc.perform(get("/api/users/me")
@@ -72,8 +70,7 @@ class UserControllerTest {
                     .andExpect(jsonPath("$.message").value("사용자 정보 조회 성공"))
                     .andExpect(jsonPath("$.data.id").value(42))
                     .andExpect(jsonPath("$.data.name").value("테스트유저"))
-                    .andExpect(jsonPath("$.data.email").value("test@example.com"))
-                    .andExpect(jsonPath("$.data.role").value("STUDENT"));
+                    .andExpect(jsonPath("$.data.email").value("test@example.com"));
         }
 
         @Test

@@ -88,7 +88,6 @@ class JwtIntegrationTest {
                 .id(1L)
                 .name("테스트사용자")
                 .email(email)
-                .role("STUDENT")
                 .build();
         
         AuthResponseDto authDto = AuthResponseDto.builder()

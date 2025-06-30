@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;                    // Swagge
 import io.swagger.v3.oas.annotations.media.Schema;                     // Swagger @Schema
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -71,11 +71,11 @@ public class AuthController {
         UserResponseDto dto = UserResponseDto.from(created);
         ApiResponse<UserResponseDto> body = ApiResponse.created(dto, "회원가입 성공");
         URI location = URI.create("/api/users/" + created.getId());
-        return ResponseEntity
-                .created(location)
-                .header(HttpHeaders.CACHE_CONTROL, "no-store")
+        return ResponseEntity.created(location)
+                .cacheControl(CacheControl.noStore())
                 .body(body);
     }
+
 
     @Operation(
             summary     = "로그인",

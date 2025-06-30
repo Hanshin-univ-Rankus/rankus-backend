@@ -135,7 +135,6 @@ class AuthServiceTest {
                 .name(name)
                 .email(email)
                 .password(AuthMockUtil.RAW_PASSWORD)
-                .role(org.univ.rankus.domain.model.user.Role.STUDENT)
                 .build();
             User saved = authService.signUp(request);
 
@@ -162,7 +161,6 @@ class AuthServiceTest {
                 .name("anyName")
                 .email(email)
                 .password(AuthMockUtil.RAW_PASSWORD)
-                .role(org.univ.rankus.domain.model.user.Role.STUDENT)
                 .build();
             assertThatThrownBy(() ->
                     authService.signUp(request))

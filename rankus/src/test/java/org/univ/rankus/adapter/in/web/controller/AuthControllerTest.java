@@ -52,8 +52,7 @@ class AuthControllerTest {
             Map<String, Object> req = Map.of(
                     "name",     "홍길동",
                     "email",    "new@example.com",
-                    "password", "password123",
-                    "role",     "STUDENT"
+                    "password", "password123"
             );
             String json = objectMapper.writeValueAsString(req);
 
@@ -62,14 +61,12 @@ class AuthControllerTest {
                     .name("홍길동")
                     .email("new@example.com")
                     .password("password123")
-                    .role(Role.STUDENT)
                     .build();
             given(authUseCase.signUp(any(UserRegisterRequestDto.class)))
                     .willReturn(mockUser);
             given(mockUser.getId()).willReturn(123L);
             given(mockUser.getName()).willReturn("홍길동");
             given(mockUser.getEmail()).willReturn("new@example.com");
-            given(mockUser.getRole()).willReturn(Role.STUDENT);
 
             mockMvc.perform(post("/api/auth/signup")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -81,8 +78,7 @@ class AuthControllerTest {
                     .andExpect(jsonPath("$.message").value("회원가입 성공"))
                     .andExpect(jsonPath("$.data.id").value(123))
                     .andExpect(jsonPath("$.data.name").value("홍길동"))
-                    .andExpect(jsonPath("$.data.email").value("new@example.com"))
-                    .andExpect(jsonPath("$.data.role").value("STUDENT"));
+                    .andExpect(jsonPath("$.data.email").value("new@example.com"));
         }
 
         @Test
@@ -127,7 +123,7 @@ class AuthControllerTest {
                     .andExpect(status().isBadRequest())
                     // 검증 오류 메시지가 JSON 배열로 반환됨
                     .andExpect(jsonPath("$.errors").isArray())
-                    .andExpect(jsonPath("$.errors.length()").value(4)); // name, email, password, role 총 4개 에러
+                    .andExpect(jsonPath("$.errors.length()").value(3)); // name, email, password, role 총 4개 에러
         }
     }
 
@@ -148,7 +144,6 @@ class AuthControllerTest {
                     .id(10L)
                     .name("테스터")
                     .email("user@example.com")
-                    .role("ADMIN")
                     .build();
             
             AuthResponseDto authDto = AuthResponseDto.builder()
@@ -172,8 +167,7 @@ class AuthControllerTest {
                     .andExpect(jsonPath("$.data.token").value("jwt-token"))
                     .andExpect(jsonPath("$.data.user.id").value(10))
                     .andExpect(jsonPath("$.data.user.name").value("테스터"))
-                    .andExpect(jsonPath("$.data.user.email").value("user@example.com"))
-                    .andExpect(jsonPath("$.data.user.role").value("ADMIN"));
+                    .andExpect(jsonPath("$.data.user.email").value("user@example.com"));
         }
 
         @Test
