@@ -14,6 +14,7 @@ import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
 import org.univ.rankus.domain.model.user.exception.UserValidationException;
+import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
 
 import java.util.Optional;
 
@@ -30,12 +31,12 @@ class UserCommandServiceTest {
     private UserCommandService userService;
 
     /**
-     * helper: 주어진 ID로 조회되는 mock User를 준비합니다.
+     * helper: 주어진 ID로 조회되는 User를 준비합니다.
      */
     private User givenExistingUser(Long userId) {
-        User mockUser = mock(User.class);
-        when(userRepo.findById(userId)).thenReturn(Optional.of(mockUser));
-        return mockUser;
+        User user = DomainUserFactory.buildValidUserWithId(userId);
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+        return user;
     }
 
     @Nested
@@ -48,7 +49,8 @@ class UserCommandServiceTest {
             // given
             Long userId = 1L;
             String newName = "김철수";
-            User mockUser = givenExistingUser(userId);
+            User user = givenExistingUser(userId);
+            when(userRepo.save(any(User.class))).thenReturn(user);
 
             // when
             ChangeNameRequestDto request = ChangeNameRequestDto.builder()
@@ -58,8 +60,7 @@ class UserCommandServiceTest {
 
             // then
             verify(userRepo).findById(userId);
-            verify(mockUser).changeName(request.getNewName());
-            verify(userRepo).save(mockUser);
+            verify(userRepo).save(user);
         }
 
         @Test
@@ -90,11 +91,7 @@ class UserCommandServiceTest {
         void changeNameBlankName() {
             // given
             Long userId = 2L;
-            User mockUser = givenExistingUser(userId);
-
-            // 도메인 changeName 내부에서 예외 발생하도록 모킹
-            doThrow(new UserValidationException(UserErrorCode.NAME_REQUIRED))
-                    .when(mockUser).changeName(null);
+            User user = givenExistingUser(userId);
 
             // when & then
             ChangeNameRequestDto request = ChangeNameRequestDto.builder()
@@ -108,7 +105,6 @@ class UserCommandServiceTest {
                                 .isEqualTo(UserErrorCode.NAME_REQUIRED);
                     });
 
-            verify(mockUser).changeName(request.getNewName());
             verify(userRepo, never()).save(any());
         }
 
@@ -118,10 +114,7 @@ class UserCommandServiceTest {
             // given
             Long userId = 3L;
             String longName = "가".repeat(31); // 31자
-            User mockUser = givenExistingUser(userId);
-
-            doThrow(new UserValidationException(UserErrorCode.NAME_TOO_LONG))
-                    .when(mockUser).changeName(longName);
+            User user = givenExistingUser(userId);
 
             // when & then
             ChangeNameRequestDto request = ChangeNameRequestDto.builder()
@@ -135,7 +128,6 @@ class UserCommandServiceTest {
                                 .isEqualTo(UserErrorCode.NAME_TOO_LONG);
                     });
 
-            verify(mockUser).changeName(request.getNewName());
             verify(userRepo, never()).save(any());
         }
     }

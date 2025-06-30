@@ -237,6 +237,25 @@ public class IntegrationUserFactory {
 }
 ```
 
+**DTO 팩토리** (dto/factory/):
+```java
+public final class DtoFactory {
+    // Controller 테스트용 Request/Response DTO 생성
+    public static UserRegisterRequestDto buildUserRegisterRequest() {
+        return UserRegisterRequestDto.builder()
+                .name("테스트사용자")
+                .email("test@example.com")
+                .password("Password!123")
+                .build();
+    }
+    
+    // Record 타입 DTO는 생성자 방식
+    public static LabApplicationRequestDto buildLabApplicationRequest() {
+        return new LabApplicationRequestDto(LocalDateTime.now().plusDays(1));
+    }
+}
+```
+
 ### 2. 테스트 데이터 격리
 - **@Transactional**: 테스트 메서드마다 자동 롤백
 - **@Sql**: 특정 SQL 스크립트 실행
@@ -337,6 +356,47 @@ assertThat(users)
 assertThatThrownBy(() -> userService.findById(999L))
     .isInstanceOf(UserNotFoundException.class)
     .hasMessage("사용자를 찾을 수 없습니다");
+```
+
+### 4. 계층별 Factory 활용 전략
+
+| 테스트 계층 | 주요 Factory | 활용 목적 | 예시 |
+|-------------|-------------|----------|------|
+| **Controller** | DTO Factory | HTTP 요청/응답 데이터 | `DtoFactory.buildUserRegisterRequest()` |
+| **Service** | Domain Factory | 비즈니스 로직 테스트 | `DomainUserFactory.buildStudentUser()` |
+| **Repository** | Integration Factory | 실제 DB 연동 테스트 | `IntegrationUserFactory.createAndSaveStudent()` |
+| **통합** | 모든 Factory 조합 | End-to-End 테스트 | Domain + DTO Factory 조합 |
+
+```java
+// Controller 테스트 - DTO Factory 활용
+@WebMvcTest(AuthController.class)
+class AuthControllerTest {
+    @Test
+    void 회원가입_성공() throws Exception {
+        UserRegisterRequestDto request = DtoFactory.buildUserRegisterRequest("홍길동", "hong@test.com", "password123");
+        // MockMvc 테스트 로직
+    }
+}
+
+// Service 테스트 - Domain Factory 활용
+@ExtendWith(MockitoExtension.class)
+class UserCommandServiceTest {
+    @Test
+    void 사용자_생성_성공() {
+        User user = DomainUserFactory.buildStudentUser();
+        // Mock 검증 로직
+    }
+}
+
+// Repository 테스트 - Integration Factory 활용
+@DataJpaTest
+class UserRepositoryTest extends BaseRepositoryTest {
+    @Test
+    void 사용자_저장_성공() {
+        User user = createPersistedUser(); // BaseRepositoryTest 헬퍼
+        // 실제 DB 테스트 로직
+    }
+}
 ```
 
 ## 🔗 관련 테스트 가이드

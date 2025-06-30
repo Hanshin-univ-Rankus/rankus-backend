@@ -48,4 +48,17 @@ public final class DomainLabImageFactory {
     public static LabImage buildCustomLabImage(Lab lab, String url, ImageType type) {
         return new LabImage(lab, url, type);
     }
+
+    public static LabImage buildRepresentativeImage(Lab lab) {
+        return new LabImage(lab, "https://example.com/representative.jpg", ImageType.REPRESENTATIVE);
+    }
+
+    public static LabImage buildAdditionalImage(Lab lab) {
+        return new LabImage(lab, "https://example.com/additional.jpg", ImageType.ADDITIONAL);
+    }
+
+    public static LabImage buildDefaultLabImage() {
+        Lab lab = DomainLabFactory.buildValidLab();
+        return buildValidLabImage(lab, "https://example.com/default.jpg", ImageType.REPRESENTATIVE);
+    }
 }

@@ -42,4 +42,24 @@ public final class DomainLabFactory {
     public static Lab buildCustomLab(String name, LabCategory cat, String desc, String prof) {
         return new Lab(name, cat, desc, prof);
     }
+
+    public static Lab buildLabWithProfessor(String professorName) {
+        return new Lab("TestLab", LabCategory.AI, "Description", professorName);
+    }
+
+    public static Lab buildLabWithCategory(LabCategory category) {
+        return new Lab("TestLab", category, "Description", "ProfX");
+    }
+
+    public static Lab buildAiLab() {
+        return new Lab("AI Lab", LabCategory.AI, "Artificial Intelligence Research Lab", "Dr. Smith");
+    }
+
+    public static Lab buildDbLab() {
+        return new Lab("DB Lab", LabCategory.DB, "Database Research Lab", "Dr. Jones");
+    }
+
+    public static Lab buildSecurityLab() {
+        return new Lab("Security Lab", LabCategory.SECURITY, "Security Research Lab", "Dr. Brown");
+    }
 }

@@ -20,12 +20,13 @@ import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserValidationException;
+import org.univ.rankus.testutil.factory.dto.DtoFactory;
+import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
 
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -49,25 +50,15 @@ class AuthControllerTest {
         @Test
         @DisplayName("정상 요청 → 201 Created + Location, Cache-Control 헤더 + ApiResponse body")
         void signupSuccess() throws Exception {
-            Map<String, Object> req = Map.of(
-                    "name",     "홍길동",
-                    "email",    "new@example.com",
-                    "password", "password123"
-            );
-            String json = objectMapper.writeValueAsString(req);
+            // given
+            UserRegisterRequestDto request = DtoFactory.buildUserRegisterRequest("홍길동", "new@example.com", "password123");
+            String json = objectMapper.writeValueAsString(request);
 
-            User mockUser = mock(User.class);
-            UserRegisterRequestDto signUpRequest = UserRegisterRequestDto.builder()
-                    .name("홍길동")
-                    .email("new@example.com")
-                    .password("password123")
-                    .build();
+            User savedUser = DomainUserFactory.buildValidUserWithId(123L);
             given(authUseCase.signUp(any(UserRegisterRequestDto.class)))
-                    .willReturn(mockUser);
-            given(mockUser.getId()).willReturn(123L);
-            given(mockUser.getName()).willReturn("홍길동");
-            given(mockUser.getEmail()).willReturn("new@example.com");
+                    .willReturn(savedUser);
 
+            // when & then
             mockMvc.perform(post("/api/auth/signup")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(json))
@@ -77,24 +68,21 @@ class AuthControllerTest {
                     .andExpect(jsonPath("$.status").value(201))
                     .andExpect(jsonPath("$.message").value("회원가입 성공"))
                     .andExpect(jsonPath("$.data.id").value(123))
-                    .andExpect(jsonPath("$.data.name").value("홍길동"))
-                    .andExpect(jsonPath("$.data.email").value("new@example.com"));
+                    .andExpect(jsonPath("$.data.name").value(savedUser.getName()))
+                    .andExpect(jsonPath("$.data.email").value(savedUser.getEmail()));
         }
 
         @Test
         @DisplayName("이메일 중복 시 UserValidationException → 409 Conflict + ErrorResponse body")
         void signupDuplicateEmail() throws Exception {
-            Map<String, Object> req = Map.of(
-                    "name",     "홍길동",
-                    "email",    "exist@example.com",
-                    "password", "password123",
-                    "role",     "STUDENT"
-            );
-            String json = objectMapper.writeValueAsString(req);
+            // given
+            UserRegisterRequestDto request = DtoFactory.buildUserRegisterRequest("홍길동", "exist@example.com", "password123");
+            String json = objectMapper.writeValueAsString(request);
 
             given(authUseCase.signUp(any(UserRegisterRequestDto.class)))
                     .willThrow(new UserValidationException(UserErrorCode.EMAIL_DUPLICATED));
 
+            // when & then
             mockMvc.perform(post("/api/auth/signup")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(json))
@@ -134,30 +122,17 @@ class AuthControllerTest {
         @Test
         @DisplayName("정상 요청 → 200 OK + ApiResponse body")
         void loginSuccess() throws Exception {
-            Map<String, String> req = Map.of(
-                    "email",    "user@example.com",
-                    "password", "password"
-            );
-            String json = objectMapper.writeValueAsString(req);
+            // given
+            UserLoginRequestDto request = DtoFactory.buildUserLoginRequest("user@example.com", "password");
+            String json = objectMapper.writeValueAsString(request);
 
-            UserResponseDto userDto = UserResponseDto.builder()
-                    .id(10L)
-                    .name("테스터")
-                    .email("user@example.com")
-                    .build();
+            UserResponseDto userDto = DtoFactory.buildUserResponseDto(10L, "테스터", "user@example.com", Role.STUDENT);
+            AuthResponseDto authDto = DtoFactory.buildAuthResponseDto("jwt-token", userDto);
             
-            AuthResponseDto authDto = AuthResponseDto.builder()
-                    .token("jwt-token")
-                    .user(userDto)
-                    .build();
-            
-            UserLoginRequestDto loginRequest = UserLoginRequestDto.builder()
-                    .email("user@example.com")
-                    .password("password")
-                    .build();
             given(authUseCase.login(any(UserLoginRequestDto.class)))
                     .willReturn(authDto);
 
+            // when & then
             mockMvc.perform(post("/api/auth/login")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(json))
@@ -173,15 +148,14 @@ class AuthControllerTest {
         @Test
         @DisplayName("인증 실패 → 401 Unauthorized + ErrorResponse body")
         void loginFailure() throws Exception {
-            Map<String, String> req = Map.of(
-                    "email",    "user@example.com",
-                    "password", "wrong"
-            );
-            String json = objectMapper.writeValueAsString(req);
+            // given
+            UserLoginRequestDto request = DtoFactory.buildUserLoginRequest("user@example.com", "wrong");
+            String json = objectMapper.writeValueAsString(request);
 
             given(authUseCase.login(any(UserLoginRequestDto.class)))
                     .willThrow(new UserValidationException(UserErrorCode.INVALID_CREDENTIALS));
 
+            // when & then
             mockMvc.perform(post("/api/auth/login")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(json))

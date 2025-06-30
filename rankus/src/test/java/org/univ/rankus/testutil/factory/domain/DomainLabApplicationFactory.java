@@ -45,4 +45,18 @@ public final class DomainLabApplicationFactory {
         ReflectionTestUtils.setField(app, "status", status);
         return app;
     }
+
+    public static LabApplication buildApprovedApplication(Lab lab, User user) {
+        return buildWithStatus(lab, user, ApplicationStatus.APPROVED);
+    }
+
+    public static LabApplication buildRejectedApplication(Lab lab, User user) {
+        return buildWithStatus(lab, user, ApplicationStatus.REJECTED);
+    }
+
+    public static LabApplication buildDefaultPendingApplication() {
+        Lab lab = DomainLabFactory.buildValidLab();
+        User user = DomainUserFactory.buildValidUser();
+        return buildValidPendingApplication(lab, user, LocalDateTime.now().plusDays(1));
+    }
 }

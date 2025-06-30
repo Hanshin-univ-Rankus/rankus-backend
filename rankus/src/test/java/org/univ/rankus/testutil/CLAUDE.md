@@ -32,6 +32,8 @@ src/test/java/org/univ/rankus/testutil/
 │   │   ├── DomainLabFactory.java
 │   │   ├── DomainLabImageFactory.java
 │   │   └── DomainUserFactory.java
+│   ├── dto/                              # DTO 팩토리 (Controller 테스트용)
+│   │   └── DtoFactory.java
 │   └── integration/                      # 통합 테스트 팩토리
 │       ├── IntegrationLabApplicationFactory.java
 │       ├── IntegrationLabFactory.java
@@ -381,6 +383,96 @@ public class IntegrationLabFactory {
 }
 ```
 
+## 📦 DTO Factory 패턴
+
+### 목표
+Controller 테스트에서 사용하는 Request/Response DTO 객체를 일관되게 생성하기 위한 팩토리
+
+### 특징
+- **타입 안전성**: Map 대신 강타입 DTO 사용
+- **재사용성**: Controller 테스트 간 공통 활용
+- **실제 구조 반영**: 실제 DTO 클래스 구조에 정확히 맞춤
+
+### 기본 구조
+```java
+public final class DtoFactory {
+    private DtoFactory() {}
+
+    // User Request DTOs
+    public static UserRegisterRequestDto buildUserRegisterRequest() {
+        return UserRegisterRequestDto.builder()
+                .name("테스트사용자")
+                .email("test@example.com")
+                .password("Password!123")
+                .build();
+    }
+
+    public static UserRegisterRequestDto buildUserRegisterRequest(String name, String email, String password) {
+        return UserRegisterRequestDto.builder()
+                .name(name)
+                .email(email)
+                .password(password)
+                .build();
+    }
+
+    // Record 타입 DTO (생성자 방식)
+    public static LabApplicationRequestDto buildLabApplicationRequest() {
+        return new LabApplicationRequestDto(
+                LocalDateTime.now().plusDays(1)
+        );
+    }
+
+    // Response DTOs (실제 DTO 구조에 맞게)
+    public static UserResponseDto buildUserResponseDto() {
+        return UserResponseDto.builder()
+                .id(1L)
+                .name("테스트사용자")
+                .email("test@example.com")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static AuthResponseDto buildAuthResponseDto() {
+        return AuthResponseDto.builder()
+                .token("mock-jwt-token")
+                .user(buildUserResponseDto())
+                .build();
+    }
+}
+```
+
+### 활용 예시
+```java
+@WebMvcTest(AuthController.class)
+class AuthControllerTest {
+    
+    @Test
+    void 회원가입_성공() throws Exception {
+        // given - DTO Factory 활용
+        UserRegisterRequestDto request = DtoFactory.buildUserRegisterRequest("홍길동", "new@example.com", "password123");
+        String json = objectMapper.writeValueAsString(request);
+
+        // when & then
+        mockMvc.perform(post("/api/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isCreated());
+    }
+}
+```
+
+### 주요 장점
+1. **타입 안전성**: 컴파일 타임에 오류 발견
+2. **재사용성**: 여러 테스트에서 동일한 DTO 생성 로직 활용
+3. **유지보수성**: DTO 구조 변경시 중앙화된 관리
+4. **가독성**: Map 기반 JSON 대신 명확한 의도 표현
+
+### 주의사항
+- **실제 DTO 구조와 일치**: 실제 DTO 클래스의 필드와 메서드에 정확히 맞춰야 함
+- **Record 타입 고려**: Record 타입 DTO는 생성자 방식 사용
+- **Builder 패턴 확인**: 모든 DTO가 Builder를 지원하는 것은 아님
+
 ## 🎭 Mock 유틸리티
 
 ### 1. AuthMockUtil - 인증 관련 Mock 헬퍼
@@ -650,8 +742,18 @@ public abstract class BaseWebTest {
 ## 🎯 TestUtil 활용 베스트 프랙티스
 
 ### 1. Factory 사용 원칙
+
+#### Factory 타입별 활용 가이드
+| Factory 타입 | 사용 목적 | 특징 | 예시 |
+|--------------|-----------|------|------|
+| **Domain Factory** | 순수 객체 생성 | 외부 의존성 없음, 정적 메서드 | `DomainUserFactory.buildStudentUser()` |
+| **Integration Factory** | 실제 DB 연동 | @Component, 실제 저장 | `IntegrationUserFactory.createAndSaveStudent()` |
+| **DTO Factory** | Controller 테스트 | HTTP 요청/응답 DTO | `DtoFactory.buildUserRegisterRequest()` |
+
+#### 핵심 원칙
 - **도메인 Factory**: 순수 객체 생성, 외부 의존성 없음
-- **Integration Factory**: 실제 DB 연동, @Component로 Spring 관리
+- **Integration Factory**: 실제 DB 연동, @Component로 Spring 관리  
+- **DTO Factory**: 실제 DTO 구조와 정확히 일치, 타입 안전성 확보
 - **빌더 패턴**: 복잡한 객체 생성 시 가독성 향상
 - **메서드 체이닝**: 유연한 테스트 데이터 생성
 
@@ -679,7 +781,51 @@ void 사용자_조회_성공() {
 }
 ```
 
-### 3. Base 클래스 상속 활용
+### 3. DTO Factory 활용 패턴
+```java
+// ✅ 권장: DTO Factory 활용
+@WebMvcTest(UserController.class)
+class UserControllerTest {
+    
+    @Test
+    void 사용자_등록_성공() throws Exception {
+        // given - DTO Factory 활용
+        UserRegisterRequestDto request = DtoFactory.buildUserRegisterRequest("홍길동", "hong@test.com", "password123");
+        String json = objectMapper.writeValueAsString(request);
+        
+        // when & then
+        mockMvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isCreated());
+    }
+}
+
+// ❌ 비권장: Map 기반 JSON 생성
+@Test
+void 사용자_등록_실패() throws Exception {
+    // given - Map 사용 (타입 안전성 부족)
+    Map<String, Object> request = Map.of(
+            "name", "홍길동",
+            "email", "invalid-email", // 오타 가능성
+            "password", "123"
+    );
+    String json = objectMapper.writeValueAsString(request);
+    // ...
+}
+
+// ✅ Record 타입 DTO 활용
+@Test
+void 랩실_지원_성공() throws Exception {
+    // given - Record 타입은 생성자 방식
+    LabApplicationRequestDto request = DtoFactory.buildLabApplicationRequest(LocalDateTime.now().plusDays(1));
+    
+    // when & then
+    // 테스트 로직
+}
+```
+
+### 4. Base 클래스 상속 활용
 ```java
 // Repository 테스트
 class UserRepositoryTest extends BaseRepositoryTest {

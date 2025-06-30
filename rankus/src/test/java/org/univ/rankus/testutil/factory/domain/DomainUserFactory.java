@@ -46,6 +46,26 @@ public final class DomainUserFactory {
         return u;
     }
 
+    public static User buildProfessorUser() {
+        return buildValidUserWithRole(Role.PROFESSOR);
+    }
+
+    public static User buildStudentUser() {
+        return buildValidUserWithRole(Role.STUDENT);
+    }
+
+    public static User buildLabLeaderUser() {
+        return buildValidUserWithRole(Role.LAB_LEADER);
+    }
+
+    public static User buildLabManagerUser() {
+        return buildValidUserWithRole(Role.LAB_MANAGER);
+    }
+
+    public static User buildLabMemberUser() {
+        return buildValidUserWithRole(Role.LAB_MEMBER);
+    }
+
     public static User buildCustomUser(String name, String email, String rawPassword) {
         return new User(name, email, Password.fromRaw(rawPassword, ENCODER));
     }
