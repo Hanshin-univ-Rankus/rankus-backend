@@ -151,7 +151,22 @@ public class User extends BaseTimeEntity {
         this.email = validateEmail(newEmail);
     }
 
-    public boolean isLabLeaderOrLabManagerInLab(Lab lab) {
-        return (this.role == Role.LAB_LEADER || this.role == Role.LAB_MANAGER) && this.lab != null && this.lab.equals(lab);
+    /**
+     * 특정 랩실의 지원서 관리 권한을 확인
+     * ADMIN은 모든 랩실의 지원서 관리 가능
+     * LAB_LEADER, PROFESSOR 역할이 해당 랩실에 소속된 경우 권한 부여
+     */
+    public boolean canManageLabApplications(Lab lab) {
+        // ADMIN은 모든 랩실 관리 가능
+        if (this.role == Role.ADMIN) {
+            return true;
+        }
+
+        return (this.role == Role.LAB_LEADER || this.role == Role.PROFESSOR)
+                && this.lab != null && this.lab.equals(lab);
+    }
+
+    public boolean isAdmin() {
+        return this.role == Role.ADMIN;
     }
 }

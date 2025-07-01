@@ -335,6 +335,12 @@ class LabApplicationCommandServiceTest {
     // ——————————————————————————————————————————————————————————
     // 4) cancelApplication 메서드 테스트
     // ——————————————————————————————————————————————————————————
+    //
+    // 주의: ADMIN 권한 확인은 서비스 계층이 아닌 보안 계층에서 처리됩니다.
+    // - Controller: @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(...)")
+    // - PermissionHandler: user.isAdmin() || app.isOwnedBy(userId)
+    // - Service: 순수 비즈니스 로직만 수행 (소유권 검증)
+    // ——————————————————————————————————————————————————————————
     @Nested
     @DisplayName("cancelApplication 메서드는")
     class CancelTests {
@@ -395,6 +401,34 @@ class LabApplicationCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() -> service.cancelApplication(appId, userId))
+                    .isInstanceOf(LabApplicationValidationException.class)
+                    .satisfies(ex -> {
+                        LabApplicationValidationException e =
+                                (LabApplicationValidationException) ex;
+                        assertThat(e.getErrorCode())
+                                .isEqualTo(LabApplicationErrorCode.UNAUTHORIZED_CANCEL_ATTEMPT);
+                    });
+
+            verify(labApplicationRepositoryPort).findById(appId);
+            verify(labApplicationRepositoryPort, never()).delete(any());
+        }
+
+        @Test
+        @DisplayName("서비스 계층에서는 소유권 검증만 수행하고 ADMIN 권한 확인은 보안 계층에서 처리됨을 검증")
+        void serviceLayerOnlyChecksOwnership() {
+            // given
+            Long appId = 1000L, nonOwnerUserId = 456L;
+            Lab lab = DomainLabFactory.buildValidLab();
+            User owner = DomainUserFactory.buildValidUserWithId(789L); // 다른 사용자
+            LabApplication app = DomainLabApplicationFactory.buildValidPendingWithId(
+                    appId, lab, owner, LocalDateTime.now().plusDays(1)
+            );
+            when(labApplicationRepositoryPort.findById(appId))
+                    .thenReturn(Optional.of(app));
+
+            // when & then - 서비스 계층에서는 소유권만 체크하므로 예외 발생
+            // ADMIN 권한 확인은 Controller의 @PreAuthorize에서 처리됨
+            assertThatThrownBy(() -> service.cancelApplication(appId, nonOwnerUserId))
                     .isInstanceOf(LabApplicationValidationException.class)
                     .satisfies(ex -> {
                         LabApplicationValidationException e =

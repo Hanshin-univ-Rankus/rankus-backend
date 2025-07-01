@@ -48,23 +48,58 @@ class LabApplicationPermissionHandlerTest {
         @Test
         @DisplayName("소유자일 경우 허용")
         void ownerCanCancel() {
+            // given
+            User mockUser = mock(User.class);
             LabApplication mockApp = mock(LabApplication.class);
+            
+            given(userQueryUseCase.getUserById(USER_ID)).willReturn(mockUser);
             given(queryUseCase.getApplicationById(APP_ID)).willReturn(mockApp);
-            given(mockApp.isOwnedBy(USER_ID)).willReturn(true);
+            given(mockUser.isAdmin()).willReturn(false); // 비관리자
+            given(mockApp.isOwnedBy(USER_ID)).willReturn(true); // 소유자
 
+            // when
             boolean allowed = handler.hasPermission(principal, APP_ID, "cancel");
+            
+            // then
             assertThat(allowed).isTrue();
         }
 
         @Test
         @DisplayName("비소유자일 경우 거부")
         void nonOwnerCannotCancel() {
+            // given
+            User mockUser = mock(User.class);
             LabApplication mockApp = mock(LabApplication.class);
+            
+            given(userQueryUseCase.getUserById(USER_ID)).willReturn(mockUser);
             given(queryUseCase.getApplicationById(APP_ID)).willReturn(mockApp);
-            given(mockApp.isOwnedBy(USER_ID)).willReturn(false);
+            given(mockUser.isAdmin()).willReturn(false); // 비관리자
+            given(mockApp.isOwnedBy(USER_ID)).willReturn(false); // 비소유자
 
+            // when
             boolean allowed = handler.hasPermission(principal, APP_ID, "cancel");
+            
+            // then
             assertThat(allowed).isFalse();
+        }
+
+        @Test
+        @DisplayName("ADMIN이면 소유자가 아니어도 취소 가능")
+        void adminCanCancelAnyApplication() {
+            // given
+            User mockUser = mock(User.class);
+            LabApplication mockApp = mock(LabApplication.class);
+            
+            given(userQueryUseCase.getUserById(USER_ID)).willReturn(mockUser);
+            given(queryUseCase.getApplicationById(APP_ID)).willReturn(mockApp);
+            given(mockUser.isAdmin()).willReturn(true); // 관리자
+            // ADMIN일 때는 isOwnedBy가 호출되지 않는다 (short-circuit evaluation)
+
+            // when
+            boolean allowed = handler.hasPermission(principal, APP_ID, "cancel");
+            
+            // then
+            assertThat(allowed).isTrue();
         }
     }
 
@@ -91,7 +126,7 @@ class LabApplicationPermissionHandlerTest {
         @Test
         @DisplayName("랩장 권한 보유 시 approve 가능")
         void leaderCanApprove() {
-            given(mockUser.isLabLeaderOrLabManagerInLab(mockLab)).willReturn(true);
+            given(mockUser.canManageLabApplications(mockLab)).willReturn(true);
             boolean allowed = handler.hasPermission(principal, APP_ID, "approve");
             assertThat(allowed).isTrue();
         }
@@ -99,7 +134,7 @@ class LabApplicationPermissionHandlerTest {
         @Test
         @DisplayName("랩장 권한 없으면 approve 불가")
         void nonLeaderCannotApprove() {
-            given(mockUser.isLabLeaderOrLabManagerInLab(mockLab)).willReturn(false);
+            given(mockUser.canManageLabApplications(mockLab)).willReturn(false);
             boolean allowed = handler.hasPermission(principal, APP_ID, "approve");
             assertThat(allowed).isFalse();
         }
@@ -107,7 +142,7 @@ class LabApplicationPermissionHandlerTest {
         @Test
         @DisplayName("reject도 같은 로직 적용")
         void leaderCanReject() {
-            given(mockUser.isLabLeaderOrLabManagerInLab(mockLab)).willReturn(true);
+            given(mockUser.canManageLabApplications(mockLab)).willReturn(true);
             boolean allowed = handler.hasPermission(principal, APP_ID, "reject");
             assertThat(allowed).isTrue();
         }
@@ -115,7 +150,31 @@ class LabApplicationPermissionHandlerTest {
         @Test
         @DisplayName("view도 같은 로직 적용")
         void leaderCanView() {
-            given(mockUser.isLabLeaderOrLabManagerInLab(mockLab)).willReturn(true);
+            given(mockUser.canManageLabApplications(mockLab)).willReturn(true);
+            boolean allowed = handler.hasPermission(principal, APP_ID, "view");
+            assertThat(allowed).isTrue();
+        }
+
+        @Test
+        @DisplayName("교수도 해당 랩실의 지원서를 승인할 수 있다")
+        void professorCanApprove() {
+            given(mockUser.canManageLabApplications(mockLab)).willReturn(true);
+            boolean allowed = handler.hasPermission(principal, APP_ID, "approve");
+            assertThat(allowed).isTrue();
+        }
+
+        @Test
+        @DisplayName("교수도 해당 랩실의 지원서를 거절할 수 있다")
+        void professorCanReject() {
+            given(mockUser.canManageLabApplications(mockLab)).willReturn(true);
+            boolean allowed = handler.hasPermission(principal, APP_ID, "reject");
+            assertThat(allowed).isTrue();
+        }
+
+        @Test
+        @DisplayName("교수도 해당 랩실의 지원서를 조회할 수 있다")
+        void professorCanView() {
+            given(mockUser.canManageLabApplications(mockLab)).willReturn(true);
             boolean allowed = handler.hasPermission(principal, APP_ID, "view");
             assertThat(allowed).isTrue();
         }

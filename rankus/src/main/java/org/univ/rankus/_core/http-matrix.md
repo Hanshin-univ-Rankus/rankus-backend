@@ -42,34 +42,41 @@
 
 ### 리소스별 액션 권한
 
-| 리소스                | 액션      | STUDENT | LAB_MEMBER | LAB_MANAGER | LAB_LEADER | PROFESSOR | ADMIN |
-|--------------------|---------|---------|------------|-------------|------------|-----------|-------|
-| **User**           | VIEW    | Own     | Own        | Own         | Own        | Own       | All   |
-|                    | CREATE  | ✅       | ✅          | ✅           | ✅          | ✅         | ✅     |
-|                    | UPDATE  | Own     | Own        | Own         | Own        | Own       | All   |
-|                    | DELETE  | ❌       | ❌          | ❌           | ❌          | ❌         | All   |
-| **Lab**            | VIEW    | ✅       | ✅          | ✅           | ✅          | ✅         | ✅     |
-|                    | CREATE  | ❌       | ❌          | ❌           | ❌          | Own       | ✅     |
-|                    | UPDATE  | ❌       | ❌          | Lab         | Lab        | Lab       | All   |
-|                    | DELETE  | ❌       | ❌          | ❌           | ❌          | ❌         | All   |
-| **LabApplication** | VIEW    | Own     | Own+Lab    | Lab         | Lab        | Lab       | All   |
-|                    | CREATE  | ✅       | ✅          | ✅           | ✅          | ✅         | ✅     |
-|                    | APPROVE | ❌       | ❌          | Lab         | Lab        | Lab       | All   |
-|                    | REJECT  | ❌       | ❌          | Lab         | Lab        | Lab       | All   |
-|                    | DELETE  | Own     | Own        | Lab         | Lab        | Lab       | All   |
-| **LabImage**       | VIEW    | ✅       | ✅          | ✅           | ✅          | ✅         | ✅     |
-|                    | CREATE  | ❌       | Lab        | Lab         | Lab        | Lab       | All   |
-|                    | UPDATE  | ❌       | Lab        | Lab         | Lab        | Lab       | All   |
-|                    | DELETE  | ❌       | Lab        | Lab         | Lab        | Lab       | All   |
+| 리소스                    | 액션      | STUDENT | LAB_MEMBER | LAB_MANAGER | LAB_LEADER | PROFESSOR | ADMIN |
+|------------------------|---------|---------|------------|-------------|------------|-----------|-------|
+| **User**               | VIEW    | Own     | Own        | Own         | Own        | Own       | All   |
+|                        | CREATE  | ✅       | ✅          | ✅           | ✅          | ✅         | ✅     |
+|                        | UPDATE  | Own     | Own        | Own         | Own        | Own       | All   |
+|                        | DELETE  | ❌       | ❌          | ❌           | ❌          | ❌         | All   |
+| **Lab**                | VIEW    | ✅       | ✅          | ✅           | ✅          | ✅         | ✅     |
+|                        | CREATE  | ❌       | ❌          | ❌           | ❌          | Own       | ✅     |
+|                        | UPDATE  | ❌       | ❌          | Lab         | Lab        | Lab       | All   |
+|                        | DELETE  | ❌       | ❌          | ❌           | ❌          | ❌         | All   |
+| **LabApplication**     | VIEW    | Own     | Own+Lab    | ❌           | Lab        | Lab       | All   |
+|                        | CREATE  | ✅       | ✅          | ✅           | ✅          | ✅         | ✅     |
+|                        | APPROVE | ❌       | ❌          | ❌           | Lab        | Lab       | All   |
+|                        | REJECT  | ❌       | ❌          | ❌           | Lab        | Lab       | All   |
+|                        | DELETE  | Own     | Own        | Own         | Own        | Own       | All   |
+| **LabImage**           | VIEW    | ✅       | ✅          | ✅           | ✅          | ✅         | ✅     |
+|                        | CREATE  | ❌       | Lab        | Lab         | Lab        | Lab       | All   |
+|                        | UPDATE  | ❌       | Lab        | Lab         | Lab        | Lab       | All   |
+|                        | DELETE  | ❌       | Lab        | Lab         | Lab        | Lab       | All   |
+| **LabCreationRequest** | VIEW    | Own     | Own        | Own         | Own        | All       | All   |
+|                        | CREATE  | ✅       | ✅          | ✅           | ✅          | ✅         | ✅     |
+|                        | APPROVE | ❌       | ❌          | ❌           | ❌          | ✅         | ✅     |
+|                        | REJECT  | ❌       | ❌          | ❌           | ❌          | ✅         | ✅     |
+|                        | DELETE  | Own     | Own        | Own         | Own        | Own       | Own   |
 
 ### @PreAuthorize 패턴 매트릭스
 
-| 권한 체크 | 패턴                                                                    | 사용 케이스      |
-|-------|-----------------------------------------------------------------------|-------------|
-| 인증만   | `isAuthenticated()`                                                   | 기본 CRUD, 지원 |
-| 역할 기반 | `hasRole('ADMIN')`                                                    | 관리자 전용      |
-| 소유권   | `@permissionEvaluator.hasPermission(auth, #id, 'Type', 'ACTION')`     | 개인 리소스      |
-| 복합 조건 | `isAuthenticated() and (hasRole('ADMIN') or @permissionEvaluator...)` | 복잡한 권한      |
+| 권한 체크 | 패턴                                                                                     | 사용 케이스      |
+|-------|----------------------------------------------------------------------------------------|-------------|
+| 인증만   | `isAuthenticated()`                                                                    | 기본 CRUD, 지원 |
+| 역할 기반 | `hasRole('ADMIN')`                                                                     | 관리자 전용      |
+| 소유권   | `@permissionEvaluator.hasPermission(auth, #id, 'Type', 'ACTION')`                      | 개인 리소스      |
+| 복합 조건 | `isAuthenticated() and (hasRole('ADMIN') or @permissionEvaluator...)`                  | 복잡한 권한      |
+| 통합 권한 | `@unifiedPermissionEvaluator.hasPermission(auth, #id, 'LabCreationRequest', 'VIEW')`   | 도메인별 권한 평가  |
+| 하이브리드 | `@unifiedPermissionEvaluator.hasPermission(auth, #id, 'LabCreationRequest', 'DELETE')` | 소유자 전용 삭제   |
 
 ### HTTP 메서드별 기본 권한
 

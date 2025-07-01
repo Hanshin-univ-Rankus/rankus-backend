@@ -177,11 +177,11 @@ public void approve() {
 
 ```java
 public boolean canBeModifiedBy(User user) {
-    return user.isLabLeaderOrLabManagerInLab(lab) || user.getRole() == ADMIN;
+    return user.canManageLabApplications(lab) || user.getRole() == ADMIN;
 }
 
 public boolean canBeViewedBy(User user) {
-    return isOwnedBy(user) || user.isLabLeaderOrLabManagerInLab(lab) || user.getRole() == ADMIN;
+    return isOwnedBy(user) || user.canManageLabApplications(lab) || user.getRole() == ADMIN;
 }
 ```
 

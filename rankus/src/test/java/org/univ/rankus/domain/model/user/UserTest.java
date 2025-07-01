@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.univ.rankus.testutil.mock.TestPasswordEncoder;
 import org.univ.rankus.domain.model.user.exception.UserValidationException;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
+import org.univ.rankus.domain.model.lab.Lab;
 import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -239,6 +240,160 @@ class UserTest {
                     UserValidationException.class,
                     () -> user.changeRole(null)
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("지원서 관리 권한 확인(canManageLabApplications)")
+    class CanManageLabApplicationsTests {
+
+        @Test
+        @DisplayName("LAB_LEADER 역할이고 해당 랩실에 소속된 경우 권한 있음")
+        void labLeader_inSameLab_hasPermission() {
+            // given
+            User user = DomainUserFactory.buildValidUser();
+            user.changeRole(Role.LAB_LEADER);
+            // Lab 객체를 Mock 대신 실제 객체로 생성
+            Lab lab = createTestLab(1L);
+            user.assignLab(lab);
+
+            // when
+            boolean result = user.canManageLabApplications(lab);
+
+            // then
+            assertTrue(result);
+        }
+
+        @Test
+        @DisplayName("LAB_MANAGER 역할이고 해당 랩실에 소속되어도 권한 없음")
+        void labManager_inSameLab_hasNoPermission() {
+            // given
+            User user = DomainUserFactory.buildValidUser();
+            user.changeRole(Role.LAB_MANAGER);
+            Lab lab = createTestLab(1L);
+            user.assignLab(lab);
+
+            // when
+            boolean result = user.canManageLabApplications(lab);
+
+            // then
+            assertFalse(result);
+        }
+
+        @Test
+        @DisplayName("PROFESSOR 역할이고 해당 랩실에 소속된 경우 권한 있음")
+        void professor_inSameLab_hasPermission() {
+            // given
+            User user = DomainUserFactory.buildValidUser();
+            user.changeRole(Role.PROFESSOR);
+            Lab lab = createTestLab(1L);
+            user.assignLab(lab);
+
+            // when
+            boolean result = user.canManageLabApplications(lab);
+
+            // then
+            assertTrue(result);
+        }
+
+        @Test
+        @DisplayName("STUDENT 역할인 경우 권한 없음")
+        void student_hasNoPermission() {
+            // given
+            User user = DomainUserFactory.buildValidUser(); // 기본 STUDENT 역할
+            Lab lab = createTestLab(1L);
+            user.assignLab(lab);
+
+            // when
+            boolean result = user.canManageLabApplications(lab);
+
+            // then
+            assertFalse(result);
+        }
+
+        @Test
+        @DisplayName("LAB_LEADER지만 다른 랩실에 소속된 경우 권한 없음")
+        void labLeader_inDifferentLab_hasNoPermission() {
+            // given
+            User user = DomainUserFactory.buildValidUser();
+            user.changeRole(Role.LAB_LEADER);
+            Lab userLab = createTestLab(1L);
+            Lab targetLab = createTestLab(2L);
+            user.assignLab(userLab);
+
+            // when
+            boolean result = user.canManageLabApplications(targetLab);
+
+            // then
+            assertFalse(result);
+        }
+
+        @Test
+        @DisplayName("랩실에 소속되지 않은 경우 권한 없음")
+        void userNotInLab_hasNoPermission() {
+            // given
+            User user = DomainUserFactory.buildValidUser();
+            user.changeRole(Role.LAB_LEADER);
+            Lab lab = createTestLab(1L);
+            // user는 어느 랩실에도 소속되지 않음
+
+            // when
+            boolean result = user.canManageLabApplications(lab);
+
+            // then
+            assertFalse(result);
+        }
+
+        @Test
+        @DisplayName("ADMIN 역할은 모든 랩실의 지원서 관리 권한이 있음")
+        void admin_hasPermissionForAllLabs() {
+            // given
+            User admin = DomainUserFactory.buildValidUser();
+            admin.changeRole(Role.ADMIN);
+            Lab lab = createTestLab(1L);
+            // admin은 어느 랩실에도 소속되지 않아도 됨
+
+            // when
+            boolean result = admin.canManageLabApplications(lab);
+
+            // then
+            assertTrue(result);
+        }
+
+        @Test
+        @DisplayName("ADMIN 역할은 랩실 소속 여부와 관계없이 권한이 있음")
+        void admin_hasPermissionRegardlessOfLabMembership() {
+            // given
+            User admin = DomainUserFactory.buildValidUser();
+            admin.changeRole(Role.ADMIN);
+            Lab userLab = createTestLab(1L);
+            Lab targetLab = createTestLab(2L);
+            admin.assignLab(userLab); // 다른 랩실에 소속
+
+            // when
+            boolean result = admin.canManageLabApplications(targetLab);
+
+            // then
+            assertTrue(result);
+        }
+
+        private Lab createTestLab(Long id) {
+            // Lab 객체 생성을 위한 헬퍼 메서드 - 실제 구현에 맞게 수정 필요
+            try {
+                // Lab 클래스의 실제 생성자나 팩토리 메서드를 사용
+                java.lang.reflect.Constructor<Lab> constructor = Lab.class.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                Lab lab = constructor.newInstance();
+                
+                // ID 설정을 위한 리플렉션
+                java.lang.reflect.Field idField = Lab.class.getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(lab, id);
+                
+                return lab;
+            } catch (Exception e) {
+                throw new RuntimeException("테스트용 Lab 객체 생성 실패", e);
+            }
         }
     }
 }

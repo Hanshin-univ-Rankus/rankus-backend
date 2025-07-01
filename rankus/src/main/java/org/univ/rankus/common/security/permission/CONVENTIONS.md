@@ -96,7 +96,7 @@ public class LabApplicationPermissionHandler implements DomainPermissionEvaluato
         }
         
         // 해당 랩실의 관리자는 볼 수 있음
-        return user.isLabLeaderOrLabManagerInLab(application.getLab()) || 
+        return user.canManageLabApplications(application.getLab()) || 
                user.getRole() == Role.ADMIN;
     }
     
@@ -104,7 +104,7 @@ public class LabApplicationPermissionHandler implements DomainPermissionEvaluato
         LabApplication application = getApplicationOrThrow(applicationId);
         
         // 랩실 관리자만 승인 가능
-        return user.isLabLeaderOrLabManagerInLab(application.getLab()) || 
+        return user.canManageLabApplications(application.getLab()) || 
                user.getRole() == Role.ADMIN;
     }
     

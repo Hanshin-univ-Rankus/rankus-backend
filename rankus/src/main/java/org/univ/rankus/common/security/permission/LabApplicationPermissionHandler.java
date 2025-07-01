@@ -36,8 +36,8 @@ public class LabApplicationPermissionHandler implements DomainPermissionEvaluato
         LabApplication app = queryUseCase.getApplicationById(id);
 
         return switch (permission) {
-            case "cancel" -> app.isOwnedBy(userId);
-            case "approve", "reject", "view" -> user.isLabLeaderOrLabManagerInLab(app.getLab());
+            case "cancel", "DELETE" -> user.isAdmin() || app.isOwnedBy(userId);
+            case "approve", "reject", "view" -> user.canManageLabApplications(app.getLab());
             default -> false;
         };
     }

@@ -37,7 +37,7 @@ public class LabImagePermissionHandler implements DomainPermissionEvaluator {
         // targetId가 Lab ID인 경우 (이미지 생성 권한)
         if (permission.equals("create") && targetId instanceof Long) {
             Lab lab = labQueryUseCase.getLabById((Long) targetId);
-            return user.isLabLeaderOrLabManagerInLab(lab);
+            return user.canManageLabApplications(lab);
         }
 
         // targetId가 LabImage ID인 경우 (이미지 삭제/조회 권한)
@@ -46,7 +46,7 @@ public class LabImagePermissionHandler implements DomainPermissionEvaluator {
 
             switch (permission) {
                 case "delete":
-                    return user.isLabLeaderOrLabManagerInLab(img.getLab());
+                    return user.canManageLabApplications(img.getLab());
                 case "view":
                     return true; // 인증된 사용자는 모두 조회 가능
                 default:

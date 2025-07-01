@@ -60,7 +60,7 @@ User ────── ManyToOne ──────► Lab
     - `checkPassword()`: 로그인 시 비밀번호 검증
     - `changePassword()`: 비밀번호 변경 및 검증
     - `assignLab()`: 랩실 배정
-    - `isLabLeaderOrLabManagerInLab()`: 권한 확인
+    - `canManageLabApplications()`: 지원서 관리 권한 확인
 
 ### Lab Entity
 

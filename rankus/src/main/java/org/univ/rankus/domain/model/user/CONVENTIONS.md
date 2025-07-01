@@ -29,7 +29,7 @@ public class User extends BaseTimeEntity {
     
     public static User create(...) { return new User(...); }
     public void checkPassword(String raw) { ... }
-    public boolean isLabLeaderOrLabManagerInLab(Lab lab) { ... }
+    public boolean canManageLabApplications(Lab lab) { ... }
 }
 ```
 
@@ -118,7 +118,7 @@ public void leaveLab() {
 ### 권한 확인
 
 ```java
-public boolean isLabLeaderOrLabManagerInLab(Lab targetLab) {
+public boolean canManageLabApplications(Lab targetLab) {
     return this.lab != null && this.lab.equals(targetLab) &&
            (role == LAB_LEADER || role == LAB_MANAGER || role == PROFESSOR);
 }
