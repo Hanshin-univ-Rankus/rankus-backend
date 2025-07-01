@@ -93,6 +93,30 @@ class LabCreationRequestPermissionHandlerTest {
     }
 
     @Test
+    @DisplayName("DELETE 권한: 관리자는 모든 요청을 삭제할 수 있다")
+    void DELETE_permission_allowsAdmin() {
+        // given
+        Long adminId = 2L;
+        Long requesterId = 1L;
+        Long requestId = 100L;
+
+        CustomUserDetails principal = createCustomUserDetails(adminId);
+        User admin = DomainUserFactory.buildValidUserWithRole(Role.ADMIN);
+        ReflectionTestUtils.setField(admin, "id", adminId);
+        User requester = DomainUserFactory.buildValidUserWithId(requesterId);
+        LabCreationRequest request = createRequestWithRequester(requestId, requester);
+
+        given(userQueryUseCase.getUserById(adminId)).willReturn(admin);
+        given(queryUseCase.getLabCreationRequestById(requestId)).willReturn(request);
+
+        // when
+        boolean hasPermission = permissionHandler.hasPermission(principal, requestId, "DELETE");
+
+        // then
+        assertThat(hasPermission).isTrue();
+    }
+
+    @Test
     @DisplayName("VIEW 권한: 신청자 본인은 가능하다")
     void VIEW_permission_allowsOwner() {
         // given

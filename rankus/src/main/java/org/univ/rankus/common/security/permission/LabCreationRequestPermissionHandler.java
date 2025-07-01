@@ -36,7 +36,7 @@ public class LabCreationRequestPermissionHandler implements DomainPermissionEval
         LabCreationRequest request = queryUseCase.getLabCreationRequestById(requestId);
 
         return switch (permission) {
-            case "DELETE" -> request.isOwnedBy(userId);
+            case "DELETE" -> request.isOwnedBy(userId) || user.getRole() == Role.ADMIN;
             case "VIEW" -> request.isOwnedBy(userId) || isAdminOrProfessor(user);
             case "APPROVE", "REJECT" -> isAdminOrProfessor(user);
             default -> false;

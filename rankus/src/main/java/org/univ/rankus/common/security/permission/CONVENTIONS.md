@@ -141,7 +141,7 @@ public class LabApplicationPermissionHandler implements DomainPermissionEvaluato
 
 - **대상**: 랩실 생성 신청 관련 권한
 - **권한**: VIEW, DELETE, APPROVE, REJECT
-- **소유권 검증**: 신청자 본인만 DELETE 가능
+- **DELETE 권한**: 신청자 본인 + 관리자 (2025.07 정책 변경: 관리자 운영 편의성 향상)
 - **조회 권한**: 신청자 본인 + 관리자/교수
 - **승인/거절**: 관리자/교수만 가능
 
@@ -170,7 +170,7 @@ public class LabCreationRequestPermissionHandler implements DomainPermissionEval
         LabCreationRequest request = queryUseCase.getLabCreationRequestById(requestId);
 
         return switch (permission) {
-            case "DELETE" -> request.isOwnedBy(userId);
+            case "DELETE" -> request.isOwnedBy(userId) || user.getRole() == Role.ADMIN;
             case "VIEW" -> request.isOwnedBy(userId) || isAdminOrProfessor(user);
             case "APPROVE", "REJECT" -> isAdminOrProfessor(user);
             default -> false;

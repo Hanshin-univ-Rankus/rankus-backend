@@ -65,7 +65,7 @@
 |                        | CREATE  | ✅       | ✅          | ✅           | ✅          | ✅         | ✅     |
 |                        | APPROVE | ❌       | ❌          | ❌           | ❌          | ✅         | ✅     |
 |                        | REJECT  | ❌       | ❌          | ❌           | ❌          | ✅         | ✅     |
-|                        | DELETE  | Own     | Own        | Own         | Own        | Own       | Own   |
+|                        | DELETE  | Own     | Own        | Own         | Own        | Own       | All   |
 
 ### @PreAuthorize 패턴 매트릭스
 

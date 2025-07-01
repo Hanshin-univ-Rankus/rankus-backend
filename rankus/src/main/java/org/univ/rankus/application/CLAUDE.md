@@ -109,7 +109,7 @@ JPA Repository (Infrastructure)
 - `approveLabCreationRequest()`: 랩실 생성 요청 승인
 - `rejectLabCreationRequest()`: 랩실 생성 요청 거부
 - `updateLabCreationRequest()`: 랩실 생성 요청 수정
-- `deleteLabCreationRequest()`: 랩실 생성 요청 삭제
+- `deleteLabCreationRequest()`: 랩실 생성 요청 삭제 (신청자 본인 + 관리자만 가능)
 
 #### AuthUseCase
 

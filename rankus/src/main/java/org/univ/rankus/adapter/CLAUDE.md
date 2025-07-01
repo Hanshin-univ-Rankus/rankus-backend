@@ -184,6 +184,7 @@ public class LabCreationRequestController {
     @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #requestId, 'LabCreationRequest', 'DELETE')")
     public ResponseEntity<Void> cancelLabCreationRequest(
             @PathVariable Long requestId);
+    // 권한: 신청자 본인 + 관리자 (2025.07 정책 변경)
 }
 ```
 
