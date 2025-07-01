@@ -5,12 +5,14 @@
 ## 🔌 Adapter Layer 테스트 개요
 
 ### 테스트 목표
+
 - **Controller 테스트**: REST API 엔드포인트 동작 검증
 - **Repository 테스트**: 데이터 영속성 계층 검증
 - **보안 통합 테스트**: 인증/인가 로직 검증
 - **DTO 변환 테스트**: 데이터 직렬화/역직렬화 검증
 
 ### 테스트 범위
+
 - HTTP 요청/응답 처리
 - JSON 직렬화/역직렬화
 - 데이터베이스 연동
@@ -20,6 +22,7 @@
 ## 📁 Adapter 테스트 구조
 
 ### 현재 구현된 테스트 파일
+
 ```
 src/test/java/org/univ/rankus/adapter/
 ├── CLAUDE.md                           # 이 파일
@@ -45,6 +48,7 @@ src/test/java/org/univ/rankus/adapter/
 ## 🎮 Controller 테스트 전략
 
 ### 1. @WebMvcTest 활용
+
 **목표**: Controller 레이어만 격리하여 테스트
 
 ```java
@@ -68,7 +72,7 @@ class UserControllerTest {
         List<UserResponseDto> users = Arrays.asList(
             UserResponseDto.builder().id(1L).name("홍길동").build()
         );
-        when(userQueryUseCase.findAllUsers()).thenReturn(users);
+        when(userQueryUseCase.getAllUsers()).thenReturn(users);
         
         // when & then
         mockMvc.perform(get("/api/users"))
@@ -76,18 +80,20 @@ class UserControllerTest {
             .andExpect(jsonPath("$.status").value(200))
             .andExpect(jsonPath("$.data[0].name").value("홍길동"));
         
-        verify(userQueryUseCase).findAllUsers();
+        verify(userQueryUseCase).getAllUsers();
     }
 }
 ```
 
 **특징**:
+
 - Spring Context의 Web Layer만 로드
 - UseCase는 @MockBean으로 대체
 - HTTP 요청/응답 검증 중심
 - 빠른 실행 속도
 
 ### 2. 보안 테스트 패턴
+
 ```java
 @Test
 void 인증_없이_보호된_엔드포인트_접근시_401_반환() throws Exception {
@@ -107,7 +113,7 @@ void 권한_없는_사용자가_관리자_기능_접근시_403_반환() throws E
 void 랩장이_자신의_랩실_지원서_조회_성공() throws Exception {
     // given
     Long labId = 1L;
-    when(userQueryUseCase.findCurrentUser())
+    when(userQueryUseCase.getCurrentUser())
         .thenReturn(createLabLeaderResponse(labId));
     
     // when & then
@@ -117,6 +123,7 @@ void 랩장이_자신의_랩실_지원서_조회_성공() throws Exception {
 ```
 
 ### 3. 요청/응답 검증 패턴
+
 ```java
 @Test
 @WithMockUser(roles = "STUDENT")
@@ -148,6 +155,7 @@ void 지원서_제출_성공() throws Exception {
 ```
 
 ### 4. 예외 처리 테스트
+
 ```java
 @Test
 @WithMockUser(roles = "STUDENT")
@@ -170,6 +178,7 @@ void 존재하지_않는_랩실_지원시_404_반환() throws Exception {
 ## 💾 Repository 테스트 전략
 
 ### 1. @DataJpaTest 활용
+
 **목표**: JPA Repository 동작 검증
 
 ```java
@@ -213,12 +222,14 @@ class SpringDataUserRepositoryTest {
 ```
 
 **특징**:
+
 - JPA 관련 구성요소만 로드
 - 자동으로 H2 인메모리 DB 사용 (또는 테스트 DB)
 - @Transactional로 자동 롤백
 - TestEntityManager로 테스트 데이터 관리
 
 ### 2. 복합 쿼리 테스트
+
 ```java
 @Test
 void 랩실별_승인된_지원서_조회() {
@@ -241,6 +252,7 @@ void 랩실별_승인된_지원서_조회() {
 ```
 
 ### 3. 페이징 테스트
+
 ```java
 @Test
 void 사용자_목록_페이징_조회() {
@@ -266,6 +278,7 @@ void 사용자_목록_페이징_조회() {
 ## 🔐 보안 통합 테스트
 
 ### 1. JWT 통합 테스트
+
 ```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class JwtIntegrationTest {
@@ -317,6 +330,7 @@ class JwtIntegrationTest {
 ```
 
 ### 2. 권한 검증 통합 테스트
+
 ```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(OrderAnnotation.class)
@@ -355,6 +369,7 @@ class LabApplicationControllerAuthorizationTest {
 ## 📊 DTO 테스트 전략
 
 ### 1. JSON 직렬화/역직렬화 테스트
+
 ```java
 @JsonTest
 class UserResponseDtoJsonTest {
@@ -405,6 +420,7 @@ class UserResponseDtoJsonTest {
 ```
 
 ### 2. 검증 어노테이션 테스트
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class LabApplicationRequestDtoValidationTest {
@@ -448,24 +464,28 @@ class LabApplicationRequestDtoValidationTest {
 ## 🎯 Adapter 테스트 베스트 프랙티스
 
 ### 1. Controller 테스트 원칙
+
 - **단일 책임**: 하나의 엔드포인트당 하나의 테스트
 - **모든 HTTP 상태**: 성공, 실패 시나리오 모두 테스트
 - **보안 검증**: 인증/인가 요구사항 검증
 - **데이터 검증**: 요청/응답 데이터 형식 검증
 
 ### 2. Repository 테스트 원칙
+
 - **쿼리 로직**: 복잡한 쿼리는 반드시 테스트
 - **제약 조건**: DB 제약 조건 위반 시나리오 테스트
 - **성능**: 대용량 데이터에 대한 쿼리 성능 검증
 - **트랜잭션**: 트랜잭션 경계 동작 검증
 
 ### 3. 통합 테스트 원칙
+
 - **End-to-End**: 실제 HTTP 요청부터 DB까지 전체 플로우
 - **보안 통합**: JWT, 권한 검증 등 보안 기능 통합
 - **환경 격리**: 테스트 환경과 개발 환경 완전 분리
 - **데이터 정리**: 테스트 후 데이터 자동 정리
 
 ### 4. 테스트 데이터 관리
+
 ```java
 // 테스트 베이스 클래스 활용
 @TestMethodOrder(OrderAnnotation.class)
@@ -498,11 +518,13 @@ abstract class BaseControllerTest {
 ## 📈 성능 및 품질 지표
 
 ### 테스트 커버리지 목표
+
 - **Controller**: 85% 이상 (모든 엔드포인트 커버)
 - **Repository**: 90% 이상 (모든 쿼리 메서드 검증)
 - **DTO**: 70% 이상 (핵심 변환 로직)
 
 ### 테스트 실행 성능
+
 - **단위 테스트**: 평균 50ms 이하
 - **통합 테스트**: 평균 500ms 이하
 - **E2E 테스트**: 평균 2초 이하

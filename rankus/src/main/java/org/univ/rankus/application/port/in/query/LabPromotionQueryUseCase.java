@@ -14,6 +14,7 @@ public interface LabPromotionQueryUseCase {
 
     /**
      * ID로 특정 랩실의 상세 정보를 조회합니다.
+     *
      * @throws org.univ.rankus.domain.model.lab.exception.LabNotFoundException
      */
     Lab getLabById(Long labId);

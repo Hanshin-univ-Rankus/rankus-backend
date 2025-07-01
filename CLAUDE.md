@@ -68,12 +68,13 @@ docker-compose up -d
 - **공통 컴포넌트**: @common/CLAUDE.md
 - **설정 관리**: @config/CLAUDE.md
 
-## 🎯 현재 구현 상태 (약 40%)
+## 🎯 현재 구현 상태 (약 65%)
 
 ### ✅ 완료된 기능
-- 회원 관리 (가입, JWT 로그인)
-- 랩실 홍보 (목록, 상세, 이미지 관리)
-- 랩실 지원 (신청, 승인/거부)
+- **회원 관리**: 가입, JWT 로그인, 권한 기반 접근 제어
+- **랩실 홍보**: 목록, 상세, 이미지 관리
+- **랩실 지원**: 신청, 승인/거부 프로세스
+- **랩실 생성 요청**: 랩실 생성 신청, 관리자 승인/거부 워크플로우
 
 ### 🔄 다음 개발 우선순위
 1. **랭킹 시스템**: 점수 관리 및 승인 프로세스
@@ -83,14 +84,38 @@ docker-compose up -d
 
 ## 🛠️ 개발 가이드
 
-### 테스트 실행
+### 🔧 Gradle 실행 환경
 ```bash
-# 전체 테스트
+# ⚠️ 중요: 모든 Gradle 명령은 rankus 디렉토리에서 실행해야 합니다
+cd rankus
+
+# 애플리케이션 실행
+./gradlew bootRun
+
+# 테스트 실행
 ./gradlew test
 
 # 특정 테스트
 ./gradlew test --tests UserCommandServiceTest
+
+# 빌드
+./gradlew build
+
+# 린트 및 타입 체크
+./gradlew check
 ```
+
+### 📁 프로젝트 구조 인식
+- **루트 디렉토리**: `/project` (현재 위치)
+- **Gradle 프로젝트**: `/project/rankus` (실행 디렉토리)
+- **소스코드**: `/project/rankus/src/main/java/org/univ/rankus`
+
+### 개발 워크플로우
+1. `cd rankus` - Gradle 프로젝트 디렉토리로 이동
+2. `./gradlew test` - 테스트 실행으로 현재 상태 확인
+3. 코드 작성/수정
+4. `./gradlew test` - 변경사항 테스트
+5. `./gradlew check` - 린트/타입 체크 (가능한 경우)
 
 ### 배포
 - **플랫폼**: AWS EC2

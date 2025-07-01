@@ -44,6 +44,7 @@ public class LabApplicationRepositoryAdapter implements LabApplicationRepository
     public void delete(LabApplication application) {
         springDataLabApplicationRepository.delete(application);
     }
+
     @Override
     public boolean existsByLabIdAndUserId(Long labId, Long userId) {
         return springDataLabApplicationRepository.existsByLabIdAndUserId(labId, userId);

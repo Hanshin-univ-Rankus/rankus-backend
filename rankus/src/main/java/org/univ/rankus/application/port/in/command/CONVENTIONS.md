@@ -1,18 +1,20 @@
 # Command UseCase 컨벤션
 
 ## 📛 네이밍
-| 구분 | 패턴 | 예시 |
-|------|------|------|
-| Interface | `{Domain}CommandUseCase` | `UserCommandUseCase` |
-| 생성 | `create{Resource}()` | `createUser()`, `createLab()` |
-| 수정 | `update{Resource}()` | `updateUser()`, `updateLabInfo()` |
-| 삭제 | `delete{Resource}()` | `deleteUser()`, `deleteLab()` |
-| 상태변경 | `{action}{Resource}()` | `approveApplication()` |
-| 관계변경 | `assign{Resource}()`, `remove{Resource}()` | `assignUserToLab()` |
+
+| 구분        | 패턴                                         | 예시                                |
+|-----------|--------------------------------------------|-----------------------------------|
+| Interface | `{Domain}CommandUseCase`                   | `UserCommandUseCase`              |
+| 생성        | `create{Resource}()`                       | `createUser()`, `createLab()`     |
+| 수정        | `update{Resource}()`                       | `updateUser()`, `updateLabInfo()` |
+| 삭제        | `delete{Resource}()`                       | `deleteUser()`, `deleteLab()`     |
+| 상태변경      | `{action}{Resource}()`                     | `approveApplication()`            |
+| 관계변경      | `assign{Resource}()`, `remove{Resource}()` | `assignUserToLab()`               |
 
 ## 🏗️ 인터페이스 구조
 
 ### 기본 패턴
+
 ```java
 public interface {Domain}CommandUseCase {
     {Domain}ResponseDto create{Domain}({Domain}CreateRequestDto request);
@@ -23,6 +25,7 @@ public interface {Domain}CommandUseCase {
 ```
 
 ### 실제 구현 예시
+
 ```java
 public interface UserCommandUseCase {
     
@@ -69,6 +72,7 @@ public interface UserCommandUseCase {
 ```
 
 ### 복잡한 Command UseCase 구조
+
 ```java
 public interface LabApplicationCommandUseCase {
     
@@ -127,6 +131,7 @@ public interface LabApplicationCommandUseCase {
 ## 📋 메서드 시그니처 패턴
 
 ### 생성 메서드
+
 ```java
 // 기본 생성
 {Domain}ResponseDto create{Domain}({Domain}CreateRequestDto request);
@@ -142,6 +147,7 @@ List<{Domain}ResponseDto> create{Domain}s(List<{Domain}CreateRequestDto> request
 ```
 
 ### 수정 메서드
+
 ```java
 // 전체 수정
 {Domain}ResponseDto update{Domain}(Long id, {Domain}UpdateRequestDto request);
@@ -158,6 +164,7 @@ void remove{Related}(Long id, Long relatedId);
 ```
 
 ### 삭제 메서드
+
 ```java
 // 단일 삭제
 void delete{Domain}(Long id);
@@ -173,6 +180,7 @@ void delete{Domain}sByCondition({ConditionDto} condition);
 ```
 
 ### 액션 메서드
+
 ```java
 // 승인/거부
 {Domain}ResponseDto approve{Domain}(Long id);
@@ -193,6 +201,7 @@ void delete{Domain}sByCondition({ConditionDto} condition);
 ## 🔐 보안 및 권한 고려사항
 
 ### 권한 검증이 필요한 메서드
+
 ```java
 public interface LabApplicationCommandUseCase {
     
@@ -212,6 +221,7 @@ public interface LabApplicationCommandUseCase {
 ```
 
 ### 권한 검증 위치
+
 ```java
 // UseCase 인터페이스에는 권한 검증 로직 없음
 // 실제 권한 검증은 다음 위치에서 수행:
@@ -223,6 +233,7 @@ public interface LabApplicationCommandUseCase {
 ## ⚠️ 예외 처리 가이드
 
 ### 예외 문서화
+
 ```java
 public interface UserCommandUseCase {
     
@@ -240,6 +251,7 @@ public interface UserCommandUseCase {
 ```
 
 ### 예외 계층 구조 고려
+
 ```java
 // 도메인별 예외 계층
 UserException
@@ -258,6 +270,7 @@ LabApplicationException
 ## 🔄 트랜잭션 고려사항
 
 ### 트랜잭션 경계
+
 ```java
 // UseCase 인터페이스는 트랜잭션 경계를 정의하지 않음
 // 실제 트랜잭션은 Service 구현체에서 @Transactional로 처리
@@ -273,6 +286,7 @@ public interface LabApplicationCommandUseCase {
 ```
 
 ### 복합 작업 고려
+
 ```java
 public interface LabApplicationCommandUseCase {
     
@@ -289,6 +303,7 @@ public interface LabApplicationCommandUseCase {
 ## 🧪 Command UseCase 테스트 가이드
 
 ### 인터페이스 테스트 전략
+
 ```java
 // Command UseCase는 인터페이스이므로 직접 테스트하지 않음
 // 대신 구현체(Service)를 테스트
@@ -309,6 +324,7 @@ class UserCommandServiceTest {
 ```
 
 ### 계약 테스트 (Contract Test)
+
 ```java
 // UseCase 인터페이스의 계약을 검증하는 테스트
 public abstract class UserCommandUseCaseContractTest {

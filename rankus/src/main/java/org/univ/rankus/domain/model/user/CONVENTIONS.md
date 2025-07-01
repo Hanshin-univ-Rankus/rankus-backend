@@ -1,20 +1,22 @@
 # User Domain 컨벤션
 
 ## 📛 네이밍
-| 구분 | 패턴 | 예시 |
-|------|------|------|
-| Entity | Domain명 | `User` |
-| Value Object | 개념명 | `Password` |
-| Enum | 단수형 | `Role` |
-| Exception | `{Domain}{Type}Exception` | `UserValidationException` |
-| Method-조회 | `get{Property}()`, `is{Condition}()` | `getName()`, `isActive()` |
-| Method-검증 | `check{Condition}()`, `validate{Property}()` | `checkPassword()` |
-| Method-변경 | `change{Property}()`, `assign{Property}()` | `changePassword()` |
-| Field | camelCase / UPPER_SNAKE_CASE | `name` / `MAX_LENGTH` |
+
+| 구분           | 패턴                                           | 예시                        |
+|--------------|----------------------------------------------|---------------------------|
+| Entity       | Domain명                                      | `User`                    |
+| Value Object | 개념명                                          | `Password`                |
+| Enum         | 단수형                                          | `Role`                    |
+| Exception    | `{Domain}{Type}Exception`                    | `UserValidationException` |
+| Method-조회    | `get{Property}()`, `is{Condition}()`         | `getName()`, `isActive()` |
+| Method-검증    | `check{Condition}()`, `validate{Property}()` | `checkPassword()`         |
+| Method-변경    | `change{Property}()`, `assign{Property}()`   | `changePassword()`        |
+| Field        | camelCase / UPPER_SNAKE_CASE                 | `name` / `MAX_LENGTH`     |
 
 ## 🏗️ 구조 패턴
 
 ### User Entity
+
 ```java
 @Entity
 @Table(name = "users")
@@ -32,6 +34,7 @@ public class User extends BaseTimeEntity {
 ```
 
 ### Password Value Object
+
 ```java
 @Embeddable
 public class Password {
@@ -51,14 +54,16 @@ public class Password {
 ## 🔒 검증 패턴
 
 ### 검증 매트릭스
-| 필드 | 필수 | 최소 | 최대 | 규칙 |
-|------|------|------|------|------|
-| name | Y | - | 30 | trim(), non-empty |
-| email | Y | - | 255 | 형식, 중복 검사 |
-| password | Y | 8 | 255 | 복잡도 |
-| role | Y | - | - | 열거형 |
+
+| 필드       | 필수 | 최소 | 최대  | 규칙                |
+|----------|----|----|-----|-------------------|
+| name     | Y  | -  | 30  | trim(), non-empty |
+| email    | Y  | -  | 255 | 형식, 중복 검사         |
+| password | Y  | 8  | 255 | 복잡도               |
+| role     | Y  | -  | -   | 열거형               |
 
 ### 검증 구현
+
 ```java
 private void validateName(String name) {
     if (isNullOrEmpty(name)) throw ex(INVALID_NAME);
@@ -67,9 +72,11 @@ private void validateName(String name) {
 ```
 
 ## ⚠️ 예외 처리
+
 상세: @exception/CONVENTIONS.md
 
 ## 🎭 Role Enum
+
 ```java
 public enum Role {
     STUDENT("학생"), LAB_MEMBER("랩실 멤버"), LAB_MANAGER("랩실 관리자"),
@@ -89,6 +96,7 @@ public enum Role {
 ```
 
 ## 🔗 연관관계
+
 ```java
 @ManyToOne(fetch = FetchType.LAZY)
 @JoinColumn(name = "lab_id")
@@ -108,6 +116,7 @@ public void leaveLab() {
 ## 📋 비즈니스 로직
 
 ### 권한 확인
+
 ```java
 public boolean isLabLeaderOrLabManagerInLab(Lab targetLab) {
     return this.lab != null && this.lab.equals(targetLab) &&
@@ -116,6 +125,7 @@ public boolean isLabLeaderOrLabManagerInLab(Lab targetLab) {
 ```
 
 ### 비밀번호 변경
+
 ```java
 public void changePassword(String newRaw) {
     Password newPassword = Password.fromRaw(newRaw, encoder);
@@ -128,6 +138,7 @@ public void changePassword(String newRaw) {
 ## 🧪 테스트 패턴
 
 ### User 테스트
+
 ```java
 @Test
 void 유효한_정보로_사용자_생성() {
@@ -143,6 +154,7 @@ void 잘못된_이름_예외_발생() {
 ```
 
 ### Password 테스트
+
 ```java
 @Test
 void 비밀번호_생성_및_검증() {
@@ -152,6 +164,7 @@ void 비밀번호_생성_및_검증() {
 ```
 
 ## 🎯 핵심 규칙
+
 1. **불변성**: Value Object immutable 설계
 2. **검증 우선**: 생성시 모든 검증 완료
 3. **명확한 예외**: 구체적 ErrorCode 사용

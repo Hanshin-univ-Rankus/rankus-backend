@@ -5,12 +5,14 @@
 ## 🧰 TestUtil 개요
 
 ### 핵심 목표
+
 - **테스트 코드 재사용**: 공통 테스트 로직 및 데이터 생성 패턴 표준화
 - **테스트 작성 효율성**: 반복적인 테스트 설정 및 데이터 생성 자동화
 - **일관된 테스트 품질**: 표준화된 테스트 헬퍼를 통한 테스트 품질 향상
 - **유지보수성**: 테스트 데이터 변경 시 중앙화된 관리 지점 제공
 
 ### 구성 요소
+
 - **Factory 패턴**: 도메인 객체 및 통합 테스트 데이터 생성
 - **Mock 유틸리티**: 인증, 쿼리 등 공통 Mock 설정
 - **Base 테스트 클래스**: 계층별 테스트 공통 설정
@@ -19,6 +21,7 @@
 ## 📁 TestUtil 구조
 
 ### 현재 구현된 구조
+
 ```
 src/test/java/org/univ/rankus/testutil/
 ├── CLAUDE.md                              # 이 파일
@@ -47,6 +50,7 @@ src/test/java/org/univ/rankus/testutil/
 ## 🏭 Factory 패턴 활용
 
 ### 1. Domain Factory 패턴
+
 **목표**: 순수 도메인 객체 생성을 위한 정적 팩토리 메서드
 
 ```java
@@ -159,6 +163,7 @@ public class DomainUserFactory {
 ```
 
 ### 2. Domain Lab Factory
+
 ```java
 public class DomainLabFactory {
     
@@ -253,6 +258,7 @@ public class DomainLabFactory {
 ```
 
 ### 3. Domain LabApplication Factory
+
 ```java
 public class DomainLabApplicationFactory {
     
@@ -386,14 +392,17 @@ public class IntegrationLabFactory {
 ## 📦 DTO Factory 패턴
 
 ### 목표
+
 Controller 테스트에서 사용하는 Request/Response DTO 객체를 일관되게 생성하기 위한 팩토리
 
 ### 특징
+
 - **타입 안전성**: Map 대신 강타입 DTO 사용
 - **재사용성**: Controller 테스트 간 공통 활용
 - **실제 구조 반영**: 실제 DTO 클래스 구조에 정확히 맞춤
 
 ### 기본 구조
+
 ```java
 public final class DtoFactory {
     private DtoFactory() {}
@@ -443,6 +452,7 @@ public final class DtoFactory {
 ```
 
 ### 활용 예시
+
 ```java
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
@@ -463,12 +473,14 @@ class AuthControllerTest {
 ```
 
 ### 주요 장점
+
 1. **타입 안전성**: 컴파일 타임에 오류 발견
 2. **재사용성**: 여러 테스트에서 동일한 DTO 생성 로직 활용
 3. **유지보수성**: DTO 구조 변경시 중앙화된 관리
 4. **가독성**: Map 기반 JSON 대신 명확한 의도 표현
 
 ### 주의사항
+
 - **실제 DTO 구조와 일치**: 실제 DTO 클래스의 필드와 메서드에 정확히 맞춰야 함
 - **Record 타입 고려**: Record 타입 DTO는 생성자 방식 사용
 - **Builder 패턴 확인**: 모든 DTO가 Builder를 지원하는 것은 아님
@@ -744,20 +756,23 @@ public abstract class BaseWebTest {
 ### 1. Factory 사용 원칙
 
 #### Factory 타입별 활용 가이드
-| Factory 타입 | 사용 목적 | 특징 | 예시 |
-|--------------|-----------|------|------|
-| **Domain Factory** | 순수 객체 생성 | 외부 의존성 없음, 정적 메서드 | `DomainUserFactory.buildStudentUser()` |
-| **Integration Factory** | 실제 DB 연동 | @Component, 실제 저장 | `IntegrationUserFactory.createAndSaveStudent()` |
-| **DTO Factory** | Controller 테스트 | HTTP 요청/응답 DTO | `DtoFactory.buildUserRegisterRequest()` |
+
+| Factory 타입              | 사용 목적          | 특징                | 예시                                              |
+|-------------------------|----------------|-------------------|-------------------------------------------------|
+| **Domain Factory**      | 순수 객체 생성       | 외부 의존성 없음, 정적 메서드 | `DomainUserFactory.buildStudentUser()`          |
+| **Integration Factory** | 실제 DB 연동       | @Component, 실제 저장 | `IntegrationUserFactory.createAndSaveStudent()` |
+| **DTO Factory**         | Controller 테스트 | HTTP 요청/응답 DTO    | `DtoFactory.buildUserRegisterRequest()`         |
 
 #### 핵심 원칙
+
 - **도메인 Factory**: 순수 객체 생성, 외부 의존성 없음
-- **Integration Factory**: 실제 DB 연동, @Component로 Spring 관리  
+- **Integration Factory**: 실제 DB 연동, @Component로 Spring 관리
 - **DTO Factory**: 실제 DTO 구조와 정확히 일치, 타입 안전성 확보
 - **빌더 패턴**: 복잡한 객체 생성 시 가독성 향상
 - **메서드 체이닝**: 유연한 테스트 데이터 생성
 
 ### 2. Mock 활용 지침
+
 ```java
 // 좋은 예: 명확한 Mock 설정
 @Test
@@ -782,6 +797,7 @@ void 사용자_조회_성공() {
 ```
 
 ### 3. DTO Factory 활용 패턴
+
 ```java
 // ✅ 권장: DTO Factory 활용
 @WebMvcTest(UserController.class)
@@ -826,6 +842,7 @@ void 랩실_지원_성공() throws Exception {
 ```
 
 ### 4. Base 클래스 상속 활용
+
 ```java
 // Repository 테스트
 class UserRepositoryTest extends BaseRepositoryTest {
@@ -846,6 +863,7 @@ class UserRepositoryTest extends BaseRepositoryTest {
 ```
 
 ### 4. 테스트 데이터 관리
+
 ```java
 // 테스트 클래스별 공통 데이터
 class UserCommandServiceTest extends BaseServiceTest {
@@ -874,11 +892,13 @@ class UserCommandServiceTest extends BaseServiceTest {
 ## 📊 TestUtil 품질 지표
 
 ### 재사용성 메트릭
+
 - **Factory 메서드 사용률**: 90% 이상
 - **중복 코드 감소**: 50% 이상
 - **테스트 작성 시간**: 30% 단축
 
 ### 유지보수성 지표
+
 - **테스트 데이터 변경**: 중앙화된 Factory에서만 수정
 - **Mock 설정 표준화**: 공통 패턴 적용
 - **Base 클래스 활용도**: 80% 이상

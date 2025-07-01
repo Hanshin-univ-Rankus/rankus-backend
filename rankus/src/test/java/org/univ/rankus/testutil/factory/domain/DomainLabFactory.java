@@ -9,7 +9,8 @@ import org.univ.rankus.domain.model.lab.LabCategory;
  * 외부 의존(JPA, Repository 등) 없이 Lab 엔티티 생성 메서드만 제공합니다.
  */
 public final class DomainLabFactory {
-    private DomainLabFactory() {}
+    private DomainLabFactory() {
+    }
 
     public static Lab buildValidLab() {
         return new Lab("TestLab", LabCategory.AI, "Description", "ProfX");

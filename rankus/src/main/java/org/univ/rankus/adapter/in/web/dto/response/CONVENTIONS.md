@@ -6,24 +6,27 @@
 ## 🎯 핵심 규칙
 
 ### 네이밍 매트릭스
-| 타입 | 패턴 | 예시 |
-|------|------|------|
-| 기본 | `{Domain}ResponseDto` | `UserResponseDto`, `LabResponseDto` |
-| 인증 | `AuthResponseDto` | 토큰 + 사용자 정보 |
-| 페이징 | `PageResponse<T>` | 제네릭 활용 |
-| 공통 | `ApiResponse<T>` | 모든 응답 래퍼 |
+
+| 타입  | 패턴                    | 예시                                  |
+|-----|-----------------------|-------------------------------------|
+| 기본  | `{Domain}ResponseDto` | `UserResponseDto`, `LabResponseDto` |
+| 인증  | `AuthResponseDto`     | 토큰 + 사용자 정보                         |
+| 페이징 | `PageResponse<T>`     | 제네릭 활용                              |
+| 공통  | `ApiResponse<T>`      | 모든 응답 래퍼                            |
 
 ### 필드 패턴
-| 타입 | 네이밍 | 예시 |
-|------|--------|------|
-| 기본 | camelCase | `firstName`, `lastName` |
-| 시간 | `{verb}At` | `createdAt`, `updatedAt` |
-| 관계 | `{domain}Id`, `{domain}Name` | `labId`, `labName` |
-| Boolean | `isActive`, `hasPermission` | 상태 표현 |
+
+| 타입      | 네이밍                          | 예시                       |
+|---------|------------------------------|--------------------------|
+| 기본      | camelCase                    | `firstName`, `lastName`  |
+| 시간      | `{verb}At`                   | `createdAt`, `updatedAt` |
+| 관계      | `{domain}Id`, `{domain}Name` | `labId`, `labName`       |
+| Boolean | `isActive`, `hasPermission`  | 상태 표현                    |
 
 ## 🏗️ 구조 패턴
 
 ### 기본 ResponseDto 템플릿
+
 ```java
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class {Domain}ResponseDto {
@@ -46,14 +49,16 @@ public class {Domain}ResponseDto {
 ## 🎁 공통 래퍼 패턴
 
 ### ApiResponse 팩토리 메서드 매트릭스
-| 상황 | 메서드 | 상태코드 | 사용 케이스 |
-|------|--------|----------|-------------|
-| 성공 | `success(data)` | 200 | 조회/수정 성공 |
-| 생성 | `created(data)` | 201 | 리소스 생성 |
-| 삭제 | `deleted()` | 200 | 삭제 완료 |
-| 에러 | `error(status, message)` | 4xx/5xx | 예외 응답 |
+
+| 상황 | 메서드                      | 상태코드    | 사용 케이스   |
+|----|--------------------------|---------|----------|
+| 성공 | `success(data)`          | 200     | 조회/수정 성공 |
+| 생성 | `created(data)`          | 201     | 리소스 생성   |
+| 삭제 | `deleted()`              | 200     | 삭제 완료    |
+| 에러 | `error(status, message)` | 4xx/5xx | 예외 응답    |
 
 ### PageResponse 구조
+
 ```java
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class PageResponse<T> {
@@ -70,6 +75,7 @@ public class PageResponse<T> {
 ## 🔄 복잡한 Response DTO 패턴
 
 ### 인증 응답 DTO
+
 ```java
 @Data
 @Builder
@@ -94,6 +100,7 @@ public class AuthResponseDto {
 ```
 
 ### 중첩 관계 포함 Response DTO
+
 ```java
 @Data
 @Builder
@@ -144,6 +151,7 @@ public class LabResponseDto {
 ```
 
 ### 통계 정보 Response DTO
+
 ```java
 @Data
 @Builder
@@ -194,6 +202,7 @@ public class LabStatisticsResponseDto {
 ## 📊 JSON 직렬화 설정
 
 ### 날짜/시간 형식 설정
+
 ```java
 @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 private LocalDateTime createdAt;
@@ -206,6 +215,7 @@ spring:
 ```
 
 ### 필드 제외/포함 설정
+
 ```java
 public class UserResponseDto {
     
@@ -228,6 +238,7 @@ public class UserResponseDto {
 ```
 
 ### Enum 직렬화 설정
+
 ```java
 public enum Role {
     STUDENT("학생"),
@@ -259,6 +270,7 @@ public enum Role {
 ## 🔍 성능 최적화 패턴
 
 ### Lazy Loading 처리
+
 ```java
 public class LabResponseDto {
     
@@ -288,6 +300,7 @@ public class LabResponseDto {
 ```
 
 ### 투영(Projection) 활용
+
 ```java
 // 특정 필드만 포함하는 간단한 Response DTO
 @Data
@@ -316,6 +329,7 @@ public class LabSummaryResponseDto {
 ## 🧪 Response DTO 테스트 패턴
 
 ### 변환 로직 테스트
+
 ```java
 class UserResponseDtoTest {
     
@@ -358,6 +372,7 @@ class UserResponseDtoTest {
 ```
 
 ### JSON 직렬화 테스트
+
 ```java
 @JsonTest
 class UserResponseDtoJsonTest {
@@ -394,6 +409,7 @@ class UserResponseDtoJsonTest {
 ## 📈 최근 개선사항 (2025년 6월)
 
 ### ApiResponse 표준화 완료
+
 ```java
 // ApiResponse.java - 추가된 정적 팩토리 메서드들
 public static <T> ApiResponse<T> success(T data) {
@@ -424,12 +440,14 @@ public static <T> ApiResponse<T> deleted() {
 ```
 
 ### 모든 ResponseDto from() 메서드 표준화
+
 - **UserResponseDto**: 관계 정보(labId, labName) null 체크 포함
 - **LabResponseDto**: 교수 정보, 생성일/수정일 포함
 - **LabApplicationResponseDto**: 지원서 상태, 면접 시간 포함
 - **LabImageResponseDto**: 이미지 URL, 타입, 생성일 포함
 
 ### Controller 응답 패턴 일관성 확보
+
 ```java
 // 표준화된 Controller 응답 패턴
 // 생성 응답 (201 Created)

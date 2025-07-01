@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 
 /**
  * 전역 예외 처리기(Global Exception Handler)
- *
+ * <p>
  * 1) BaseCustomException (도메인별 Validation/NotFound 예외 포함)
- *    → errorCode.getStatus() 에 따라 400·404·409 등 처리
- *
+ * → errorCode.getStatus() 에 따라 400·404·409 등 처리
+ * <p>
  * 2) MethodArgumentNotValidException (@Valid 바인딩 오류) → 400 + fieldErrors
  * 3) ConstraintViolationException (@RequestParam·@PathVariable 제약 위반) → 400 + fieldErrors
  * 4) AuthenticationException (인증 오류) → 401 Unauthorized
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 1) 도메인 예외(BaseCustomException 하위) 처리
-     *    예: UserValidationException, UserNotFoundException, LabValidationException, LabNotFoundException 등
+     * 예: UserValidationException, UserNotFoundException, LabValidationException, LabNotFoundException 등
      */
     @ExceptionHandler(BaseCustomException.class)
     protected ResponseEntity<ErrorResponse> handleBaseCustomException(
@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 2) DTO 검증(@Valid) 실패 시 발생하는 예외 처리 (400 Bad Request)
-     *    BindingResult 에 담긴 모든 필드 오류를 FieldError 리스트로 변환
+     * BindingResult 에 담긴 모든 필드 오류를 FieldError 리스트로 변환
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(

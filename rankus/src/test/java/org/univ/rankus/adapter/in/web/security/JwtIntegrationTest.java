@@ -82,18 +82,18 @@ class JwtIntegrationTest {
         String email = "user@example.com";
         String rawPassword = "password";
         String fakeToken = "fake-jwt-token";
-        
+
         UserResponseDto userDto = UserResponseDto.builder()
                 .id(1L)
                 .name("테스트사용자")
                 .email(email)
                 .build();
-        
+
         AuthResponseDto authDto = AuthResponseDto.builder()
                 .token(fakeToken)
                 .user(userDto)
                 .build();
-        
+
         UserLoginRequestDto loginRequest = UserLoginRequestDto.builder()
                 .email(email)
                 .password(rawPassword)
@@ -125,9 +125,9 @@ class JwtIntegrationTest {
 
         // TestingAuthenticationToken에 principal과 권한 전달
         java.util.List<org.springframework.security.core.authority.SimpleGrantedAuthority> authorities =
-            java.util.Collections.singletonList(
-                new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN")
-            );
+                java.util.Collections.singletonList(
+                        new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN")
+                );
         TestingAuthenticationToken auth = new TestingAuthenticationToken(principal, null, authorities);
         given(tokenProvider.getAuthentication(fakeToken, userDetailsService))
                 .willReturn(auth);
@@ -137,7 +137,7 @@ class JwtIntegrationTest {
                         post("/api/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(
-                                        new java.util.HashMap<String,String>() {{
+                                        new java.util.HashMap<String, String>() {{
                                             put("email", email);
                                             put("password", rawPassword);
                                         }}

@@ -1,7 +1,6 @@
 package org.univ.rankus.common.security.permission;
 
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;

@@ -15,10 +15,12 @@ import java.util.UUID;
  */
 public final class DomainUserFactory {
     private static final PasswordEncoder ENCODER = new TestPasswordEncoder();
-    private DomainUserFactory() {}
+
+    private DomainUserFactory() {
+    }
 
     public static User buildValidUser() {
-        String uid = UUID.randomUUID().toString().substring(0,8);
+        String uid = UUID.randomUUID().toString().substring(0, 8);
         return new User(
                 "User-" + uid,
                 uid + "@example.com",

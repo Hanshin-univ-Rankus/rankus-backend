@@ -10,19 +10,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.univ.rankus.application.port.out.LabApplicationRepositoryPort;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
-import org.univ.rankus.domain.model.lab.*;
+import org.univ.rankus.domain.model.lab.ApplicationStatus;
+import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.lab.LabApplication;
 import org.univ.rankus.domain.model.lab.exception.*;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
+import org.univ.rankus.testutil.factory.domain.DomainLabApplicationFactory;
 import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
 import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
-import org.univ.rankus.testutil.factory.domain.DomainLabApplicationFactory;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,10 +63,10 @@ class LabApplicationCommandServiceTest {
 
     private LabApplication givenExistingApplication(Long appId) {
         LabApplication app = DomainLabApplicationFactory.buildValidPendingWithId(
-            appId,
-            DomainLabFactory.buildValidLab(),
-            DomainUserFactory.buildValidUser(),
-            LocalDateTime.now().plusDays(1)
+                appId,
+                DomainLabFactory.buildValidLab(),
+                DomainUserFactory.buildValidUser(),
+                LocalDateTime.now().plusDays(1)
         );
         when(labApplicationRepositoryPort.findById(appId))
                 .thenReturn(Optional.of(app));
@@ -85,7 +88,7 @@ class LabApplicationCommandServiceTest {
             Lab lab = givenExistingLab(labId);
             User user = givenExistingUser(userId);
             LocalDateTime futureTime = LocalDateTime.now().plusDays(1);
-            
+
             LabApplication expectedApplication = DomainLabApplicationFactory.buildValidPendingApplication(lab, user, futureTime);
             when(labApplicationRepositoryPort.save(any(LabApplication.class)))
                     .thenReturn(expectedApplication);
@@ -344,7 +347,7 @@ class LabApplicationCommandServiceTest {
             Lab lab = DomainLabFactory.buildValidLab();
             User owner = DomainUserFactory.buildValidUserWithId(userId);
             LabApplication app = DomainLabApplicationFactory.buildValidPendingWithId(
-                appId, lab, owner, LocalDateTime.now().plusDays(1)
+                    appId, lab, owner, LocalDateTime.now().plusDays(1)
             );
             when(labApplicationRepositoryPort.findById(appId))
                     .thenReturn(Optional.of(app));
@@ -385,7 +388,7 @@ class LabApplicationCommandServiceTest {
             Lab lab = DomainLabFactory.buildValidLab();
             User owner = DomainUserFactory.buildValidUserWithId(999L); // 다른 사용자
             LabApplication app = DomainLabApplicationFactory.buildValidPendingWithId(
-                appId, lab, owner, LocalDateTime.now().plusDays(1)
+                    appId, lab, owner, LocalDateTime.now().plusDays(1)
             );
             when(labApplicationRepositoryPort.findById(appId))
                     .thenReturn(Optional.of(app));

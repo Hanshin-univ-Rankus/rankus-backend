@@ -12,4 +12,5 @@ public record LabApplicationRequestDto(
         @NotNull(message = "인터뷰 시간은 필수입니다.")
         @Future(message = "인터뷰 시간은 미래여야 합니다.")
         LocalDateTime interviewTime
-) { }
+) {
+}

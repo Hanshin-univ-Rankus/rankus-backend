@@ -1,7 +1,12 @@
 package org.univ.rankus.testutil.factory.dto;
 
-import org.univ.rankus.adapter.in.web.dto.request.*;
-import org.univ.rankus.adapter.in.web.dto.response.*;
+import org.univ.rankus.adapter.in.web.dto.request.LabApplicationRequestDto;
+import org.univ.rankus.adapter.in.web.dto.request.UserLoginRequestDto;
+import org.univ.rankus.adapter.in.web.dto.request.UserRegisterRequestDto;
+import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
+import org.univ.rankus.adapter.in.web.dto.response.LabApplicationResponseDto;
+import org.univ.rankus.adapter.in.web.dto.response.LabResponseDto;
+import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.domain.model.lab.ApplicationStatus;
 import org.univ.rankus.domain.model.user.Role;
 
@@ -12,7 +17,8 @@ import java.time.LocalDateTime;
  * Controller 테스트에서 Request/Response DTO 생성에 활용
  */
 public final class DtoFactory {
-    private DtoFactory() {}
+    private DtoFactory() {
+    }
 
     // User Request DTOs
     public static UserRegisterRequestDto buildUserRegisterRequest() {

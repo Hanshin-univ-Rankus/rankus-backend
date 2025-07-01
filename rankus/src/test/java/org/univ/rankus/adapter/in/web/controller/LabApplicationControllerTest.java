@@ -19,13 +19,9 @@ import org.univ.rankus.application.port.in.command.LabApplicationCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.lab.ApplicationStatus;
-import org.univ.rankus.domain.model.lab.LabApplication;
 import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.lab.exception.LabApplicationErrorCode;
-import org.univ.rankus.domain.model.lab.exception.LabApplicationNotFoundException;
-import org.univ.rankus.domain.model.lab.exception.LabApplicationValidationException;
-import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
-import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
+import org.univ.rankus.domain.model.lab.LabApplication;
+import org.univ.rankus.domain.model.lab.exception.*;
 import org.univ.rankus.domain.model.user.User;
 
 import java.time.LocalDateTime;
@@ -33,7 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -79,7 +76,7 @@ class LabApplicationControllerTest {
                     .setAuthentication(new TestingAuthenticationToken(principal, null));
 
             LocalDateTime time = LocalDateTime.now().plusDays(1);
-            Map<String,Object> req = new HashMap<>();
+            Map<String, Object> req = new HashMap<>();
             req.put("interviewTime", time.toString());
             String json = objectMapper.writeValueAsString(req);
 
@@ -120,7 +117,7 @@ class LabApplicationControllerTest {
             SecurityContextHolder.getContext()
                     .setAuthentication(new TestingAuthenticationToken(principal, null));
 
-            Map<String,Object> req = new HashMap<>();
+            Map<String, Object> req = new HashMap<>();
             String json = objectMapper.writeValueAsString(req);
 
             mockMvc.perform(post("/api/labs/{labId}/applications", LAB_ID)
@@ -139,7 +136,7 @@ class LabApplicationControllerTest {
                     .setAuthentication(new TestingAuthenticationToken(principal, null));
 
             LocalDateTime past = LocalDateTime.now().minusDays(1);
-            Map<String,Object> req = new HashMap<>();
+            Map<String, Object> req = new HashMap<>();
             req.put("interviewTime", past.toString());
             String json = objectMapper.writeValueAsString(req);
 
@@ -160,7 +157,7 @@ class LabApplicationControllerTest {
                     .setAuthentication(new TestingAuthenticationToken(principal, null));
 
             LocalDateTime time = LocalDateTime.now().plusDays(1);
-            Map<String,Object> req = new HashMap<>();
+            Map<String, Object> req = new HashMap<>();
             req.put("interviewTime", time.toString());
             String json = objectMapper.writeValueAsString(req);
 
@@ -184,7 +181,7 @@ class LabApplicationControllerTest {
                     .setAuthentication(new TestingAuthenticationToken(principal, null));
 
             LocalDateTime time = LocalDateTime.now().plusDays(1);
-            Map<String,Object> req = new HashMap<>();
+            Map<String, Object> req = new HashMap<>();
             req.put("interviewTime", time.toString());
             String json = objectMapper.writeValueAsString(req);
 

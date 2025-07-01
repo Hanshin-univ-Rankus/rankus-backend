@@ -24,9 +24,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider tokenProvider;
     // 사용자 정보를 로드하는 서비스
     private final UserDetailsService userDetailsService;
+
     /**
      * JwtAuthenticationFilter 생성자
-     * @param tokenProvider JWT 토큰 Provider
+     *
+     * @param tokenProvider      JWT 토큰 Provider
      * @param userDetailsService 사용자 정보 서비스
      */
     public JwtAuthenticationFilter(
@@ -38,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-        * HTTP 요청을 필터링하는 메서드입니다.
+     * HTTP 요청을 필터링하는 메서드입니다.
      */
     @Override
     protected void doFilterInternal(

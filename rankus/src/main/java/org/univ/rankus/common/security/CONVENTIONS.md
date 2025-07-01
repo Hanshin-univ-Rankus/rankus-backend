@@ -1,6 +1,7 @@
 # Security 공통 컨벤션
 
 ## 클래스 네이밍
+
 - 상수: `SecurityConstants`
 - 핸들러: `{Type}Handler` - `CustomAccessDeniedHandler`
 - 인증관련: `Custom{Type}` - `CustomUserDetails`
@@ -8,6 +9,7 @@
 - 통합 평가자: `UnifiedPermissionEvaluator`
 
 ## SecurityConstants 구조
+
 ```java
 public final class SecurityConstants {
     
@@ -44,6 +46,7 @@ public final class SecurityConstants {
 ```
 
 ## 예외 핸들러 패턴
+
 ```java
 @Component
 @Slf4j
@@ -121,6 +124,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 ```
 
 ## 인증 진입점 패턴
+
 ```java
 @Component
 @Slf4j
@@ -184,6 +188,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 ```
 
 ## 보안 유틸리티 패턴
+
 ```java
 public final class SecurityUtils {
     
@@ -223,6 +228,7 @@ public final class SecurityUtils {
 ```
 
 ## 설정 상수 관리
+
 ```java
 @ConfigurationProperties(prefix = "security")
 @Component
@@ -248,6 +254,7 @@ public class SecurityProperties {
 ```
 
 ## 테스트 지원 유틸리티
+
 ```java
 public final class SecurityTestUtils {
     

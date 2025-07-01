@@ -10,7 +10,8 @@ import java.util.List;
 /**
  * 공통 에러 응답 DTO
  */
-@Getter @Setter
+@Getter
+@Setter
 public class ErrorResponse {
 
     private String code;               // ErrorCode.getCode()
@@ -21,7 +22,8 @@ public class ErrorResponse {
     private String path;               // 요청 URI
     private List<FieldError> errors;   // 필드별 에러 상세 목록 (Validation)
 
-    public ErrorResponse() { }
+    public ErrorResponse() {
+    }
 
     /**
      * ErrorCode 기반으로 기본 필드 세팅 (status, path, errors 포함)

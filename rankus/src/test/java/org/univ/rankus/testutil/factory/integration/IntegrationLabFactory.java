@@ -10,7 +10,8 @@ import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
  * - DomainLabFactory.build*() 를 호출하여 Lab 생성 후, 영속화 기능(persist)만 제공합니다.
  */
 public final class IntegrationLabFactory {
-    private IntegrationLabFactory() {}
+    private IntegrationLabFactory() {
+    }
 
     public static Lab persistValidLab(LabRepositoryPort repo) {
         Lab lab = DomainLabFactory.buildValidLab();

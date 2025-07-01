@@ -3,31 +3,32 @@
 > 📋 **예외 체계**: @common/exception/CONVENTIONS.md  
 > 🔐 **보안 설정**: @common/security/CONVENTIONS.md  
 > 🎯 **공통 패턴**: @core/conventions.md#common-컴포넌트  
-> 📋 **표준 템플릿**: @core/templates.md
+> 📋 **표준 템플릿**: @core/patterns.md
 
 ## 🛠️ 핵심 구조
 
 ### 책임 매트릭스
-| 컴포넌트 | 역할 | 구현체 |
-|----------|------|--------|
-| BaseTimeEntity | JPA Auditing | 생성/수정 시간 자동 관리 |
-| Exception | 전역 예외 처리 | ErrorCode + ErrorResponse |
-| Security | 인증/인가 | JWT + Permission 평가 |
-| Utility | 공통 헬퍼 | SecurityUtils, ValidationUtils |
+
+| 컴포넌트           | 역할           | 구현체                            |
+|----------------|--------------|--------------------------------|
+| BaseTimeEntity | JPA Auditing | 생성/수정 시간 자동 관리                 |
+| Exception      | 전역 예외 처리     | ErrorCode + ErrorResponse      |
+| Security       | 인증/인가        | JWT + Permission 평가            |
+| Utility        | 공통 헬퍼        | SecurityUtils, ValidationUtils |
 
 ## 🏗️ 기본 템플릿
 
 ### BaseTimeEntity
 
-> 📋 **표준 템플릿**: @core/templates.md#basetimeentity
+> 📋 **표준 템플릿**: @core/patterns.md#basetimeentity
 
 ### Exception 체계
 
 > 📋 **상세 구현**: @common/exception/CONVENTIONS.md
 
-> 📋 **표준 템플릿**: @core/templates.md#basecustomexception  
-> 📋 **ErrorCode**: @core/templates.md#errorcode-enum  
-> 📋 **GlobalExceptionHandler**: @core/templates.md#globalexceptionhandler
+> 📋 **표준 템플릿**: @core/patterns.md#basecustomexception  
+> 📋 **ErrorCode**: @core/patterns.md#errorcode-enum  
+> 📋 **GlobalExceptionHandler**: @core/patterns.md#globalexceptionhandler
 
 ### Security 컴포넌트
 
@@ -37,17 +38,19 @@
 > 👤 **사용자 인증**: @common/security/customUser/CONVENTIONS.md
 
 ### 예외 처리 플로우
+
 ```
 Domain Exception → Application → Adapter → HTTP Response
 비즈니스 규칙 위반 → 유스케이스 실패 → HTTP 변환 → 클라이언트 응답
 ```
 
 ### 로깅 전략 매트릭스
-| 상태코드 | 로그 레벨 | 예외 타입 |
-|----------|-----------|----------|
-| 500번대 | ERROR | 시스템 오류 |
-| 400번대 | WARN | 비즈니스 예외 |
-| 2xx | INFO | 정상 처리 |
+
+| 상태코드  | 로그 레벨 | 예외 타입   |
+|-------|-------|---------|
+| 500번대 | ERROR | 시스템 오류  |
+| 400번대 | WARN  | 비즈니스 예외 |
+| 2xx   | INFO  | 정상 처리   |
 
 ## 🧪 테스트 패턴
 

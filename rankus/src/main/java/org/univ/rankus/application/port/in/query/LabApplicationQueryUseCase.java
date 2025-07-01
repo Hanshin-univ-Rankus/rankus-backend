@@ -7,6 +7,7 @@ import java.util.List;
 public interface LabApplicationQueryUseCase {
 
     List<LabApplication> listApplicationsByLab(Long labId);
+
     LabApplication getApplicationById(Long appId);
 
 }

@@ -57,15 +57,6 @@ public class User extends BaseTimeEntity {
         this.role = Role.STUDENT;  // 기본값 설정
     }
 
-    /**
-     * 사용자 생성을 위한 정적 팩토리 메서드
-     */
-    public static User create(String name, String email, String rawPassword, Role role, PasswordEncoder encoder) {
-        Password password = Password.fromRaw(rawPassword, encoder);
-        User user = new User(name, email, password);
-        user.role = role;
-        return user;
-    }
 
     /**
      * 이름 유효성 검증
@@ -108,17 +99,19 @@ public class User extends BaseTimeEntity {
 
     /**
      * 비밀번호 변경
+     *
      * @param rawNewPassword 새 비밀번호 (평문)
      */
     public void changePassword(String rawNewPassword, PasswordEncoder encoder) {
         if (!StringUtils.hasText(rawNewPassword)) {
-            throw new UserValidationException(UserErrorCode.EMAIL_INVALID);
+            throw new UserValidationException(UserErrorCode.PASSWORD_REQUIRED);
         }
         this.password = Password.fromRaw(rawNewPassword, encoder);
     }
 
     /**
      * User가 Lab에 소속될 때 호출
+     *
      * @param lab 소속될 Lab 객체
      */
     public void assignLab(Lab lab) {
@@ -130,6 +123,7 @@ public class User extends BaseTimeEntity {
 
     /**
      * User 권한(role) 변경
+     *
      * @param newRole 새 권한
      */
     public void changeRole(Role newRole) {
@@ -141,6 +135,7 @@ public class User extends BaseTimeEntity {
 
     /**
      * 사용자 이름 변경
+     *
      * @param newName 새 사용자 이름
      */
     public void changeName(String newName) {
@@ -149,6 +144,7 @@ public class User extends BaseTimeEntity {
 
     /**
      * 이메일 변경
+     *
      * @param newEmail 새 이메일
      */
     public void changeEmail(String newEmail) {

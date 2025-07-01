@@ -39,8 +39,8 @@ public interface LabApplicationRepositoryPort {
     /**
      * 특정 랩실 ID와 특정 유저 ID가 중복 신청했는지 여부를 확인합니다.
      *
-     * @param labId  랩실 ID
-     * @param user 유저 ID
+     * @param labId 랩실 ID
+     * @param user  유저 ID
      * @return 이미 존재하면 true
      */
     boolean existsByLabIdAndUser(Long labId, User user);

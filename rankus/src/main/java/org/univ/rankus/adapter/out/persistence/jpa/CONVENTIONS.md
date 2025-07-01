@@ -1,10 +1,12 @@
 # JPA Repository 컨벤션
 
 ## 인터페이스 네이밍
+
 - 패턴: `SpringData{Domain}Repository`
 - 예시: `SpringDataUserRepository`, `SpringDataLabRepository`
 
 ## 표준 구조
+
 ```java
 public interface SpringData{Domain}Repository extends JpaRepository<{Domain}, Long> {
     
@@ -40,12 +42,14 @@ public interface SpringData{Domain}Repository extends JpaRepository<{Domain}, Lo
 ```
 
 ## Query Method 네이밍 패턴
+
 - 조회: `findBy{Property}`, `findBy{Property1}And{Property2}`
 - 존재확인: `existsBy{Property}`
 - 개수: `countBy{Property}`
 - 삭제: `deleteBy{Property}` (주의: 트랜잭션 필요)
 
 ## 조건 키워드
+
 - `And`, `Or`: 논리 연산
 - `Is`, `Equals`: 같음 (생략 가능)
 - `IsNot`, `Not`: 다름
@@ -59,11 +63,13 @@ public interface SpringData{Domain}Repository extends JpaRepository<{Domain}, Lo
 - `Before`, `After`: 날짜 비교
 
 ## 정렬 키워드
+
 - `OrderBy{Property}Asc`: 오름차순
 - `OrderBy{Property}Desc`: 내림차순
 - `OrderBy{Property1}Asc{Property2}Desc`: 다중 정렬
 
 ## JPQL 사용 패턴
+
 ```java
 // 기본 JPQL
 @Query("SELECT u FROM User u WHERE u.email = :email")
@@ -83,6 +89,7 @@ List<Lab> findByOptionalCategory(@Param("category") LabCategory category);
 ```
 
 ## Native Query 사용 패턴
+
 ```java
 // 복잡한 집계
 @Query(value = """
@@ -99,6 +106,7 @@ Optional<User> findByEmailOptimized(@Param("email") String email);
 ```
 
 ## 페이징 처리
+
 ```java
 // 기본 페이징
 Page<User> findAll(Pageable pageable);
@@ -112,6 +120,7 @@ Page<User> findByLabIdOrderByCreatedAtDesc(@Param("labId") Long labId, Pageable 
 ```
 
 ## 수정/삭제 쿼리
+
 ```java
 // 수정 쿼리
 @Modifying
@@ -125,6 +134,7 @@ int deleteApplicationsByLabId(@Param("labId") Long labId);
 ```
 
 ## 성능 최적화
+
 ```java
 // Fetch Join으로 N+1 문제 해결
 @Query("SELECT u FROM User u JOIN FETCH u.lab WHERE u.role = :role")
@@ -141,6 +151,7 @@ Optional<User> findByIdReadOnly(@Param("id") Long id);
 ```
 
 ## 테스트 패턴
+
 ```java
 @DataJpaTest
 class SpringDataUserRepositoryTest {

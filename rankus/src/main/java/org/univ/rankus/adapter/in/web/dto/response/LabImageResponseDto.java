@@ -8,11 +8,12 @@ import org.univ.rankus.domain.model.lab.LabImage;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter @Builder
+@Getter
+@Builder
 public class LabImageResponseDto {
-    private final Long      id;
-    private final Long      labId;
-    private final String    imageUrl;
+    private final Long id;
+    private final Long labId;
+    private final String imageUrl;
     private final ImageType type;
 
     public static LabImageResponseDto from(Long id, Long labId, String imageUrl, ImageType type) {

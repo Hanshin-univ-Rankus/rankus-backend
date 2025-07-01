@@ -7,8 +7,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.univ.rankus.domain.model.lab.exception.LabImageValidationException;
 import org.univ.rankus.domain.model.lab.exception.LabImageErrorCode;
+import org.univ.rankus.domain.model.lab.exception.LabImageValidationException;
 import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
 import org.univ.rankus.testutil.factory.domain.DomainLabImageFactory;
 

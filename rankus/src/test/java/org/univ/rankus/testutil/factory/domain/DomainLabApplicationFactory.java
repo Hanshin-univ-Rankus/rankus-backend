@@ -1,10 +1,11 @@
 package org.univ.rankus.testutil.factory.domain;
 
 import org.springframework.test.util.ReflectionTestUtils;
+import org.univ.rankus.domain.model.lab.ApplicationStatus;
 import org.univ.rankus.domain.model.lab.Lab;
 import org.univ.rankus.domain.model.lab.LabApplication;
-import org.univ.rankus.domain.model.lab.ApplicationStatus;
 import org.univ.rankus.domain.model.user.User;
+
 import java.time.LocalDateTime;
 
 /**
@@ -12,7 +13,8 @@ import java.time.LocalDateTime;
  * 외부 의존(JPA, Repository 등) 없이 LabApplication 엔티티 생성 메서드만 제공합니다.
  */
 public final class DomainLabApplicationFactory {
-    private DomainLabApplicationFactory() {}
+    private DomainLabApplicationFactory() {
+    }
 
     public static LabApplication buildValidPendingApplication(Lab lab, User user, LocalDateTime time) {
         return new LabApplication(lab, user, time);

@@ -1,11 +1,11 @@
 package org.univ.rankus.adapter.in.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import org.univ.rankus.adapter.in.web.dto.request.LabApplicationRequestDto;
 import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;
 import org.univ.rankus.adapter.in.web.dto.response.LabApplicationResponseDto;
-import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 import org.univ.rankus.application.port.in.command.LabApplicationCommandUseCase;
+import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.lab.LabApplication;
 
@@ -42,19 +42,19 @@ public class LabApplicationController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "201", description = "가입 신청 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = { ApiResponse.class, LabApplicationResponseDto.class })
+                            schema = @Schema(allOf = {ApiResponse.class, LabApplicationResponseDto.class})
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400", description = "입력 검증 실패",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = { ApiResponse.class })
+                            schema = @Schema(allOf = {ApiResponse.class})
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404", description = "랩실 또는 사용자 정보 없음",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = { ApiResponse.class })
+                            schema = @Schema(allOf = {ApiResponse.class})
                     )
             )
     })
@@ -105,7 +105,7 @@ public class LabApplicationController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "목록 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = { ApiResponse.class, LabApplicationResponseDto.class })
+                            schema = @Schema(allOf = {ApiResponse.class, LabApplicationResponseDto.class})
                     )
             )
     })
@@ -127,7 +127,7 @@ public class LabApplicationController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = { ApiResponse.class, LabApplicationResponseDto.class })
+                            schema = @Schema(allOf = {ApiResponse.class, LabApplicationResponseDto.class})
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(

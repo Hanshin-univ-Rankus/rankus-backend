@@ -1,19 +1,22 @@
 package org.univ.rankus.adapter.in.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;          // Swagger @ApiResponses
-import io.swagger.v3.oas.annotations.media.Content;                    // Swagger @Content
-import io.swagger.v3.oas.annotations.media.Schema;                     // Swagger @Schema
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.univ.rankus.adapter.in.web.dto.request.UserLoginRequestDto;
 import org.univ.rankus.adapter.in.web.dto.request.UserRegisterRequestDto;
-import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;         // DTO 래퍼 클래스
+import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;
 import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
 import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
@@ -34,32 +37,32 @@ public class AuthController {
     private final AuthUseCase authUseCase;
 
     @Operation(
-            summary     = "회원가입",
+            summary = "회원가입",
             description = "새로운 사용자를 가입 처리하고, ApiResponse<UserResponseDto> 형태로 반환합니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "201",
-                    description  = "회원가입 성공",
-                    content      = @Content(
+                    description = "회원가입 성공",
+                    content = @Content(
                             mediaType = "application/json",
-                            schema    = @Schema(allOf = { ApiResponse.class, UserResponseDto.class })
+                            schema = @Schema(allOf = {ApiResponse.class, UserResponseDto.class})
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400",
-                    description  = "입력값 검증 실패",
-                    content      = @Content(
+                    description = "입력값 검증 실패",
+                    content = @Content(
                             mediaType = "application/json",
-                            schema    = @Schema(allOf = { ApiResponse.class })
+                            schema = @Schema(allOf = {ApiResponse.class})
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "409",
-                    description  = "이메일 중복 등 회원가입 실패",
-                    content      = @Content(
+                    description = "이메일 중복 등 회원가입 실패",
+                    content = @Content(
                             mediaType = "application/json",
-                            schema    = @Schema(allOf = { ApiResponse.class })
+                            schema = @Schema(allOf = {ApiResponse.class})
                     )
             )
     })
@@ -78,40 +81,40 @@ public class AuthController {
 
 
     @Operation(
-            summary     = "로그인",
+            summary = "로그인",
             description = "이메일과 비밀번호로 로그인하여 JWT 토큰 및 유저 정보를 ApiResponse<AuthResponseDto>로 반환합니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
-                    description  = "로그인 성공",
-                    content      = @Content(
+                    description = "로그인 성공",
+                    content = @Content(
                             mediaType = "application/json",
-                            schema    = @Schema(allOf = { ApiResponse.class, AuthResponseDto.class })
+                            schema = @Schema(allOf = {ApiResponse.class, AuthResponseDto.class})
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400",
-                    description  = "입력값 검증 실패",
-                    content      = @Content(
+                    description = "입력값 검증 실패",
+                    content = @Content(
                             mediaType = "application/json",
-                            schema    = @Schema(allOf = { ApiResponse.class })
+                            schema = @Schema(allOf = {ApiResponse.class})
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "401",
-                    description  = "인증 실패(잘못된 이메일/비밀번호)",
-                    content      = @Content(
+                    description = "인증 실패(잘못된 이메일/비밀번호)",
+                    content = @Content(
                             mediaType = "application/json",
-                            schema    = @Schema(allOf = { ApiResponse.class })
+                            schema = @Schema(allOf = {ApiResponse.class})
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
-                    description  = "사용자 정보 없음",
-                    content      = @Content(
+                    description = "사용자 정보 없음",
+                    content = @Content(
                             mediaType = "application/json",
-                            schema    = @Schema(allOf = { ApiResponse.class })
+                            schema = @Schema(allOf = {ApiResponse.class})
                     )
             )
     })

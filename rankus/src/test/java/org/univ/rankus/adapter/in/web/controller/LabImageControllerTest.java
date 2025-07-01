@@ -15,13 +15,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.univ.rankus.application.port.in.command.LabImageCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabImageQueryUseCase;
 import org.univ.rankus.domain.model.lab.ImageType;
-import org.univ.rankus.domain.model.lab.LabImage;
 import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
-import org.univ.rankus.domain.model.lab.exception.LabImageErrorCode;
-import org.univ.rankus.domain.model.lab.exception.LabImageNotFoundException;
-import org.univ.rankus.domain.model.lab.exception.LabImageValidationException;
-import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
+import org.univ.rankus.domain.model.lab.LabImage;
+import org.univ.rankus.domain.model.lab.exception.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +58,7 @@ class LabImageControllerTest {
         void createSuccess() throws Exception {
             Map<String, Object> req = Map.of(
                     "imageUrl", "http://img.png",
-                    "type",     ImageType.REPRESENTATIVE
+                    "type", ImageType.REPRESENTATIVE
             );
             String json = objectMapper.writeValueAsString(req);
 
@@ -117,7 +113,7 @@ class LabImageControllerTest {
         void createDomainError() throws Exception {
             Map<String, Object> req = Map.of(
                     "imageUrl", "bad-url",
-                    "type",     ImageType.REPRESENTATIVE
+                    "type", ImageType.REPRESENTATIVE
             );
             String json = objectMapper.writeValueAsString(req);
 
@@ -140,7 +136,7 @@ class LabImageControllerTest {
         void createLabNotFound() throws Exception {
             Map<String, Object> req = Map.of(
                     "imageUrl", "http://img.png",
-                    "type",     ImageType.REPRESENTATIVE
+                    "type", ImageType.REPRESENTATIVE
             );
             String json = objectMapper.writeValueAsString(req);
 

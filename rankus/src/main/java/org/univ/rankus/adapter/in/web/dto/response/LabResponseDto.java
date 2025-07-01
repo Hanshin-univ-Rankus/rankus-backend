@@ -7,13 +7,14 @@ import org.univ.rankus.domain.model.lab.Lab;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter @Builder
+@Getter
+@Builder
 public class LabResponseDto {
-    private final Long    id;
-    private final String  name;
-    private final String  description;
+    private final Long id;
+    private final String name;
+    private final String description;
     private final Integer ranking;
-    private final String  professorName;
+    private final String professorName;
     private final String createdAt;
 
     public static LabResponseDto from(Long id, String name, String description, Integer ranking, String professorName, String createdAt) {
@@ -37,7 +38,7 @@ public class LabResponseDto {
                 .createdAt(lab.getCreatedAt().toString()) // Assuming createdAt is a LocalDateTime
                 .build();
     }
-    
+
     public static List<LabResponseDto> fromList(List<Lab> labs) {
         return labs.stream()
                 .map(LabResponseDto::from)

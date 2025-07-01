@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class LabApplicationPermissionHandler implements DomainPermissionEvaluator {
 
     private final LabApplicationQueryUseCase queryUseCase;
-    private final UserQueryUseCase           userQueryUseCase;
+    private final UserQueryUseCase userQueryUseCase;
 
     @Override
     public String targetType() {

@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
  * - DomainLabApplicationFactory.build*() 를 호출하여 LabApplication 생성 후, 영속화(persist) 기능만 제공합니다.
  */
 public final class IntegrationLabApplicationFactory {
-    private IntegrationLabApplicationFactory() {}
+    private IntegrationLabApplicationFactory() {
+    }
 
     public static LabApplication persistValidPendingApplication(LabApplicationRepositoryPort repo, Lab lab, User user, LocalDateTime time) {
         LabApplication app = DomainLabApplicationFactory.buildValidPendingApplication(lab, user, time);

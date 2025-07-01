@@ -5,12 +5,14 @@
 ## 🏛️ Domain Layer 테스트 개요
 
 ### 테스트 목표
+
 - **비즈니스 로직 검증**: 엔티티 내부의 핵심 비즈니스 규칙 검증
 - **도메인 불변 조건**: 도메인 규칙과 제약조건 위반 시 적절한 예외 발생
 - **상태 전이 검증**: 엔티티 상태 변경의 정확성과 일관성
 - **Value Object 동작**: 불변성, 동등성, 유효성 검증
 
 ### 테스트 범위
+
 - 엔티티 생성 및 수정 로직
 - 도메인 메서드의 비즈니스 규칙
 - Value Object의 불변성과 검증
@@ -20,6 +22,7 @@
 ## 📁 Domain 테스트 구조
 
 ### 현재 구현된 테스트 파일
+
 ```
 src/test/java/org/univ/rankus/domain/
 ├── CLAUDE.md                     # 이 파일
@@ -36,6 +39,7 @@ src/test/java/org/univ/rankus/domain/
 ## 🧪 엔티티 테스트 전략
 
 ### 1. 순수 단위 테스트 패턴
+
 **목표**: 외부 의존성 없는 순수한 도메인 로직 검증
 
 ```java
@@ -88,12 +92,14 @@ class UserTest {
 ```
 
 **특징**:
+
 - 외부 프레임워크 의존성 없음
 - 빠른 실행 속도 (평균 1-5ms)
 - 순수 Java 객체 테스트
 - Given-When-Then 패턴 적용
 
 ### 2. 비즈니스 로직 테스트
+
 ```java
 class LabApplicationTest {
     
@@ -140,6 +146,7 @@ class LabApplicationTest {
 ```
 
 ### 3. 상태 전이 테스트
+
 ```java
 class LabApplicationStatusTransitionTest {
     
@@ -182,6 +189,7 @@ class LabApplicationStatusTransitionTest {
 ## 💎 Value Object 테스트 전략
 
 ### Password Value Object 테스트
+
 ```java
 class PasswordTest {
     
@@ -246,6 +254,7 @@ class PasswordTest {
 ## 🎭 Enum 테스트 전략
 
 ### Role Enum 테스트
+
 ```java
 class RoleTest {
     
@@ -289,6 +298,7 @@ class RoleTest {
 ## 🔗 연관관계 테스트
 
 ### 양방향 연관관계 테스트
+
 ```java
 class UserLabRelationshipTest {
     
@@ -344,6 +354,7 @@ class UserLabRelationshipTest {
 ## ⚠️ 도메인 예외 테스트
 
 ### 예외 발생 조건 테스트
+
 ```java
 class DomainExceptionTest {
     
@@ -395,6 +406,7 @@ class DomainExceptionTest {
 ## 🧩 도메인 팩토리 메서드 테스트
 
 ### 팩토리 메서드 검증
+
 ```java
 class DomainFactoryMethodTest {
     
@@ -441,6 +453,7 @@ class DomainFactoryMethodTest {
 ## 🎯 Domain 테스트 베스트 프랙티스
 
 ### 1. 테스트 데이터 생성 패턴
+
 ```java
 // 팩토리 메서드 활용
 class UserTest {
@@ -465,6 +478,7 @@ class UserTest {
 ```
 
 ### 2. 매개변수화 테스트 활용
+
 ```java
 @ParameterizedTest
 @CsvSource({
@@ -484,6 +498,7 @@ void 다양한_역할의_사용자_생성_성공(String name, String email, Role
 ```
 
 ### 3. 불변 조건 테스트
+
 ```java
 @Test
 void 도메인_불변_조건_검증() {
@@ -499,6 +514,7 @@ void 도메인_불변_조건_검증() {
 ```
 
 ### 4. 동등성 및 해시코드 테스트
+
 ```java
 @Test
 void 엔티티_동등성_ID_기반_검증() {
@@ -522,17 +538,20 @@ void 엔티티_동등성_ID_기반_검증() {
 ## 📊 Domain 테스트 메트릭
 
 ### 커버리지 목표
+
 - **엔티티 클래스**: 95% 이상 (핵심 비즈니스 로직)
 - **Value Object**: 100% (모든 메서드 검증)
 - **Enum**: 90% 이상 (모든 값과 메서드)
 - **도메인 예외**: 100% (모든 예외 케이스)
 
 ### 테스트 성능 목표
+
 - **단위 테스트**: 평균 1ms 이하
 - **테스트 격리**: 각 테스트 완전 독립
 - **외부 의존성**: 0개 (순수 Java)
 
 ### 품질 체크리스트
+
 - [ ] 모든 public 메서드 테스트
 - [ ] 모든 비즈니스 규칙 검증
 - [ ] 예외 발생 조건 테스트

@@ -8,13 +8,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter @Builder
+@Getter
+@Builder
 public class LabApplicationResponseDto {
-    private final Long               id;
-    private final Long               labId;
-    private final UserResponseDto    applicant;
-    private final LocalDateTime      interviewTime;
-    private final String             status;
+    private final Long id;
+    private final Long labId;
+    private final UserResponseDto applicant;
+    private final LocalDateTime interviewTime;
+    private final String status;
 
     public static LabApplicationResponseDto from(Long id, Long labId, UserResponseDto applicant, LocalDateTime interviewTime, String status) {
         return LabApplicationResponseDto.builder()

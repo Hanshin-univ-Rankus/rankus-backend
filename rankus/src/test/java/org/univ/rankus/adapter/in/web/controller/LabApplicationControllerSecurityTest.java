@@ -14,7 +14,7 @@ import org.univ.rankus.application.port.in.command.LabApplicationCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Security Smoke Test: 인증 없는 요청 시 403 Forbidden 반환 확인

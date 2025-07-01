@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         configurer
-            .defaultContentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
-            .mediaType("json", new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8));
+                .defaultContentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+                .mediaType("json", new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8));
     }
 }

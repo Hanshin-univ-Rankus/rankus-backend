@@ -5,8 +5,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.univ.rankus.common.BaseTimeEntity;
-import org.univ.rankus.domain.model.lab.exception.*;
-import org.univ.rankus.domain.model.user.User;  // 추가: User 엔티티 직접 참조
+import org.univ.rankus.domain.model.lab.exception.LabApplicationErrorCode;
+import org.univ.rankus.domain.model.lab.exception.LabApplicationValidationException;
+import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
+import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
+import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
 
@@ -44,8 +47,8 @@ public class LabApplication extends BaseTimeEntity {
 
     /**
      * 변경된 생성자:
-     *  - 기존: (Lab lab, Long userId, String userName, LocalDateTime interviewTime)
-     *  - 삭제: userId, userName → 대신 User 엔티티 전체를 넘겨받음
+     * - 기존: (Lab lab, Long userId, String userName, LocalDateTime interviewTime)
+     * - 삭제: userId, userName → 대신 User 엔티티 전체를 넘겨받음
      */
     public LabApplication(Lab lab, User user, LocalDateTime interviewTime) {
         if (lab == null) {

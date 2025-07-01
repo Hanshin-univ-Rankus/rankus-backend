@@ -1,10 +1,12 @@
 # CustomUser 컨벤션
 
 ## 클래스 네이밍
+
 - UserDetails 구현: `CustomUserDetails`
 - UserDetailsService 구현: `CustomUserDetailsService`
 
 ## CustomUserDetails 구조
+
 ```java
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
@@ -69,6 +71,7 @@ public class CustomUserDetails implements UserDetails {
 ```
 
 ## CustomUserDetailsService 구조
+
 ```java
 @Service
 @RequiredArgsConstructor
@@ -96,6 +99,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 ```
 
 ## 권한 매핑 규칙
+
 ```java
 // Role enum → Spring Security Authority 변환
 public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -131,6 +135,7 @@ public Collection<? extends GrantedAuthority> getAuthorities() {
 ```
 
 ## 인증 컨텍스트 유틸리티
+
 ```java
 public final class AuthenticationUtils {
     
@@ -167,6 +172,7 @@ public final class AuthenticationUtils {
 ```
 
 ## Controller에서 사용자 정보 주입
+
 ```java
 @RestController
 public class UserController {
@@ -194,6 +200,7 @@ public class UserController {
 ```
 
 ## 사용자 정보 캐싱
+
 ```java
 @Service
 @RequiredArgsConstructor
@@ -218,6 +225,7 @@ public class CachedUserDetailsService implements UserDetailsService {
 ```
 
 ## 테스트 지원
+
 ```java
 public final class CustomUserDetailsTestUtils {
     
@@ -250,6 +258,7 @@ public final class CustomUserDetailsTestUtils {
 ```
 
 ## 테스트 패턴
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class CustomUserDetailsServiceTest {

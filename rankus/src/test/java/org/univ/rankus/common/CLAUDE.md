@@ -5,12 +5,14 @@
 ## 🛠️ Common Layer 테스트 개요
 
 ### 테스트 목표
+
 - **보안 컴포넌트 검증**: JWT, 인증/인가 로직의 정확한 동작
 - **예외 처리 검증**: 전역 예외 처리기의 올바른 에러 응답
 - **공통 유틸리티 검증**: 모든 계층에서 사용되는 공통 기능
 - **설정 검증**: 보안 설정 및 권한 평가 로직
 
 ### 테스트 범위
+
 - JWT 토큰 생성, 검증, 만료 처리
 - 권한 평가 로직 (Permission Evaluator)
 - 전역 예외 처리기 동작
@@ -20,6 +22,7 @@
 ## 📁 Common 테스트 구조
 
 ### 현재 구현된 테스트 파일
+
 ```
 src/test/java/org/univ/rankus/common/
 ├── CLAUDE.md                              # 이 파일
@@ -29,6 +32,7 @@ src/test/java/org/univ/rankus/common/
 ```
 
 ### 확장 가능한 테스트 구조 (향후 구현)
+
 ```
 src/test/java/org/univ/rankus/common/
 ├── CLAUDE.md
@@ -54,6 +58,7 @@ src/test/java/org/univ/rankus/common/
 ## 🔐 JWT 보안 테스트 전략
 
 ### 1. JwtTokenProvider 테스트
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class JwtTokenProviderTest {
@@ -146,6 +151,7 @@ class JwtTokenProviderTest {
 ```
 
 ### 2. JwtAuthenticationFilter 테스트
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class JwtAuthenticationFilterTest {
@@ -230,6 +236,7 @@ class JwtAuthenticationFilterTest {
 ## 🔍 권한 평가 테스트 전략
 
 ### 1. UnifiedPermissionEvaluator 테스트
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class UnifiedPermissionEvaluatorTest {
@@ -294,6 +301,7 @@ class UnifiedPermissionEvaluatorTest {
 ```
 
 ### 2. LabApplicationPermissionHandler 테스트
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class LabApplicationPermissionHandlerTest {
@@ -387,6 +395,7 @@ class LabApplicationPermissionHandlerTest {
 ## ⚠️ 예외 처리 테스트 전략
 
 ### GlobalExceptionHandler 테스트
+
 ```java
 @WebMvcTest
 @Import(GlobalExceptionHandler.class)
@@ -452,6 +461,7 @@ class GlobalExceptionHandlerTest {
 ## 🧪 CustomUserDetails 테스트
 
 ### CustomUserDetails 구현 테스트
+
 ```java
 class CustomUserDetailsTest {
     
@@ -507,12 +517,14 @@ class CustomUserDetailsTest {
 ## 🎯 Common 테스트 베스트 프랙티스
 
 ### 1. 보안 테스트 원칙
+
 - **토큰 생명주기**: 생성, 검증, 만료 전체 사이클 테스트
 - **권한 경계**: 허용/거부 경계 조건 명확히 테스트
 - **보안 설정**: 프로덕션과 동일한 보안 설정 테스트
 - **인증 플로우**: 전체 인증 과정 End-to-End 테스트
 
 ### 2. Mock 보안 컨텍스트 설정
+
 ```java
 // 테스트용 인증 컨텍스트 생성 유틸리티
 public class SecurityTestUtils {
@@ -535,6 +547,7 @@ public class SecurityTestUtils {
 ```
 
 ### 3. JWT 테스트 데이터 관리
+
 ```java
 @TestConfiguration
 public class JwtTestConfig {
@@ -568,6 +581,7 @@ public class JwtTestHelper {
 ```
 
 ### 4. 예외 테스트 패턴
+
 ```java
 @Test
 void 예외_응답_형식_검증() {
@@ -588,16 +602,19 @@ void 예외_응답_형식_검증() {
 ## 📊 Common 테스트 메트릭
 
 ### 커버리지 목표
+
 - **보안 컴포넌트**: 95% 이상 (JWT, 권한 평가)
 - **예외 처리**: 90% 이상 (모든 예외 시나리오)
 - **공통 유틸리티**: 85% 이상
 
 ### 테스트 성능 목표
+
 - **JWT 테스트**: 평균 5ms 이하
 - **권한 평가 테스트**: 평균 10ms 이하
 - **예외 처리 테스트**: 평균 50ms 이하
 
 ### 보안 테스트 체크리스트
+
 - [ ] 토큰 생성/검증 전체 사이클
 - [ ] 토큰 만료 처리
 - [ ] 잘못된 토큰 형식 처리

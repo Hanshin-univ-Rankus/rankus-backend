@@ -5,12 +5,14 @@
 ## 🎯 Application Layer 테스트 개요
 
 ### 테스트 목표
+
 - **유스케이스 구현 검증**: 비즈니스 요구사항의 정확한 구현
 - **포트 상호작용 검증**: 의존성 주입된 포트들의 올바른 호출
 - **트랜잭션 경계 검증**: 데이터 일관성과 원자성 보장
 - **예외 처리 검증**: 비즈니스 예외의 적절한 처리
 
 ### 테스트 범위
+
 - Service 클래스의 비즈니스 로직
 - UseCase 인터페이스 구현 검증
 - 포트 인터페이스 호출 및 응답 처리
@@ -20,6 +22,7 @@
 ## 📁 Application 테스트 구조
 
 ### 현재 구현된 테스트 파일
+
 ```
 src/test/java/org/univ/rankus/application/
 ├── CLAUDE.md                          # 이 파일
@@ -40,6 +43,7 @@ src/test/java/org/univ/rankus/application/
 ## 🧪 Service 테스트 전략
 
 ### 1. @ExtendWith(MockitoExtension.class) 패턴
+
 **목표**: 순수한 서비스 로직 검증, 의존성 격리
 
 ```java
@@ -91,12 +95,14 @@ class UserCommandServiceTest {
 ```
 
 **특징**:
+
 - 모든 외부 의존성을 Mock으로 대체
 - 서비스의 순수한 비즈니스 로직에 집중
 - 빠른 실행 속도
 - 의존성 호출 검증 (verify)
 
 ### 2. 예외 시나리오 테스트
+
 ```java
 @Test
 void 중복된_이메일로_사용자_생성시_예외_발생() {
@@ -118,6 +124,7 @@ void 중복된_이메일로_사용자_생성시_예외_발생() {
 ```
 
 ### 3. 복잡한 비즈니스 로직 테스트
+
 ```java
 @Test
 void 지원서_승인시_사용자_랩실_할당_및_알림_발송() {
@@ -150,6 +157,7 @@ void 지원서_승인시_사용자_랩실_할당_및_알림_발송() {
 ## 🔄 Command vs Query 서비스 테스트
 
 ### Command Service 테스트 특징
+
 **목표**: 상태 변경 로직 및 트랜잭션 경계 검증
 
 ```java
@@ -200,6 +208,7 @@ class LabApplicationCommandServiceTest {
 ```
 
 ### Query Service 테스트 특징
+
 **목표**: 조회 로직 및 데이터 변환 검증
 
 ```java
@@ -264,6 +273,7 @@ class LabPromotionQueryServiceTest {
 ## 🔐 인증 서비스 테스트
 
 ### AuthService 테스트 특별 고려사항
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -332,6 +342,7 @@ class AuthServiceTest {
 ## 🧩 Mock 활용 전략
 
 ### 1. Mock 객체 설정 패턴
+
 ```java
 @BeforeEach
 void setUp() {
@@ -345,6 +356,7 @@ void setUp() {
 ```
 
 ### 2. ArgumentCaptor 활용
+
 ```java
 @Test
 void 지원서_저장시_올바른_데이터_전달_검증() {
@@ -365,6 +377,7 @@ void 지원서_저장시_올바른_데이터_전달_검증() {
 ```
 
 ### 3. Mock 응답 체이닝
+
 ```java
 @Test
 void 복잡한_조회_로직_체이닝_테스트() {
@@ -391,6 +404,7 @@ void 복잡한_조회_로직_체이닝_테스트() {
 ## 🎯 Application 테스트 베스트 프랙티스
 
 ### 1. 테스트 구조 원칙
+
 ```java
 // Given-When-Then 패턴 엄격 적용
 @Test
@@ -410,6 +424,7 @@ void 메서드명은_한국어로_명확한_시나리오_표현() {
 ```
 
 ### 2. Mock 검증 수준
+
 ```java
 // 1단계: 반환값 검증
 assertThat(result).isNotNull();
@@ -429,6 +444,7 @@ verify(repositoryPort, never()).delete(any());
 ```
 
 ### 3. 예외 테스트 패턴
+
 ```java
 @Test
 void 비즈니스_규칙_위반시_적절한_예외_발생() {
@@ -447,6 +463,7 @@ void 비즈니스_규칙_위반시_적절한_예외_발생() {
 ```
 
 ### 4. 테스트 데이터 관리
+
 ```java
 // 테스트 클래스별 공통 데이터 관리
 class UserCommandServiceTest {
@@ -474,16 +491,19 @@ class UserCommandServiceTest {
 ## 📊 테스트 메트릭 및 품질
 
 ### 커버리지 목표
+
 - **Command Service**: 90% 이상 (상태 변경 로직 중요)
 - **Query Service**: 85% 이상 (조회 로직 및 변환)
 - **Auth Service**: 95% 이상 (보안 관련 핵심 로직)
 
 ### 테스트 성능 목표
+
 - **단위 테스트**: 평균 10ms 이하
 - **Mock 설정**: 테스트당 최대 5개 Mock
 - **테스트 격리**: 각 테스트 독립 실행 가능
 
 ### 품질 체크리스트
+
 - [ ] 모든 public 메서드 테스트 커버
 - [ ] 예외 시나리오 테스트 포함
 - [ ] Mock 호출 검증 포함

@@ -2,9 +2,9 @@ package org.univ.rankus.testutil.factory.integration;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.univ.rankus.application.port.out.LabImageRepositoryPort;
+import org.univ.rankus.domain.model.lab.ImageType;
 import org.univ.rankus.domain.model.lab.Lab;
 import org.univ.rankus.domain.model.lab.LabImage;
-import org.univ.rankus.domain.model.lab.ImageType;
 import org.univ.rankus.testutil.factory.domain.DomainLabImageFactory;
 
 /**
@@ -12,7 +12,8 @@ import org.univ.rankus.testutil.factory.domain.DomainLabImageFactory;
  * - DomainLabImageFactory.build*() 를 호출하여 LabImage 생성 후, 영속화 기능(persist)만 제공합니다.
  */
 public final class IntegrationLabImageFactory {
-    private IntegrationLabImageFactory() {}
+    private IntegrationLabImageFactory() {
+    }
 
     public static LabImage persistValidLabImage(LabImageRepositoryPort repo, Lab lab, String url, ImageType type) {
         LabImage img = DomainLabImageFactory.buildValidLabImage(lab, url, type);

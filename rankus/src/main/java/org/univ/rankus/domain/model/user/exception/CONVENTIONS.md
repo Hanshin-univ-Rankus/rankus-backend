@@ -1,11 +1,13 @@
 # User Exception 컨벤션
 
 ## 클래스 네이밍
+
 - 베이스: `UserException`
 - 구체적: `User{Specific}Exception`
 - ErrorCode: `UserErrorCode`, `PasswordErrorCode`
 
 ## 예외 계층 구조
+
 ```
 BaseCustomException
 └── UserException
@@ -15,6 +17,7 @@ BaseCustomException
 ```
 
 ## 표준 예외 클래스 구조
+
 ```java
 public class User{Specific}Exception extends UserException {
     
@@ -39,6 +42,7 @@ public class User{Specific}Exception extends UserException {
 ```
 
 ## ErrorCode 구조
+
 ```java
 public enum UserErrorCode implements ErrorCode {
     
@@ -64,6 +68,7 @@ public enum UserErrorCode implements ErrorCode {
 ## 구체적 예외 클래스들
 
 ### UserNotFoundException
+
 ```java
 public class UserNotFoundException extends UserException {
     public UserNotFoundException() { /* 기본 */ }
@@ -72,7 +77,8 @@ public class UserNotFoundException extends UserException {
 }
 ```
 
-### UserValidationException  
+### UserValidationException
+
 ```java
 public class UserValidationException extends UserException {
     private final Map<String, String> fieldErrors;
@@ -83,6 +89,7 @@ public class UserValidationException extends UserException {
 ```
 
 ### PasswordValidationException
+
 ```java
 public class PasswordValidationException extends UserException {
     public PasswordValidationException() { /* 기본 */ }
@@ -91,16 +98,19 @@ public class PasswordValidationException extends UserException {
 ```
 
 ## 예외 발생 시점
+
 - `UserNotFoundException`: Repository 조회 실패 시
 - `UserValidationException`: 도메인 객체 생성/수정 시 검증 실패
 - `PasswordValidationException`: 비밀번호 관련 검증 실패
 
 ## 메시지 생성 규칙
+
 1. 기본 메시지: ErrorCode에서 제공
 2. 구체적 정보: 생성자에서 포맷팅
 3. 다국어 지원 고려사항
 
 ## 테스트 패턴
+
 ```java
 @Test
 void 사용자_없음_예외_테스트() {

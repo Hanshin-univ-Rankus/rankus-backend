@@ -5,12 +5,14 @@
 ## 🧪 테스트 아키텍처 개요
 
 ### 핵심 원칙
+
 - **테스트 피라미드**: Unit Tests (70%) → Integration Tests (20%) → E2E Tests (10%)
 - **계층별 격리**: 각 계층의 책임에 맞는 독립적인 테스트
 - **포트/어댑터 테스트**: 인터페이스 기반의 Mock 활용
 - **의존성 역전**: 실제 구현체 대신 Mock/Stub 사용
 
 ### 테스트 전략 매핑
+
 ```
 ┌─────────────────────────────────────────┐
 │             Adapter Layer               │ ← @WebMvcTest, @DataJpaTest
@@ -26,6 +28,7 @@
 ## 📁 테스트 디렉토리 구조
 
 ### 현재 구현된 테스트 구조
+
 ```
 src/test/
 ├── CLAUDE.md                     # 이 파일
@@ -104,6 +107,7 @@ src/test/
 ## 🏗️ 계층별 테스트 전략
 
 ### 1. Domain Layer 테스트 (70% - Unit Tests)
+
 **목표**: 순수한 비즈니스 로직 검증
 
 ```java
@@ -122,12 +126,14 @@ void 지원서_승인시_상태가_APPROVED로_변경된다() {
 ```
 
 **특징**:
+
 - 외부 의존성 없음 (순수 Java 객체)
 - 빠른 실행 속도
 - 비즈니스 규칙 검증 중심
 - Given-When-Then 패턴 활용
 
 ### 2. Application Layer 테스트 (20% - Integration Tests)
+
 **목표**: 유스케이스 구현 검증
 
 ```java
@@ -155,12 +161,14 @@ class UserCommandServiceTest {
 ```
 
 **특징**:
+
 - @Mock으로 포트 인터페이스 대체
 - 트랜잭션 경계 테스트
 - 예외 처리 시나리오 검증
 - 포트 호출 검증 (verify)
 
 ### 3. Adapter Layer 테스트 (10% - Integration/E2E Tests)
+
 **목표**: 외부 시스템과의 통합 검증
 
 ```java
@@ -183,6 +191,7 @@ class UserControllerTest {
 ```
 
 **특징**:
+
 - Spring Context 로딩
 - HTTP 요청/응답 테스트
 - 보안 설정 검증
@@ -191,15 +200,17 @@ class UserControllerTest {
 ## 🎭 테스트 어노테이션 가이드
 
 ### Spring Boot Test 어노테이션
-| 어노테이션 | 용도 | 로딩되는 컴포넌트 | 사용 계층 |
-|------------|------|-------------------|-----------|
-| `@SpringBootTest` | 전체 통합 테스트 | 모든 Bean | E2E 테스트 |
-| `@WebMvcTest` | Controller 테스트 | Web Layer | Adapter/Controller |
-| `@DataJpaTest` | Repository 테스트 | JPA 관련 | Adapter/Repository |
-| `@JsonTest` | JSON 직렬화 테스트 | Jackson | DTO 테스트 |
-| `@ExtendWith(MockitoExtension.class)` | Mock 테스트 | 없음 | Application/Domain |
+
+| 어노테이션                                 | 용도             | 로딩되는 컴포넌트 | 사용 계층              |
+|---------------------------------------|----------------|-----------|--------------------|
+| `@SpringBootTest`                     | 전체 통합 테스트      | 모든 Bean   | E2E 테스트            |
+| `@WebMvcTest`                         | Controller 테스트 | Web Layer | Adapter/Controller |
+| `@DataJpaTest`                        | Repository 테스트 | JPA 관련    | Adapter/Repository |
+| `@JsonTest`                           | JSON 직렬화 테스트   | Jackson   | DTO 테스트            |
+| `@ExtendWith(MockitoExtension.class)` | Mock 테스트       | 없음        | Application/Domain |
 
 ### 보안 테스트 어노테이션
+
 ```java
 @WithMockUser(roles = "ADMIN")              // 관리자 권한
 @WithMockUser(username = "user@test.com")   // 특정 사용자
@@ -210,7 +221,9 @@ class UserControllerTest {
 ## 📊 테스트 데이터 관리 전략
 
 ### 1. Factory 패턴 활용
+
 **도메인 팩토리** (domain/factory/):
+
 ```java
 public class DomainUserFactory {
     public static User createStudent() {
@@ -224,6 +237,7 @@ public class DomainUserFactory {
 ```
 
 **통합 팩토리** (integration/factory/):
+
 ```java
 @Component
 public class IntegrationUserFactory {
@@ -238,6 +252,7 @@ public class IntegrationUserFactory {
 ```
 
 **DTO 팩토리** (dto/factory/):
+
 ```java
 public final class DtoFactory {
     // Controller 테스트용 Request/Response DTO 생성
@@ -257,11 +272,13 @@ public final class DtoFactory {
 ```
 
 ### 2. 테스트 데이터 격리
+
 - **@Transactional**: 테스트 메서드마다 자동 롤백
 - **@Sql**: 특정 SQL 스크립트 실행
 - **@DirtiesContext**: Spring Context 재시작
 
 ### 3. Mock 데이터 관리
+
 ```java
 public class AuthMockUtil {
     public static Authentication createMockAuthentication(User user) {
@@ -275,6 +292,7 @@ public class AuthMockUtil {
 ## 🔒 보안 테스트 전략
 
 ### 1. 인증 테스트
+
 ```java
 @Test
 void 인증_없이_보호된_엔드포인트_접근시_401_반환() throws Exception {
@@ -284,6 +302,7 @@ void 인증_없이_보호된_엔드포인트_접근시_401_반환() throws Excep
 ```
 
 ### 2. 인가 테스트
+
 ```java
 @Test
 @WithMockUser(roles = "STUDENT")
@@ -294,6 +313,7 @@ void 학생은_다른_사용자_지원서를_조회할_수_없다() throws Excep
 ```
 
 ### 3. JWT 토큰 테스트
+
 ```java
 @Test
 void 유효한_JWT_토큰으로_인증된_요청_처리() {
@@ -304,16 +324,19 @@ void 유효한_JWT_토큰으로_인증된_요청_처리() {
 ## 📈 테스트 성능 최적화
 
 ### 1. 테스트 실행 속도 향상
+
 - **슬라이스 테스트**: 필요한 컴포넌트만 로딩
 - **@MockBean vs @Mock**: 적절한 Mock 전략 선택
 - **테스트 병렬 실행**: `@Execution(ExecutionMode.CONCURRENT)`
 
 ### 2. 메모리 최적화
+
 - **@DirtiesContext 최소화**: Context 재시작 비용 고려
 - **대용량 데이터 테스트**: 페이징 처리 검증
 - **Connection Pool**: 테스트용 최소 설정
 
 ### 3. 플레이키 테스트 방지
+
 - **시간 의존성 제거**: `Clock` 인터페이스 활용
 - **비동기 처리 테스트**: `@Async` 메서드 검증
 - **외부 의존성 격리**: WireMock, TestContainers 활용
@@ -321,6 +344,7 @@ void 유효한_JWT_토큰으로_인증된_요청_처리() {
 ## 🎯 테스트 베스트 프랙티스
 
 ### 1. 테스트 명명 규칙
+
 ```java
 // Given-When-Then 패턴
 void 유효한_정보로_사용자_생성시_사용자가_반환된다()
@@ -329,6 +353,7 @@ void 권한이_없는_사용자가_지원서_승인시_403_반환된다()
 ```
 
 ### 2. 테스트 구조
+
 ```java
 @Test
 void 테스트_메서드명() {
@@ -345,6 +370,7 @@ void 테스트_메서드명() {
 ```
 
 ### 3. Assertion 전략
+
 ```java
 // AssertJ 활용
 assertThat(users)
@@ -360,12 +386,12 @@ assertThatThrownBy(() -> userService.findById(999L))
 
 ### 4. 계층별 Factory 활용 전략
 
-| 테스트 계층 | 주요 Factory | 활용 목적 | 예시 |
-|-------------|-------------|----------|------|
-| **Controller** | DTO Factory | HTTP 요청/응답 데이터 | `DtoFactory.buildUserRegisterRequest()` |
-| **Service** | Domain Factory | 비즈니스 로직 테스트 | `DomainUserFactory.buildStudentUser()` |
-| **Repository** | Integration Factory | 실제 DB 연동 테스트 | `IntegrationUserFactory.createAndSaveStudent()` |
-| **통합** | 모든 Factory 조합 | End-to-End 테스트 | Domain + DTO Factory 조합 |
+| 테스트 계층         | 주요 Factory          | 활용 목적          | 예시                                              |
+|----------------|---------------------|----------------|-------------------------------------------------|
+| **Controller** | DTO Factory         | HTTP 요청/응답 데이터 | `DtoFactory.buildUserRegisterRequest()`         |
+| **Service**    | Domain Factory      | 비즈니스 로직 테스트    | `DomainUserFactory.buildStudentUser()`          |
+| **Repository** | Integration Factory | 실제 DB 연동 테스트   | `IntegrationUserFactory.createAndSaveStudent()` |
+| **통합**         | 모든 Factory 조합       | End-to-End 테스트 | Domain + DTO Factory 조합                         |
 
 ```java
 // Controller 테스트 - DTO Factory 활용
@@ -413,6 +439,7 @@ class UserRepositoryTest extends BaseRepositoryTest {
 ## 🚀 CI/CD 통합
 
 ### GitHub Actions 테스트 파이프라인
+
 ```yaml
 - name: Run Tests
   run: ./gradlew test
@@ -427,6 +454,7 @@ class UserRepositoryTest extends BaseRepositoryTest {
 ```
 
 ### 테스트 커버리지 목표
+
 - **전체 코버리지**: 80% 이상
 - **Domain Layer**: 90% 이상 (핵심 비즈니스 로직)
 - **Application Layer**: 85% 이상 (유스케이스 구현)

@@ -1,16 +1,17 @@
 package org.univ.rankus.testutil.factory.domain;
 
 import org.springframework.test.util.ReflectionTestUtils;
+import org.univ.rankus.domain.model.lab.ImageType;
 import org.univ.rankus.domain.model.lab.Lab;
 import org.univ.rankus.domain.model.lab.LabImage;
-import org.univ.rankus.domain.model.lab.ImageType;
 
 /**
  * DomainLabImageFactory - 순수 도메인 단위 테스트 전용 팩토리
  * 외부 의존(JPA, Repository 등) 없이 LabImage 엔티티 생성 메서드만 제공합니다.
  */
 public final class DomainLabImageFactory {
-    private DomainLabImageFactory() {}
+    private DomainLabImageFactory() {
+    }
 
     public static LabImage buildValidLabImage(Lab lab, String url, ImageType type) {
         return new LabImage(lab, url, type);

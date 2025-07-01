@@ -1,11 +1,13 @@
 # JWT 컨벤션
 
 ## 클래스 네이밍
+
 - 제공자: `JwtTokenProvider`
 - 필터: `JwtAuthenticationFilter`
 - 진입점: `JwtAuthenticationEntryPoint`
 
 ## JwtTokenProvider 구조
+
 ```java
 @Component
 @RequiredArgsConstructor
@@ -68,6 +70,7 @@ public class JwtTokenProvider {
 ```
 
 ## JwtAuthenticationFilter 구조
+
 ```java
 @Component
 @RequiredArgsConstructor
@@ -116,6 +119,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 ```
 
 ## JWT 클레임 구조
+
 ```java
 // 표준 클레임
 {
@@ -127,6 +131,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 ```
 
 ## 토큰 생성 패턴
+
 ```java
 // 기본 토큰 생성
 public String createToken(String email, Role role) {
@@ -145,6 +150,7 @@ public String createRefreshToken(String email) {
 ```
 
 ## 토큰 검증 패턴
+
 ```java
 public TokenValidationResult validateTokenWithDetails(String token) {
     try {
@@ -165,6 +171,7 @@ public enum TokenValidationResult {
 ```
 
 ## 예외 처리
+
 ```java
 // 토큰 관련 예외
 public enum JwtErrorCode implements ErrorCode {
@@ -176,6 +183,7 @@ public enum JwtErrorCode implements ErrorCode {
 ```
 
 ## 테스트 패턴
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class JwtTokenProviderTest {

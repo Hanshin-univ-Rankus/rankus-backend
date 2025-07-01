@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.univ.rankus.adapter.in.web.dto.request.*;
+import org.univ.rankus.adapter.in.web.dto.request.ChangeNameRequestDto;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
@@ -18,7 +18,8 @@ import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,8 +55,8 @@ class UserCommandServiceTest {
 
             // when
             ChangeNameRequestDto request = ChangeNameRequestDto.builder()
-                .newName(newName)
-                .build();
+                    .newName(newName)
+                    .build();
             userService.changeName(userId, request);
 
             // then
@@ -72,8 +73,8 @@ class UserCommandServiceTest {
 
             // when & then
             ChangeNameRequestDto request = ChangeNameRequestDto.builder()
-                .newName("어느누구")
-                .build();
+                    .newName("어느누구")
+                    .build();
             assertThatThrownBy(() -> userService.changeName(userId, request))
                     .isInstanceOf(UserNotFoundException.class)
                     .satisfies(ex -> {
@@ -95,8 +96,8 @@ class UserCommandServiceTest {
 
             // when & then
             ChangeNameRequestDto request = ChangeNameRequestDto.builder()
-                .newName(null)
-                .build();
+                    .newName(null)
+                    .build();
             assertThatThrownBy(() -> userService.changeName(userId, request))
                     .isInstanceOf(UserValidationException.class)
                     .satisfies(ex -> {
@@ -118,8 +119,8 @@ class UserCommandServiceTest {
 
             // when & then
             ChangeNameRequestDto request = ChangeNameRequestDto.builder()
-                .newName(longName)
-                .build();
+                    .newName(longName)
+                    .build();
             assertThatThrownBy(() -> userService.changeName(userId, request))
                     .isInstanceOf(UserValidationException.class)
                     .satisfies(ex -> {

@@ -14,26 +14,34 @@ import static org.mockito.Mockito.when;
  */
 public class QueryMockUtil {
 
-    /** ID로 조회 성공 시 mock User를 생성하고 반환, findById stub 설정 */
+    /**
+     * ID로 조회 성공 시 mock User를 생성하고 반환, findById stub 설정
+     */
     public static User mockExistingUserById(UserRepositoryPort repo, Long userId) {
         User user = mock(User.class);
         when(repo.findById(userId)).thenReturn(Optional.of(user));
         return user;
     }
 
-    /** ID로 조회 실패 시 Optional.empty() 반환 stub 설정 */
+    /**
+     * ID로 조회 실패 시 Optional.empty() 반환 stub 설정
+     */
     public static void mockUserNotFoundById(UserRepositoryPort repo, Long userId) {
         when(repo.findById(userId)).thenReturn(Optional.empty());
     }
 
-    /** 이메일로 조회 성공 시 mock User를 생성하고 반환, findByEmail stub 설정 */
+    /**
+     * 이메일로 조회 성공 시 mock User를 생성하고 반환, findByEmail stub 설정
+     */
     public static User mockExistingUserByEmail(UserRepositoryPort repo, String email) {
         User user = mock(User.class);
         when(repo.findByEmail(email)).thenReturn(Optional.of(user));
         return user;
     }
 
-    /** 이메일로 조회 실패 시 Optional.empty() 반환 stub 설정 */
+    /**
+     * 이메일로 조회 실패 시 Optional.empty() 반환 stub 설정
+     */
     public static void mockUserNotFoundByEmail(UserRepositoryPort repo, String email) {
         when(repo.findByEmail(email)).thenReturn(Optional.empty());
     }

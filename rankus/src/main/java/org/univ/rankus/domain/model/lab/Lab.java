@@ -128,6 +128,7 @@ public class Lab extends BaseTimeEntity {
 
     /**
      * 랭킹 업데이트
+     *
      * @param newRanking 새로운 랭킹 값
      */
     public void updateRanking(Integer newRanking) {

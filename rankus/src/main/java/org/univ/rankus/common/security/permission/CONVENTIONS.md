@@ -1,11 +1,13 @@
 # Permission 컨벤션
 
 ## 클래스 네이밍
+
 - 평가자: `UnifiedPermissionEvaluator`
 - 핸들러: `{Domain}PermissionHandler`
 - 인터페이스: `DomainPermissionEvaluator`
 
 ## 통합 권한 평가자 구조
+
 ```java
 @Component
 @RequiredArgsConstructor
@@ -43,6 +45,7 @@ public class UnifiedPermissionEvaluator implements PermissionEvaluator {
 ```
 
 ## 도메인 권한 평가자 인터페이스
+
 ```java
 public interface DomainPermissionEvaluator {
     boolean hasPermission(Authentication authentication, Long resourceId, String permission);
@@ -51,6 +54,7 @@ public interface DomainPermissionEvaluator {
 ```
 
 ## 도메인별 권한 핸들러 구조
+
 ```java
 @Component
 @RequiredArgsConstructor
@@ -118,7 +122,69 @@ public class LabApplicationPermissionHandler implements DomainPermissionEvaluato
 }
 ```
 
+## 구현된 도메인 권한 핸들러
+
+### LabApplicationPermissionHandler
+
+- **대상**: 랩실 지원서 관련 권한
+- **권한**: VIEW, APPROVE, REJECT, DELETE
+- **소유권 검증**: 지원자 본인만 DELETE 가능
+- **관리자 권한**: 랩실 관리자는 VIEW, APPROVE, REJECT 가능
+
+### LabImagePermissionHandler
+
+- **대상**: 랩실 이미지 관련 권한
+- **권한**: CREATE, DELETE
+- **관리자 권한**: 랩실 관리자만 생성/삭제 가능
+
+### LabCreationRequestPermissionHandler
+
+- **대상**: 랩실 생성 신청 관련 권한
+- **권한**: VIEW, DELETE, APPROVE, REJECT
+- **소유권 검증**: 신청자 본인만 DELETE 가능
+- **조회 권한**: 신청자 본인 + 관리자/교수
+- **승인/거절**: 관리자/교수만 가능
+
+```java
+@Component
+@RequiredArgsConstructor
+public class LabCreationRequestPermissionHandler implements DomainPermissionEvaluator {
+
+    private final LabCreationRequestQueryUseCase queryUseCase;
+    private final UserQueryUseCase userQueryUseCase;
+
+    @Override
+    public String targetType() {
+        return "LabCreationRequest";
+    }
+
+    @Override
+    public boolean hasPermission(Object principalObj, Serializable targetId, String permission) {
+        if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long)) {
+            return false;
+        }
+
+        Long userId = ((CustomUserDetails) principalObj).getUserId();
+        User user = userQueryUseCase.getUserById(userId);
+        Long requestId = (Long) targetId;
+        LabCreationRequest request = queryUseCase.getLabCreationRequestById(requestId);
+
+        return switch (permission) {
+            case "DELETE" -> request.isOwnedBy(userId);
+            case "VIEW" -> request.isOwnedBy(userId) || isAdminOrProfessor(user);
+            case "APPROVE", "REJECT" -> isAdminOrProfessor(user);
+            default -> false;
+        };
+    }
+
+    private boolean isAdminOrProfessor(User user) {
+        return user.getRole() == Role.ADMIN || user.getRole() == Role.PROFESSOR;
+    }
+}
+```
+
 ## 권한 종류 정의
+
 ```java
 public enum PermissionType {
     
@@ -149,6 +215,7 @@ public enum PermissionType {
 ```
 
 ## PreAuthorize 사용 패턴
+
 ```java
 // 기본 권한 검사
 @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #resourceId, 'LabApplication', 'VIEW')")
@@ -164,6 +231,7 @@ public enum PermissionType {
 ```
 
 ## 권한 캐싱 패턴
+
 ```java
 @Component
 @RequiredArgsConstructor
@@ -185,6 +253,7 @@ public class CachedPermissionEvaluator implements DomainPermissionEvaluator {
 ```
 
 ## 테스트 패턴
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class LabApplicationPermissionHandlerTest {

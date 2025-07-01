@@ -7,18 +7,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.univ.rankus.domain.model.user.PasswordEncoder;
+import org.univ.rankus.adapter.in.web.dto.request.UserLoginRequestDto;
+import org.univ.rankus.adapter.in.web.dto.request.UserRegisterRequestDto;
+import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
 import org.univ.rankus.application.port.out.AuthTokenPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
+import org.univ.rankus.domain.model.user.PasswordEncoder;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
 import org.univ.rankus.domain.model.user.exception.UserValidationException;
-import org.univ.rankus.adapter.in.web.dto.request.*;
 import org.univ.rankus.testutil.mock.AuthMockUtil;
-import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 /**
@@ -52,9 +54,9 @@ class AuthServiceTest {
 
             // when: 서비스 호출
             UserLoginRequestDto request = UserLoginRequestDto.builder()
-                .email(AuthMockUtil.VALID_EMAIL)
-                .password(AuthMockUtil.RAW_PASSWORD)
-                .build();
+                    .email(AuthMockUtil.VALID_EMAIL)
+                    .password(AuthMockUtil.RAW_PASSWORD)
+                    .build();
             AuthResponseDto response = authService.login(request);
 
             // then: AuthResponseDto 리턴 및 포트 호출 검증
@@ -74,9 +76,9 @@ class AuthServiceTest {
 
             // when & then: 예외 및 에러코드 검증
             UserLoginRequestDto request = UserLoginRequestDto.builder()
-                .email("noone@example.com")
-                .password(AuthMockUtil.RAW_PASSWORD)
-                .build();
+                    .email("noone@example.com")
+                    .password(AuthMockUtil.RAW_PASSWORD)
+                    .build();
             assertThatThrownBy(() ->
                     authService.login(request))
                     .isInstanceOf(UserNotFoundException.class)
@@ -95,9 +97,9 @@ class AuthServiceTest {
 
             // when & then: 예외 및 에러코드 검증
             UserLoginRequestDto request = UserLoginRequestDto.builder()
-                .email(AuthMockUtil.VALID_EMAIL)
-                .password(AuthMockUtil.RAW_PASSWORD)
-                .build();
+                    .email(AuthMockUtil.VALID_EMAIL)
+                    .password(AuthMockUtil.RAW_PASSWORD)
+                    .build();
             assertThatThrownBy(() ->
                     authService.login(request))
                     .isInstanceOf(UserValidationException.class)
@@ -132,10 +134,10 @@ class AuthServiceTest {
 
             // when: 서비스 호출
             UserRegisterRequestDto request = UserRegisterRequestDto.builder()
-                .name(name)
-                .email(email)
-                .password(AuthMockUtil.RAW_PASSWORD)
-                .build();
+                    .name(name)
+                    .email(email)
+                    .password(AuthMockUtil.RAW_PASSWORD)
+                    .build();
             User saved = authService.signUp(request);
 
             // then: 반환된 User 필드 검증 및 포트 호출 검증
@@ -158,10 +160,10 @@ class AuthServiceTest {
 
             // when & then: 예외 및 에러코드 검증
             UserRegisterRequestDto request = UserRegisterRequestDto.builder()
-                .name("anyName")
-                .email(email)
-                .password(AuthMockUtil.RAW_PASSWORD)
-                .build();
+                    .name("anyName")
+                    .email(email)
+                    .password(AuthMockUtil.RAW_PASSWORD)
+                    .build();
             assertThatThrownBy(() ->
                     authService.signUp(request))
                     .isInstanceOf(UserValidationException.class)

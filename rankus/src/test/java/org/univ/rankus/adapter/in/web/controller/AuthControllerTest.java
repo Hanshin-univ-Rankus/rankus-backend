@@ -98,8 +98,8 @@ class AuthControllerTest {
         void signupValidationError() throws Exception {
             // name이 빈 문자열, email 형식 불일치, password 너무 짧음, role이 null
             Map<String, Object> req = Map.of(
-                    "name",     "",
-                    "email",    "bad-email",
+                    "name", "",
+                    "email", "bad-email",
                     "password", "123"
                     // role 필드를 빠뜨려서 null로 만듦
             );
@@ -128,7 +128,7 @@ class AuthControllerTest {
 
             UserResponseDto userDto = DtoFactory.buildUserResponseDto(10L, "테스터", "user@example.com", Role.STUDENT);
             AuthResponseDto authDto = DtoFactory.buildAuthResponseDto("jwt-token", userDto);
-            
+
             given(authUseCase.login(any(UserLoginRequestDto.class)))
                     .willReturn(authDto);
 
@@ -170,7 +170,7 @@ class AuthControllerTest {
         @DisplayName("DTO 검증 실패 (잘못된 이메일 형식) → 400 Bad Request")
         void loginValidationError() throws Exception {
             Map<String, String> req = Map.of(
-                    "email",    "not-an-email",
+                    "email", "not-an-email",
                     "password", "password"
             );
             String json = objectMapper.writeValueAsString(req);

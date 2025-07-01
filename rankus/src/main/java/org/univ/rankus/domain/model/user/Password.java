@@ -3,8 +3,8 @@ package org.univ.rankus.domain.model.user;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
-import org.univ.rankus.domain.model.user.exception.PasswordValidationException;
 import org.univ.rankus.domain.model.user.exception.PasswordErrorCode;
+import org.univ.rankus.domain.model.user.exception.PasswordValidationException;
 
 import java.util.Objects;
 
@@ -17,7 +17,7 @@ public class Password {
 
     /**
      * -- GETTER --
-     *  해시값 반환 (getter)
+     * 해시값 반환 (getter)
      */
     @Column(name = "password_hash", nullable = false, length = 255)
     private String hashed; // 해시된 비밀번호
@@ -35,9 +35,10 @@ public class Password {
 
     /**
      * 서비스 계층에서 rawPassword와 PasswordEncoder를 이용해 해시를 생성하고 Password 객체를 반환한다.
-     * @param rawPassword  사용자가 입력한 평문 비밀번호
-     * @param encoder      도메인 PasswordEncoder 인터페이스
-     * @return             Password 객체 (해시된 비밀번호만 보유)
+     *
+     * @param rawPassword 사용자가 입력한 평문 비밀번호
+     * @param encoder     도메인 PasswordEncoder 인터페이스
+     * @return Password 객체 (해시된 비밀번호만 보유)
      */
     public static Password fromRaw(String rawPassword, PasswordEncoder encoder) {
         if (rawPassword == null || rawPassword.isBlank()) {
@@ -56,9 +57,10 @@ public class Password {
 
     /**
      * 입력받은 rawPassword를 내부 해시와 비교하여 일치 여부를 반환한다.
+     *
      * @param rawPassword 사용자가 입력한 평문 비밀번호
      * @param encoder     도메인 PasswordEncoder 인터페이스
-     * @return            일치하면 true, 아니면 false
+     * @return 일치하면 true, 아니면 false
      */
     public boolean matches(String rawPassword, PasswordEncoder encoder) {
         if (rawPassword == null || rawPassword.isBlank()) {

@@ -10,7 +10,8 @@ import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
  * - DomainUserFactory.build*() 를 호출하여 도메인 객체 생성 후, 저장(persist) 기능만 제공합니다.
  */
 public final class IntegrationUserFactory {
-    private IntegrationUserFactory() {}
+    private IntegrationUserFactory() {
+    }
 
     public static User persistValidUser(UserRepositoryPort repo) {
         User u = DomainUserFactory.buildValidUser();

@@ -1,11 +1,13 @@
 # Lab Exception 컨벤션
 
 ## 클래스 네이밍
+
 - 베이스: `LabException`, `LabApplicationException`, `LabImageException`
 - 구체적: `{Domain}{Specific}Exception`
 - ErrorCode: `LabErrorCode`, `LabApplicationErrorCode`, `LabImageErrorCode`
 
 ## 예외 계층 구조
+
 ```
 BaseCustomException
 ├── LabException
@@ -20,6 +22,7 @@ BaseCustomException
 ```
 
 ## Lab 도메인 ErrorCode
+
 ```java
 public enum LabErrorCode implements ErrorCode {
     
@@ -34,6 +37,7 @@ public enum LabErrorCode implements ErrorCode {
 ```
 
 ## LabApplication 도메인 ErrorCode
+
 ```java
 public enum LabApplicationErrorCode implements ErrorCode {
     
@@ -56,7 +60,8 @@ public enum LabApplicationErrorCode implements ErrorCode {
 }
 ```
 
-## LabImage 도메인 ErrorCode  
+## LabImage 도메인 ErrorCode
+
 ```java
 public enum LabImageErrorCode implements ErrorCode {
     
@@ -70,6 +75,7 @@ public enum LabImageErrorCode implements ErrorCode {
 ```
 
 ## 상태 전이 예외 패턴
+
 ```java
 public class LabApplicationValidationException extends LabApplicationException {
     
@@ -85,6 +91,7 @@ public class LabApplicationValidationException extends LabApplicationException {
 ```
 
 ## 권한 검증 예외 패턴
+
 ```java
 public class InsufficientPermissionException extends LabApplicationException {
     
@@ -96,6 +103,7 @@ public class InsufficientPermissionException extends LabApplicationException {
 ```
 
 ## 비즈니스 규칙 예외 패턴
+
 ```java
 public class DuplicateApplicationException extends LabApplicationException {
     
@@ -107,11 +115,13 @@ public class DuplicateApplicationException extends LabApplicationException {
 ```
 
 ## 도메인 이벤트와 예외
+
 - 상태 전이 실패 시 예외 발생
 - 도메인 규칙 위반 시 즉시 예외 발생
 - 예외 발생 후 롤백 처리
 
 ## 테스트 패턴
+
 ```java
 @Test 
 void 중복_지원시_예외_발생() {
