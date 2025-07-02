@@ -104,12 +104,18 @@ User ────── ManyToOne ──────► Lab
 ### LabNotice Entity
 
 - **역할**: 랩실 공지사항 관리 및 게시
+- **테이블**: `lab_notice`
+- **연관관계**: 
+    - User (ManyToOne - 작성자)
+    - Lab (ManyToOne - 소속 랩실)
 - **핵심 비즈니스 로직**:
     - `pin()`: 공지사항 고정
     - `unpin()`: 공지사항 고정 해제
     - `togglePin()`: 고정 상태 토글
-    - `update()`: 제목, 내용, 타입, 고정 상태 수정
+    - `update()`: 제목, 내용, 타입 일괄 수정
     - `isOwnedBy()`: 작성자 소유권 확인
+    - `canBeViewedBy()`: 조회 권한 확인
+    - `canBeModifiedBy()`: 수정 권한 확인
 
 ## 🎭 도메인 Enum 정의
 
@@ -236,6 +242,8 @@ public enum UserErrorCode implements ErrorCode {
 3. 작성자와 소속 랩실은 필수 관계
 4. 고정 상태는 명시적 메서드로만 변경 가능
 5. 수정 권한은 작성자, 랩실 관리자, 교수, 관리자만 보유
+6. 타입은 NORMAL 또는 URGENT만 허용
+7. 삭제 권한은 수정 권한과 동일한 규칙 적용
 
 ## 🎯 도메인 서비스 (향후 확장)
 
@@ -253,6 +261,7 @@ public enum UserErrorCode implements ErrorCode {
 - **User 도메인 컨벤션**: @model/user/CONVENTIONS.md
 - **Lab 도메인 컨벤션**: @model/lab/CONVENTIONS.md
 - **Notice 도메인 가이드**: @model/notice/CLAUDE.md
+- **Notice 도메인 컨벤션**: @model/notice/CONVENTIONS.md
 
 ## 🧪 도메인 테스트 전략
 

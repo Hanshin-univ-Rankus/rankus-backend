@@ -154,11 +154,11 @@ JPA Repository (Infrastructure)
 
 #### LabNoticeQueryUseCase
 
-- `getNoticesByLabId()`: 랩실별 공지사항 목록 조회 (페이징)
-- `getNoticesByLabId()`: 랩실별 공지사항 전체 목록 조회
+- `getNoticesByLabId()`: 랩실별 공지사항 목록 조회 (페이징 지원)
+- `getAllNoticesByLabId()`: 랩실별 공지사항 전체 목록 조회
 - `getNoticesByLabIdAndType()`: 랩실별 특정 타입 공지사항 조회
 - `getPinnedNoticesByLabId()`: 랩실별 고정 공지사항 조회
-- `getNoticeById()`: 공지사항 상세 조회
+- `getNoticeById()`: 공지사항 상세 조회 (권한 검증 포함)
 
 ## 🏗️ 서비스 구현 패턴
 
