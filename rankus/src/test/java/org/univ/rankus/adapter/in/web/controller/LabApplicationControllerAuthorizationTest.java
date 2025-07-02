@@ -1,6 +1,5 @@
 package org.univ.rankus.adapter.in.web.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,16 +9,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.univ.rankus.application.port.in.command.LabApplicationCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
-import org.univ.rankus.domain.model.user.Role;
-import org.univ.rankus.domain.model.lab.exception.LabApplicationValidationException;
 import org.univ.rankus.domain.model.lab.exception.LabApplicationErrorCode;
-
-import java.util.Collections;
+import org.univ.rankus.domain.model.lab.exception.LabApplicationValidationException;
+import org.univ.rankus.domain.model.user.Role;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -100,7 +95,7 @@ class LabApplicationControllerAuthorizationTest {
                         LabApplicationValidationException e = (LabApplicationValidationException) ex;
                         assertThat(e.getErrorCode()).isEqualTo(LabApplicationErrorCode.UNAUTHORIZED_CANCEL_ATTEMPT);
                     });
-            
+
             verify(commandUseCase).cancelApplication(APP_ID, OTHER_USER_ID);
         }
     }
@@ -126,7 +121,7 @@ class LabApplicationControllerAuthorizationTest {
     @Nested
     @DisplayName("권한 기반 DELETE 테스트 - 종합 시나리오")
     class DeletePermissionTests {
-        
+
         @Test
         @DisplayName("ADMIN은 모든 사용자의 지원서를 삭제할 수 있다")
         void adminCanDeleteAnyApplication() {

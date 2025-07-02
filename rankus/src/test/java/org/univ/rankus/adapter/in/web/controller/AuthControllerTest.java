@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -20,12 +20,12 @@ import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserValidationException;
-import org.univ.rankus.testutil.factory.dto.DtoFactory;
 import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
+import org.univ.rankus.testutil.factory.dto.DtoFactory;
 
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

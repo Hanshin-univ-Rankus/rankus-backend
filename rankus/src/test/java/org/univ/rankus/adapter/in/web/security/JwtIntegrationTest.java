@@ -23,10 +23,10 @@ import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.common.security.CustomAccessDeniedHandler;
+import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.common.security.jwt.JwtAuthenticationEntryPoint;
 import org.univ.rankus.common.security.jwt.JwtAuthenticationFilter;
 import org.univ.rankus.common.security.jwt.JwtTokenProvider;
-import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.common.security.permission.UnifiedPermissionEvaluator;
 import org.univ.rankus.config.CorsConfig;
 import org.univ.rankus.config.MethodSecurityConfig;
@@ -37,7 +37,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest({AuthController.class, UserController.class})
 @AutoConfigureMockMvc

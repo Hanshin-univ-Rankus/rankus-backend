@@ -2,6 +2,7 @@ package org.univ.rankus.application.port.in.query;
 
 
 import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface LabPromotionQueryUseCase {
     /**
      * ID로 특정 랩실의 상세 정보를 조회합니다.
      *
-     * @throws org.univ.rankus.domain.model.lab.exception.LabNotFoundException
+     * @throws LabNotFoundException
      */
     Lab getLabById(Long labId);
 }

@@ -37,7 +37,16 @@ Lab (Root)
 ├── LabApplication (Entity)
 ├── LabImage (Entity)
 ├── LabCreationRequest (Entity)
+├── LabNotice (Entity)
 └── LabException (Domain Exception)
+```
+
+#### 3. Notice Aggregate
+
+```
+LabNotice (Root)
+├── NoticeType (Enum)
+└── NoticeException (Domain Exception)
 ```
 
 ### 도메인 관계도
@@ -47,8 +56,10 @@ User ────── ManyToOne ──────► Lab
  │                           │
  │                           ├── LabApplication
  │                           ├── LabImage
+ │                           ├── LabNotice
  └── LabApplication ◄────────┘
  └── LabCreationRequest ◄────┘
+ └── LabNotice ◄─────────────┘
 ```
 
 ## 🗄️ 엔티티 상세 정보
@@ -90,6 +101,16 @@ User ────── ManyToOne ──────► Lab
     - `reject()`: 생성 요청 거부 (PENDING → REJECTED)
     - `isOwnedBy()`: 요청자 소유권 확인
 
+### LabNotice Entity
+
+- **역할**: 랩실 공지사항 관리 및 게시
+- **핵심 비즈니스 로직**:
+    - `pin()`: 공지사항 고정
+    - `unpin()`: 공지사항 고정 해제
+    - `togglePin()`: 고정 상태 토글
+    - `update()`: 제목, 내용, 타입, 고정 상태 수정
+    - `isOwnedBy()`: 작성자 소유권 확인
+
 ## 🎭 도메인 Enum 정의
 
 ### Role (사용자 역할)
@@ -119,19 +140,25 @@ User ────── ManyToOne ──────► Lab
 - `APPROVED`: 승인됨
 - `REJECTED`: 거부됨
 
+### NoticeType (공지사항 타입)
+
+- `NORMAL`: 일반 공지
+- `URGENT`: 긴급 공지
+
 ## 💎 Value Object 활용
 
 ### Password Value Object
 
 ```java
+
 @Embeddable
 public class Password {
     // 암호화된 비밀번호만 저장, 평문 저장 금지
     private String value;
-    
+
     // 팩토리 메서드로 생성 (PasswordEncoder 주입 필요)
     public static Password fromRaw(String rawPassword, PasswordEncoder encoder);
-    
+
     // 비밀번호 일치 확인 (PasswordEncoder 주입 필요)
     public boolean matches(String rawPassword, PasswordEncoder encoder);
 }
@@ -153,13 +180,16 @@ BaseCustomException
 │   ├── UserNotFoundException
 │   ├── UserValidationException
 │   └── PasswordValidationException
-└── LabException
-    ├── LabNotFoundException
-    ├── LabApplicationException
-    ├── LabImageException
-    └── LabCreationRequestException
-        ├── LabCreationRequestNotFoundException
-        └── LabCreationRequestValidationException
+├── LabException
+│   ├── LabNotFoundException
+│   ├── LabApplicationException
+│   ├── LabImageException
+│   └── LabCreationRequestException
+│       ├── LabCreationRequestNotFoundException
+│       └── LabCreationRequestValidationException
+└── NoticeException
+    ├── NoticeNotFoundException
+    └── NoticeValidationException
 ```
 
 ### ErrorCode 패턴
@@ -199,6 +229,14 @@ public enum UserErrorCode implements ErrorCode {
 3. 요청자 본인만 요청서 수정/삭제 가능
 4. 승인 시 자동으로 Lab 엔티티 생성
 
+### LabNotice 불변 조건
+
+1. 제목과 내용은 필수 항목
+2. 제목은 100자, 내용은 2000자 이내
+3. 작성자와 소속 랩실은 필수 관계
+4. 고정 상태는 명시적 메서드로만 변경 가능
+5. 수정 권한은 작성자, 랩실 관리자, 교수, 관리자만 보유
+
 ## 🎯 도메인 서비스 (향후 확장)
 
 ### 현재 미구현, 향후 필요한 도메인 서비스
@@ -214,6 +252,7 @@ public enum UserErrorCode implements ErrorCode {
 - **도메인 모델 구현**: @model/CLAUDE.md
 - **User 도메인 컨벤션**: @model/user/CONVENTIONS.md
 - **Lab 도메인 컨벤션**: @model/lab/CONVENTIONS.md
+- **Notice 도메인 가이드**: @model/notice/CLAUDE.md
 
 ## 🧪 도메인 테스트 전략
 
@@ -227,14 +266,15 @@ public enum UserErrorCode implements ErrorCode {
 ### 테스트 예시
 
 ```java
+
 @Test
 void 지원서_승인시_상태가_APPROVED로_변경된다() {
     // given
     LabApplication application = createPendingApplication();
-    
+
     // when
     application.approve();
-    
+
     // then
     assertThat(application.getStatus()).isEqualTo(APPROVED);
 }

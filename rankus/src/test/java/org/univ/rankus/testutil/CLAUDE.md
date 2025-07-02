@@ -311,42 +311,43 @@ public class DomainLabApplicationFactory {
 ### 실제 데이터베이스와 연동하는 통합 테스트용 팩토리
 
 ```java
+
 @Component
 public class IntegrationUserFactory {
-    
+
     @Autowired
     private UserRepositoryPort userRepositoryPort;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
     public User createAndSaveStudent() {
         User user = DomainUserFactory.createStudent();
         return userRepositoryPort.save(user);
     }
-    
+
     public User createAndSaveWithRole(Role role) {
         User user = DomainUserFactory.createWithRole(role);
         return userRepositoryPort.save(user);
     }
-    
+
     public User createAndSaveWithEmail(String email) {
         User user = DomainUserFactory.createWithEmail(email);
         return userRepositoryPort.save(user);
     }
-    
+
     public List<User> createAndSaveMultipleStudents(int count) {
         List<User> users = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             User user = DomainUserFactory.builder()
-                .name("학생" + i)
-                .email("student" + i + "@test.com")
-                .build();
+                    .name("학생" + i)
+                    .email("student" + i + "@test.com")
+                    .build();
             users.add(userRepositoryPort.save(user));
         }
         return users;
     }
-    
+
     public User createAndSaveLabMember(Lab lab) {
         User user = DomainUserFactory.createWithRole(Role.LAB_MEMBER);
         user.assignLab(lab);
@@ -491,53 +492,53 @@ class AuthControllerTest {
 
 ```java
 public class AuthMockUtil {
-    
+
     public static Authentication createMockAuthentication(User user) {
         CustomUserDetails userDetails = new CustomUserDetails(user);
         return new UsernamePasswordAuthenticationToken(
-            userDetails, null, userDetails.getAuthorities());
+                userDetails, null, userDetails.getAuthorities());
     }
-    
+
     public static Authentication createStudentAuthentication() {
         User student = DomainUserFactory.createStudent();
         return createMockAuthentication(student);
     }
-    
+
     public static Authentication createLabLeaderAuthentication(Lab lab) {
         User labLeader = DomainUserFactory.createLabLeader();
         labLeader.assignLab(lab);
         return createMockAuthentication(labLeader);
     }
-    
+
     public static Authentication createProfessorAuthentication() {
         User professor = DomainUserFactory.createProfessor();
         return createMockAuthentication(professor);
     }
-    
+
     public static Authentication createAdminAuthentication() {
         User admin = DomainUserFactory.createWithRole(Role.ADMIN);
         return createMockAuthentication(admin);
     }
-    
+
     // SecurityContext에 인증 정보 설정
     public static void setSecurityContext(User user) {
         Authentication authentication = createMockAuthentication(user);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
-    
+
     public static void setSecurityContextAsStudent() {
         setSecurityContext(DomainUserFactory.createStudent());
     }
-    
+
     public static void clearSecurityContext() {
         SecurityContextHolder.clearContext();
     }
-    
+
     // JWT 토큰 관련 Mock 설정
     public static void mockJwtToken(JwtTokenProvider jwtTokenProvider, User user) {
         String token = "mock.jwt.token";
         when(jwtTokenProvider.createToken(user.getEmail(), user.getRole()))
-            .thenReturn(token);
+                .thenReturn(token);
         when(jwtTokenProvider.validateToken(token)).thenReturn(true);
         when(jwtTokenProvider.getEmail(token)).thenReturn(user.getEmail());
     }

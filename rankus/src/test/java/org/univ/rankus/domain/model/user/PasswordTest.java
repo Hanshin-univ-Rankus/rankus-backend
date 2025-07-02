@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.univ.rankus.testutil.mock.TestPasswordEncoder;
-import org.univ.rankus.domain.model.user.exception.PasswordValidationException;
 import org.univ.rankus.domain.model.user.exception.PasswordErrorCode;
+import org.univ.rankus.domain.model.user.exception.PasswordValidationException;
+import org.univ.rankus.testutil.mock.TestPasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 

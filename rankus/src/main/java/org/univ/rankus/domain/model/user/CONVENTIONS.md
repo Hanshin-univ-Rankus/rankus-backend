@@ -18,36 +18,50 @@
 ### User Entity
 
 ```java
+
 @Entity
 @Table(name = "users")
 public class User extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = IDENTITY)
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
-    
-    protected User() {} // JPA
-    private User(...) { validate(); }
-    
-    public static User create(...) { return new User(...); }
-    public void checkPassword(String raw) { ... }
-    public boolean canManageLabApplications(Lab lab) { ... }
+
+    protected User() {
+    } // JPA
+
+    private User(...) {
+        validate();
+    }
+
+    public static User create(...) {
+        return new User(...);
+    }
+
+    public void checkPassword(String raw) { ...}
+
+    public boolean canManageLabApplications(Lab lab) { ...}
 }
 ```
 
 ### Password Value Object
 
 ```java
+
 @Embeddable
 public class Password {
     @Column(name = "password", length = 255, nullable = false)
     private final String value;
-    
-    private Password(String hashedPassword) { this.value = hashedPassword; }
-    
-    public static Password fromRaw(String raw, PasswordEncoder encoder) {
-        validate(raw); return new Password(encoder.encode(raw));
+
+    private Password(String hashedPassword) {
+        this.value = hashedPassword;
     }
-    
-    public boolean matches(String raw, PasswordEncoder encoder) { ... }
+
+    public static Password fromRaw(String raw, PasswordEncoder encoder) {
+        validate(raw);
+        return new Password(encoder.encode(raw));
+    }
+
+    public boolean matches(String raw, PasswordEncoder encoder) { ...}
 }
 ```
 
@@ -81,14 +95,17 @@ private void validateName(String name) {
 public enum Role {
     STUDENT("학생"), LAB_MEMBER("랩실 멤버"), LAB_MANAGER("랩실 관리자"),
     LAB_LEADER("랩장"), PROFESSOR("교수"), ADMIN("관리자");
-    
+
     private final String description;
-    Role(String description) { this.description = description; }
-    
+
+    Role(String description) {
+        this.description = description;
+    }
+
     public boolean hasHigherOrEqualAuthorityThan(Role other) {
         return this.ordinal() >= other.ordinal();
     }
-    
+
     public boolean isLabManager() {
         return this == LAB_MANAGER || this == LAB_LEADER;
     }
@@ -98,6 +115,7 @@ public enum Role {
 ## 🔗 연관관계
 
 ```java
+
 @ManyToOne(fetch = FetchType.LAZY)
 @JoinColumn(name = "lab_id")
 private Lab lab;
@@ -109,7 +127,10 @@ public void assignLab(Lab lab) {
 }
 
 public void leaveLab() {
-    if (this.lab != null) { this.lab.removeMember(this); this.lab = null; }
+    if (this.lab != null) {
+        this.lab.removeMember(this);
+        this.lab = null;
+    }
 }
 ```
 
@@ -120,7 +141,26 @@ public void leaveLab() {
 ```java
 public boolean canManageLabApplications(Lab targetLab) {
     return this.lab != null && this.lab.equals(targetLab) &&
-           (role == LAB_LEADER || role == LAB_MANAGER || role == PROFESSOR);
+            (role == LAB_LEADER || role == LAB_MANAGER || role == PROFESSOR);
+}
+
+public boolean canViewLabNotices(Lab targetLab) {
+    // 교수, 관리자는 모든 랩실 공지 조회 가능
+    if (role == PROFESSOR || role == ADMIN) {
+        return true;
+    }
+    // 랩실 멤버는 자신의 랩실 공지만 조회 가능
+    return this.lab != null && this.lab.equals(targetLab);
+}
+
+public boolean canManageLabNotices(Lab targetLab) {
+    // 교수, 관리자는 모든 랩실 공지 관리 가능
+    if (role == PROFESSOR || role == ADMIN) {
+        return true;
+    }
+    // 랩실 관리자는 자신의 랩실 공지만 관리 가능
+    return this.lab != null && this.lab.equals(targetLab) &&
+            (role == LAB_LEADER || role == LAB_MANAGER);
 }
 ```
 
@@ -129,7 +169,7 @@ public boolean canManageLabApplications(Lab targetLab) {
 ```java
 public void changePassword(String newRaw) {
     Password newPassword = Password.fromRaw(newRaw, encoder);
-    if (this.password.matches(newRaw, encoder)) 
+    if (this.password.matches(newRaw, encoder))
         throw ex(SAME_AS_CURRENT_PASSWORD);
     this.password = newPassword;
 }
@@ -140,6 +180,7 @@ public void changePassword(String newRaw) {
 ### User 테스트
 
 ```java
+
 @Test
 void 유효한_정보로_사용자_생성() {
     User user = User.create("홍길동", "hong@example.com", "password123!", STUDENT, encoder);
@@ -149,13 +190,14 @@ void 유효한_정보로_사용자_생성() {
 @Test
 void 잘못된_이름_예외_발생() {
     assertThatThrownBy(() -> User.create("", "test@example.com", "password123!", STUDENT, encoder))
-        .isInstanceOf(UserValidationException.class);
+            .isInstanceOf(UserValidationException.class);
 }
 ```
 
 ### Password 테스트
 
 ```java
+
 @Test
 void 비밀번호_생성_및_검증() {
     Password password = Password.fromRaw("password123!", encoder);

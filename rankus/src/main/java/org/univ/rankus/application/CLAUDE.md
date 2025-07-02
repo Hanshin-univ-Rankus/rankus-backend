@@ -111,6 +111,13 @@ JPA Repository (Infrastructure)
 - `updateLabCreationRequest()`: 랩실 생성 요청 수정
 - `deleteLabCreationRequest()`: 랩실 생성 요청 삭제 (신청자 본인 + 관리자만 가능)
 
+#### LabNoticeCommandUseCase
+
+- `createNotice()`: 공지사항 생성
+- `updateNotice()`: 공지사항 수정
+- `deleteNotice()`: 공지사항 삭제
+- `togglePinNotice()`: 공지사항 고정/해제
+
 #### AuthUseCase
 
 - `signup()`: 회원가입
@@ -145,6 +152,14 @@ JPA Repository (Infrastructure)
 - `findLabCreationRequestsByUser()`: 사용자별 랩실 생성 요청 목록
 - `findLabCreationRequestsByStatus()`: 상태별 랩실 생성 요청 목록
 
+#### LabNoticeQueryUseCase
+
+- `getNoticesByLabId()`: 랩실별 공지사항 목록 조회 (페이징)
+- `getNoticesByLabId()`: 랩실별 공지사항 전체 목록 조회
+- `getNoticesByLabIdAndType()`: 랩실별 특정 타입 공지사항 조회
+- `getPinnedNoticesByLabId()`: 랩실별 고정 공지사항 조회
+- `getNoticeById()`: 공지사항 상세 조회
+
 ## 🏗️ 서비스 구현 패턴
 
 Service 구현에 대한 상세 내용은 다음을 참조하세요:
@@ -164,17 +179,18 @@ Service 구현에 대한 상세 내용은 다음을 참조하세요:
 ### 트랜잭션 전파 규칙
 
 ```java
+
 @Service
 @RequiredArgsConstructor
 public class LabApplicationCommandService {
-    
+
     // 기본 트랜잭션 (REQUIRED)
     @Override
     @Transactional
     public LabApplication approveApplication(Long applicationId) {
         // 전체가 하나의 트랜잭션으로 처리
     }
-    
+
     // 새로운 트랜잭션 (REQUIRES_NEW)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendNotification(Long userId) {
@@ -194,21 +210,22 @@ public class LabApplicationCommandService {
 ### 예외 전파 패턴
 
 ```java
+
 @Service
 @RequiredArgsConstructor
 public class LabApplicationCommandService {
-    
+
     @Override
     @Transactional
     public LabApplication approveApplication(Long applicationId, Long approverId) {
         // 1. 엔티티 조회 (없으면 NotFoundException)
         LabApplication application = labApplicationRepositoryPort
-            .findById(applicationId)
-            .orElseThrow(() -> new LabApplicationNotFoundException());
-            
+                .findById(applicationId)
+                .orElseThrow(() -> new LabApplicationNotFoundException());
+
         // 2. 비즈니스 로직 (도메인 예외 발생 가능)
         application.approve(); // → LabApplicationValidationException 가능
-        
+
         // 3. 영속화 (인프라 예외 발생 가능)
         return labApplicationRepositoryPort.save(application);
     }
@@ -225,11 +242,11 @@ public class LabApplicationCommandService {
 - **이미지 관리**: 업로드, 조회, 삭제
 - **랩실 생성 요청**: 요청 생성, 승인, 거부, 조회
 - **인증**: 회원가입, 로그인
+- **공지사항 관리**: 생성, 수정, 삭제, 조회, 고정/해제
 
 ### 🔄 미구현 기능 (향후 개발)
 
 - **랭킹 시스템**: 점수 관리, 승인 프로세스
-- **공지사항**: 생성, 수정, 삭제, 조회
 - **QR 출석**: QR 생성, 스캔, 출석 기록
 - **캘린더**: 일정 생성, 수정, 삭제, 조회
 - **관리자**: 사용자 승인, 시스템 통계
@@ -259,29 +276,30 @@ public class LabApplicationCommandService {
 ### 테스트 예시
 
 ```java
+
 @ExtendWith(MockitoExtension.class)
 class UserCommandServiceTest {
-    
+
     @Mock
     private UserRepositoryPort userRepositoryPort;
-    
+
     @InjectMocks
     private UserCommandService userCommandService;
-    
+
     @Test
     void 유효한_정보로_사용자를_생성할_수_있다() {
         // given
         UserCreateRequestDto request = new UserCreateRequestDto(...);
         User savedUser = User.create(...);
-        
+
         when(userRepositoryPort.existsByEmail(request.getEmail()))
-            .thenReturn(false);
+                .thenReturn(false);
         when(userRepositoryPort.save(any(User.class)))
-            .thenReturn(savedUser);
-        
+                .thenReturn(savedUser);
+
         // when
         UserResponseDto result = userCommandService.createUser(request);
-        
+
         // then
         assertThat(result.getName()).isEqualTo(request.getName());
         verify(userRepositoryPort).save(any(User.class));

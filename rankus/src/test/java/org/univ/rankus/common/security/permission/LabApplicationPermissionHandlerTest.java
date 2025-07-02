@@ -51,7 +51,7 @@ class LabApplicationPermissionHandlerTest {
             // given
             User mockUser = mock(User.class);
             LabApplication mockApp = mock(LabApplication.class);
-            
+
             given(userQueryUseCase.getUserById(USER_ID)).willReturn(mockUser);
             given(queryUseCase.getApplicationById(APP_ID)).willReturn(mockApp);
             given(mockUser.isAdmin()).willReturn(false); // 비관리자
@@ -59,7 +59,7 @@ class LabApplicationPermissionHandlerTest {
 
             // when
             boolean allowed = handler.hasPermission(principal, APP_ID, "cancel");
-            
+
             // then
             assertThat(allowed).isTrue();
         }
@@ -70,7 +70,7 @@ class LabApplicationPermissionHandlerTest {
             // given
             User mockUser = mock(User.class);
             LabApplication mockApp = mock(LabApplication.class);
-            
+
             given(userQueryUseCase.getUserById(USER_ID)).willReturn(mockUser);
             given(queryUseCase.getApplicationById(APP_ID)).willReturn(mockApp);
             given(mockUser.isAdmin()).willReturn(false); // 비관리자
@@ -78,7 +78,7 @@ class LabApplicationPermissionHandlerTest {
 
             // when
             boolean allowed = handler.hasPermission(principal, APP_ID, "cancel");
-            
+
             // then
             assertThat(allowed).isFalse();
         }
@@ -89,7 +89,7 @@ class LabApplicationPermissionHandlerTest {
             // given
             User mockUser = mock(User.class);
             LabApplication mockApp = mock(LabApplication.class);
-            
+
             given(userQueryUseCase.getUserById(USER_ID)).willReturn(mockUser);
             given(queryUseCase.getApplicationById(APP_ID)).willReturn(mockApp);
             given(mockUser.isAdmin()).willReturn(true); // 관리자
@@ -97,7 +97,7 @@ class LabApplicationPermissionHandlerTest {
 
             // when
             boolean allowed = handler.hasPermission(principal, APP_ID, "cancel");
-            
+
             // then
             assertThat(allowed).isTrue();
         }

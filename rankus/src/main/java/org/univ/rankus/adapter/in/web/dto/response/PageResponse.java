@@ -1,8 +1,10 @@
 package org.univ.rankus.adapter.in.web.dto.response;
 
 import lombok.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.function.Function;
 
 @Getter
 @Setter
@@ -23,6 +25,20 @@ public class PageResponse<T> {
                 .totalPages(totalPages)
                 .page(page)
                 .size(size)
+                .build();
+    }
+
+    public static <T, R> PageResponse<R> of(Page<T> page, Function<T, R> converter) {
+        List<R> convertedContent = page.getContent().stream()
+                .map(converter)
+                .toList();
+
+        return PageResponse.<R>builder()
+                .content(convertedContent)
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .page(page.getNumber())
+                .size(page.getSize())
                 .build();
     }
 }

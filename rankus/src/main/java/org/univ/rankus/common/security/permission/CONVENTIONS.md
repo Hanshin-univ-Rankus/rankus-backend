@@ -1,300 +1,138 @@
 # Permission 컨벤션
 
-## 클래스 네이밍
+## 📛 네이밍
 
-- 평가자: `UnifiedPermissionEvaluator`
-- 핸들러: `{Domain}PermissionHandler`
-- 인터페이스: `DomainPermissionEvaluator`
+| 구분     | 패턴                           | 예시                                 |
+|--------|------------------------------|------------------------------------|
+| 평가자    | `UnifiedPermissionEvaluator` | Spring Security 통합                 |
+| 핸들러    | `{Domain}PermissionHandler`  | `LabNoticePermissionHandler`       |
+| 인터페이스  | `DomainPermissionEvaluator`  | 도메인별 구현 계약                         |
+| 권한 문자열 | `UPPER_CASE`                 | `VIEW`, `CREATE`, `MANAGE_NOTICES` |
 
-## 통합 권한 평가자 구조
+## 🏗️ 구조 패턴
 
-```java
-@Component
-@RequiredArgsConstructor
-public class UnifiedPermissionEvaluator implements PermissionEvaluator {
-    
-    private final Map<String, DomainPermissionEvaluator> permissionHandlers;
-    
-    @Override
-    public boolean hasPermission(Authentication authentication, Object targetId,
-                                Object targetType, Object permission) {
-        
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return false;
-        }
-        
-        String targetTypeName = (String) targetType;
-        String permissionName = (String) permission;
-        Long resourceId = (Long) targetId;
-        
-        DomainPermissionEvaluator handler = permissionHandlers.get(targetTypeName.toLowerCase() + "PermissionHandler");
-        
-        if (handler == null) {
-            return false;
-        }
-        
-        return handler.hasPermission(authentication, resourceId, permissionName);
-    }
-    
-    @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId,
-                                String targetType, Object permission) {
-        return hasPermission(authentication, (Object) targetId, targetType, permission);
-    }
-}
-```
-
-## 도메인 권한 평가자 인터페이스
-
-```java
-public interface DomainPermissionEvaluator {
-    boolean hasPermission(Authentication authentication, Long resourceId, String permission);
-    boolean hasPermission(Authentication authentication, Object resource, String permission);
-}
-```
-
-## 도메인별 권한 핸들러 구조
+### 도메인 권한 핸들러 템플릿
 
 ```java
 @Component
 @RequiredArgsConstructor
-public class LabApplicationPermissionHandler implements DomainPermissionEvaluator {
-    
-    private final LabApplicationRepositoryPort labApplicationRepositoryPort;
-    
-    @Override
-    public boolean hasPermission(Authentication authentication, Long applicationId, String permission) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        User currentUser = userDetails.getUser();
-        
-        switch (permission.toUpperCase()) {
-            case "VIEW":
-                return canView(currentUser, applicationId);
-            case "APPROVE":
-                return canApprove(currentUser, applicationId);
-            case "DELETE":
-                return canDelete(currentUser, applicationId);
-            default:
-                return false;
-        }
-    }
-    
-    @Override
-    public boolean hasPermission(Authentication authentication, Object resource, String permission) {
-        if (resource instanceof LabApplication) {
-            return hasPermission(authentication, ((LabApplication) resource).getId(), permission);
-        }
-        return false;
-    }
-    
-    private boolean canView(User user, Long applicationId) {
-        LabApplication application = getApplicationOrThrow(applicationId);
-        
-        // 본인 지원서는 항상 볼 수 있음
-        if (application.isOwnedBy(user)) {
-            return true;
-        }
-        
-        // 해당 랩실의 관리자는 볼 수 있음
-        return user.canManageLabApplications(application.getLab()) || 
-               user.getRole() == Role.ADMIN;
-    }
-    
-    private boolean canApprove(User user, Long applicationId) {
-        LabApplication application = getApplicationOrThrow(applicationId);
-        
-        // 랩실 관리자만 승인 가능
-        return user.canManageLabApplications(application.getLab()) || 
-               user.getRole() == Role.ADMIN;
-    }
-    
-    private boolean canDelete(User user, Long applicationId) {
-        LabApplication application = getApplicationOrThrow(applicationId);
-        
-        // 본인 지원서만 취소 가능 (또는 관리자)
-        return application.isOwnedBy(user) || user.getRole() == Role.ADMIN;
-    }
-    
-    private LabApplication getApplicationOrThrow(Long applicationId) {
-        return labApplicationRepositoryPort.findById(applicationId)
-            .orElseThrow(() -> new LabApplicationNotFoundException(applicationId));
-    }
-}
-```
+public class {Domain}PermissionHandler implements
 
-## 구현된 도메인 권한 핸들러
+DomainPermissionEvaluator {
 
-### LabApplicationPermissionHandler
-
-- **대상**: 랩실 지원서 관련 권한
-- **권한**: VIEW, APPROVE, REJECT, DELETE
-- **소유권 검증**: 지원자 본인만 DELETE 가능
-- **관리자 권한**: 랩실 관리자는 VIEW, APPROVE, REJECT 가능
-
-### LabImagePermissionHandler
-
-- **대상**: 랩실 이미지 관련 권한
-- **권한**: CREATE, DELETE
-- **관리자 권한**: 랩실 관리자만 생성/삭제 가능
-
-### LabCreationRequestPermissionHandler
-
-- **대상**: 랩실 생성 신청 관련 권한
-- **권한**: VIEW, DELETE, APPROVE, REJECT
-- **DELETE 권한**: 신청자 본인 + 관리자 (2025.07 정책 변경: 관리자 운영 편의성 향상)
-- **조회 권한**: 신청자 본인 + 관리자/교수
-- **승인/거절**: 관리자/교수만 가능
-
-```java
-@Component
-@RequiredArgsConstructor
-public class LabCreationRequestPermissionHandler implements DomainPermissionEvaluator {
-
-    private final LabCreationRequestQueryUseCase queryUseCase;
+    private final {
+        Domain
+    } QueryUseCase queryUseCase;
     private final UserQueryUseCase userQueryUseCase;
 
     @Override
-    public String targetType() {
-        return "LabCreationRequest";
+    public String targetType () {
+        return "{Domain}";
     }
 
     @Override
-    public boolean hasPermission(Object principalObj, Serializable targetId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long)) {
-            return false;
-        }
-
-        Long userId = ((CustomUserDetails) principalObj).getUserId();
-        User user = userQueryUseCase.getUserById(userId);
-        Long requestId = (Long) targetId;
-        LabCreationRequest request = queryUseCase.getLabCreationRequestById(requestId);
-
+    public boolean hasPermission (Object principalObj, Serializable targetId, String permission){
+        // 구현: 타입 검증 → 사용자/리소스 조회 → 권한 체크
         return switch (permission) {
-            case "DELETE" -> request.isOwnedBy(userId) || user.getRole() == Role.ADMIN;
-            case "VIEW" -> request.isOwnedBy(userId) || isAdminOrProfessor(user);
-            case "APPROVE", "REJECT" -> isAdminOrProfessor(user);
+            case "VIEW" -> canView(user, resource);
+            case "CREATE", "UPDATE", "DELETE" -> canManage(user, resource);
             default -> false;
         };
     }
-
-    private boolean isAdminOrProfessor(User user) {
-        return user.getRole() == Role.ADMIN || user.getRole() == Role.PROFESSOR;
-    }
 }
 ```
 
-## 권한 종류 정의
+## 📋 구현된 권한 핸들러
+
+| 핸들러                                   | 대상       | 주요 권한                         | 특별 기능         |
+|---------------------------------------|----------|-------------------------------|---------------|
+| `LabApplicationPermissionHandler`     | 지원서      | VIEW, APPROVE, DELETE         | 소유권 기반 DELETE |
+| `LabImagePermissionHandler`           | 이미지      | CREATE, DELETE                | 랩실 관리자만       |
+| `LabCreationRequestPermissionHandler` | 랩실 생성 요청 | VIEW, DELETE, APPROVE, REJECT | 관리자 DELETE 추가 |
+| `LabNoticePermissionHandler`          | 공지사항     | VIEW, CREATE, UPDATE, DELETE  | Lab 단위 권한 체크  |
+
+## 🔐 권한 매트릭스
+
+### LabNoticePermissionHandler
+
+| 권한     | 대상      | 조건                         |
+|--------|---------|----------------------------|
+| VIEW   | 공지사항 조회 | 랩실 멤버 + 교수 + 관리자           |
+| CREATE | 공지사항 생성 | 랩실 관리자 + 교수 + 관리자          |
+| UPDATE | 공지사항 수정 | 작성자 본인 + 랩실 관리자 + 교수 + 관리자 |
+| DELETE | 공지사항 삭제 | 작성자 본인 + 랩실 관리자 + 교수 + 관리자 |
+
+#### 특별 메서드: Lab 단위 권한 체크
 
 ```java
-public enum PermissionType {
-    
-    // 기본 CRUD 권한
-    CREATE("CREATE"),
-    VIEW("VIEW"),
-    UPDATE("UPDATE"),
-    DELETE("DELETE"),
-    
-    // 비즈니스 특화 권한
-    APPROVE("APPROVE"),
-    REJECT("REJECT"),
-    MANAGE("MANAGE"),
-    
-    // 관리 권한
-    ADMIN("ADMIN");
-    
-    private final String code;
-    
-    PermissionType(String code) {
-        this.code = code;
-    }
-    
-    public String getCode() {
-        return code;
-    }
+// 랩실별 공지사항 목록 조회용
+public boolean hasPermissionForLab(Object principalObj, Serializable labId, String permission) {
+    return switch (permission) {
+        case "VIEW_NOTICES" -> user.canViewLabNotices(lab);
+        case "MANAGE_NOTICES" -> user.canManageLabNotices(lab);
+        default -> false;
+    };
 }
 ```
 
-## PreAuthorize 사용 패턴
+## 🎯 PreAuthorize 패턴
+
+### 표준 패턴
+
+| 패턴                                                                                       | 사용 케이스         |
+|------------------------------------------------------------------------------------------|----------------|
+| `@PreAuthorize("isAuthenticated()")`                                                     | 기본 인증 확인       |
+| `@PreAuthorize("hasRole('ADMIN')")`                                                      | 역할 기반 권한       |
+| `@PreAuthorize("@unifiedPermissionEvaluator.hasPermission(..., #id, 'Domain', 'VIEW')")` | 리소스별 권한 확인     |
+| `@PreAuthorize("hasRole('ADMIN') or @handler.hasPermissionForLab(..., #labId, 'VIEW')")` | 복합 조건 (Notice) |
+
+### Notice 전용 패턴
 
 ```java
-// 기본 권한 검사
-@PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #resourceId, 'LabApplication', 'VIEW')")
+// 개별 공지사항 권한 체크
+@PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #noticeId, 'LabNotice', 'VIEW')")
 
-// 역할 기반 검사
-@PreAuthorize("hasRole('ADMIN') or hasRole('LAB_LEADER')")
-
-// 복합 조건
-@PreAuthorize("isAuthenticated() and (@unifiedPermissionEvaluator.hasPermission(authentication, #labId, 'Lab', 'MANAGE') or hasRole('ADMIN'))")
-
-// 메서드 결과 기반 검사
-@PostAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, returnObject.id, 'LabApplication', 'VIEW')")
+// 랩실별 공지사항 권한 체크  
+@PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_NOTICES')")
 ```
 
-## 권한 캐싱 패턴
+## 🧪 테스트 패턴
+
+### 권한 핸들러 테스트 구조
 
 ```java
-@Component
-@RequiredArgsConstructor
-public class CachedPermissionEvaluator implements DomainPermissionEvaluator {
-    
-    private final DomainPermissionEvaluator delegate;
-    
-    @Cacheable(value = "permissions", key = "#authentication.name + ':' + #resourceId + ':' + #permission")
-    @Override
-    public boolean hasPermission(Authentication authentication, Long resourceId, String permission) {
-        return delegate.hasPermission(authentication, resourceId, permission);
-    }
-    
-    @CacheEvict(value = "permissions", key = "#authentication.name + ':' + #resourceId + ':*'")
-    public void evictPermissionCache(Authentication authentication, Long resourceId) {
-        // 권한 캐시 무효화
-    }
-}
-```
+@ExtendWith(MockitoExtension.class) class {Domain}
 
-## 테스트 패턴
+PermissionHandlerTest {
 
-```java
-@ExtendWith(MockitoExtension.class)
-class LabApplicationPermissionHandlerTest {
-    
-    @Mock
-    private LabApplicationRepositoryPort labApplicationRepositoryPort;
-    
-    @InjectMocks
-    private LabApplicationPermissionHandler permissionHandler;
-    
+    @Mock private {
+        Domain
+    } QueryUseCase queryUseCase;
+    @Mock private UserQueryUseCase userQueryUseCase;
+    @InjectMocks private {
+        Domain
+    } PermissionHandler permissionHandler;
+
     @Test
-    void 지원자는_본인_지원서를_볼_수_있다() {
-        // given
-        User applicant = createUser("applicant@example.com", Role.STUDENT);
-        LabApplication application = createApplication(applicant);
-        Authentication auth = createAuthentication(applicant);
-        
-        when(labApplicationRepositoryPort.findById(1L)).thenReturn(Optional.of(application));
-        
-        // when
-        boolean result = permissionHandler.hasPermission(auth, 1L, "VIEW");
-        
-        // then
-        assertThat(result).isTrue();
+    void 소유자는_리소스를_볼_수_있다 () {
+        // given: 소유자 + 리소스 설정
+        // when: hasPermission 호출
+        // then: true 반환 확인
     }
-    
+
     @Test
-    void 일반_사용자는_다른_사용자_지원서를_볼_수_없다() {
-        // given
-        User applicant = createUser("applicant@example.com", Role.STUDENT);
-        User other = createUser("other@example.com", Role.STUDENT);
-        LabApplication application = createApplication(applicant);
-        Authentication auth = createAuthentication(other);
-        
-        when(labApplicationRepositoryPort.findById(1L)).thenReturn(Optional.of(application));
-        
-        // when
-        boolean result = permissionHandler.hasPermission(auth, 1L, "VIEW");
-        
-        // then
-        assertThat(result).isFalse();
+    void 권한_없는_사용자는_리소스를_볼_수_없다 () {
+        // given: 일반 사용자 + 타인 리소스
+        // when: hasPermission 호출  
+        // then: false 반환 확인
     }
 }
 ```
+
+## 🎯 핵심 규칙
+
+1. **명확한 권한**: 도메인별 구체적 권한 정의
+2. **소유권 우선**: 리소스 소유자 권한 최우선 고려
+3. **역할 기반**: 관리자/교수 권한 적절히 분배
+4. **성능 고려**: 불필요한 DB 조회 최소화
+5. **테스트 필수**: 모든 권한 시나리오 테스트 작성

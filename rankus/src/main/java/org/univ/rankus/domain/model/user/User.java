@@ -169,4 +169,34 @@ public class User extends BaseTimeEntity {
     public boolean isAdmin() {
         return this.role == Role.ADMIN;
     }
+
+    /**
+     * 특정 랩실의 공지사항 조회 권한을 확인
+     * 랩실 소속 멤버(LAB_MEMBER 이상) + 모든 PROFESSOR, ADMIN
+     */
+    public boolean canViewLabNotices(Lab lab) {
+        // ADMIN과 PROFESSOR는 모든 랩실의 공지사항 조회 가능
+        if (this.role == Role.ADMIN || this.role == Role.PROFESSOR) {
+            return true;
+        }
+
+        // 랩실 소속 멤버(LAB_MEMBER 이상)는 해당 랩실 공지사항 조회 가능
+        return this.lab != null && this.lab.equals(lab)
+                && (this.role == Role.LAB_MEMBER || this.role == Role.LAB_MANAGER || this.role == Role.LAB_LEADER);
+    }
+
+    /**
+     * 특정 랩실의 공지사항 관리(생성/수정/삭제) 권한을 확인
+     * 랩 소속 LAB_MANAGER, LAB_LEADER + 모든 PROFESSOR, ADMIN
+     */
+    public boolean canManageLabNotices(Lab lab) {
+        // ADMIN과 PROFESSOR는 모든 랩실의 공지사항 관리 가능
+        if (this.role == Role.ADMIN || this.role == Role.PROFESSOR) {
+            return true;
+        }
+
+        // 랩실 소속 LAB_MANAGER, LAB_LEADER는 해당 랩실 공지사항 관리 가능
+        return this.lab != null && this.lab.equals(lab)
+                && (this.role == Role.LAB_MANAGER || this.role == Role.LAB_LEADER);
+    }
 }

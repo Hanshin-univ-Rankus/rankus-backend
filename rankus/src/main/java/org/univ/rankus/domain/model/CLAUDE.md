@@ -6,26 +6,31 @@
 
 ### 핵심 엔티티 구조
 
-| 엔티티                    | 테이블                    | 주요 필드                                 | 비즈니스 메서드                                                      |
-|------------------------|------------------------|---------------------------------------|---------------------------------------------------------------|
-| **User**               | `users`                | name, email, password, role, lab      | `checkPassword()`, `assignLab()`, `isLabLeaderOrLabManager()` |
-| **Lab**                | `labs`                 | name, category, description, ranking  | `autoAssignProfessor()`, `updateRanking()`                    |
-| **LabApplication**     | `lab_application`      | lab, user, interviewTime, status      | `approve()`, `reject()`, `isOwnedBy()`                        |
-| **LabImage**           | `lab_image`            | lab, imageUrl, type                   | `setImageUrl()`                                               |
-| **LabCreationRequest** | `lab_creation_request` | title, description, requestor, status | `approve()`, `reject()`, `isOwnedBy()`                        |
+| 엔티티                    | 테이블                    | 주요 필드                                       | 비즈니스 메서드                                                                         |
+|------------------------|------------------------|---------------------------------------------|----------------------------------------------------------------------------------|
+| **User**               | `users`                | name, email, password, role, lab            | `checkPassword()`, `assignLab()`, `canViewLabNotices()`, `canManageLabNotices()` |
+| **Lab**                | `labs`                 | name, category, description, ranking        | `autoAssignProfessor()`, `updateRanking()`                                       |
+| **LabApplication**     | `lab_application`      | lab, user, interviewTime, status            | `approve()`, `reject()`, `isOwnedBy()`                                           |
+| **LabImage**           | `lab_image`            | lab, imageUrl, type                         | `setImageUrl()`                                                                  |
+| **LabCreationRequest** | `lab_creation_request` | title, description, requestor, status       | `approve()`, `reject()`, `isOwnedBy()`                                           |
+| **LabNotice**          | `lab_notice`           | title, content, type, isPinned, author, lab | `pin()`, `unpin()`, `togglePin()`, `update()`, `isOwnedBy()`                     |
 
 ### 검증 규칙 매트릭스
 
-| 엔티티                | 필드            | 규칙              | 제약사항     |
-|--------------------|---------------|-----------------|----------|
-| User               | name          | 필수, 최대 30자      | Not null |
-| User               | email         | 필수, 고유, 최대 100자 | Unique   |
-| User               | password      | Password VO     | 8자 이상    |
-| Lab                | name          | 필수, 최대 10자      | Not null |
-| Lab                | ranking       | 필수, 0 이상        | ≥ 0      |
-| LabApplication     | interviewTime | 필수, 미래          | Future   |
-| LabCreationRequest | title         | 필수, 최대 100자     | Not null |
-| LabCreationRequest | description   | 필수, 최대 1000자    | Not null |
+| 엔티티                | 필드            | 규칙              | 제약사항          |
+|--------------------|---------------|-----------------|---------------|
+| User               | name          | 필수, 최대 30자      | Not null      |
+| User               | email         | 필수, 고유, 최대 100자 | Unique        |
+| User               | password      | Password VO     | 8자 이상         |
+| Lab                | name          | 필수, 최대 10자      | Not null      |
+| Lab                | ranking       | 필수, 0 이상        | ≥ 0           |
+| LabApplication     | interviewTime | 필수, 미래          | Future        |
+| LabCreationRequest | title         | 필수, 최대 100자     | Not null      |
+| LabCreationRequest | description   | 필수, 최대 1000자    | Not null      |
+| LabNotice          | title         | 필수, 최대 100자     | Not null      |
+| LabNotice          | content       | 필수, 최대 2000자    | Not null      |
+| LabNotice          | type          | 필수, 열거형         | NORMAL/URGENT |
+| LabNotice          | isPinned      | 불린값, 기본값 false  | Not null      |
 
 ### 상태 전이 매트릭스
 
@@ -34,6 +39,8 @@
 | LabApplication     | PENDING | → APPROVED, REJECTED                    | PENDING에서만 변경 가능 |
 | LabCreationRequest | PENDING | → APPROVED, REJECTED                    | PENDING에서만 변경 가능 |
 | User               | STUDENT | → LAB_MEMBER → LAB_MANAGER → LAB_LEADER | 랩 배정 시 승급        |
+| LabNotice          | NORMAL  | ↔ URGENT                                | 수정 시 타입 변경 가능    |
+| LabNotice          | false   | ↔ true (isPinned)                       | 고정 상태 토글 가능      |
 
 ### 연관관계 매트릭스
 
@@ -43,6 +50,8 @@
 | Lab ↔ LabApplication      | LabApplication     | Lab  | @ManyToOne      | 중복 지원 금지    |
 | Lab ↔ LabImage            | LabImage           | Lab  | @ManyToOne      | Cascade ALL |
 | User ↔ LabCreationRequest | LabCreationRequest | User | @ManyToOne      | 요청자 관계      |
+| LabNotice ↔ User          | LabNotice          | User | @ManyToOne LAZY | 작성자 관계      |
+| LabNotice ↔ Lab           | LabNotice          | Lab  | @ManyToOne LAZY | 랩실 소속       |
 
 ## 💎 Value Object 상세 분석
 
@@ -51,22 +60,23 @@
 #### 구현 특징
 
 ```java
+
 @Embeddable
 public class Password {
     @Column(name = "password", length = 255, nullable = false)
     private String value; // 암호화된 비밀번호만 저장
-    
+
     // private 생성자로 직접 생성 방지
     private Password(String hashedPassword) {
         this.value = hashedPassword;
     }
-    
+
     // 팩토리 메서드로 생성 (도메인 인터페이스 사용)
     public static Password fromRaw(String rawPassword, PasswordEncoder encoder) {
         validatePassword(rawPassword);
         return new Password(encoder.encode(rawPassword));
     }
-    
+
     // 비밀번호 검증 (도메인 인터페이스 사용)
     public boolean matches(String rawPassword, PasswordEncoder encoder) {
         return encoder.matches(rawPassword, this.value);
@@ -104,11 +114,11 @@ Password (Domain) → PasswordEncoder (Domain Interface)
 public enum Role {
     STUDENT("학생"),
     LAB_MEMBER("랩실 멤버"),
-    LAB_MANAGER("랩실 관리자"), 
+    LAB_MANAGER("랩실 관리자"),
     LAB_LEADER("랩장"),
     PROFESSOR("교수"),
     ADMIN("관리자");
-    
+
     private final String description;
 }
 ```
@@ -145,6 +155,21 @@ public enum ImageType {
 }
 ```
 
+### NoticeType Enum
+
+```java
+public enum NoticeType {
+    NORMAL("일반 공지"),
+    URGENT("긴급 공지");
+
+    private final String description;
+
+    public boolean isUrgent() {
+        return this == URGENT;
+    }
+}
+```
+
 ## 🔗 엔티티 관계 상세
 
 ### 연관관계 매핑
@@ -173,6 +198,20 @@ public enum ImageType {
 - **매핑**: lab_id 외래키
 - **Cascade**: ALL (랩실과 함께 관리)
 
+#### LabNotice ↔ User (ManyToOne)
+
+- **페치 전략**: LAZY (N+1 문제 방지)
+- **조인 컬럼**: author_id
+- **Cascade**: NONE (수동 관리)
+- **역할**: 공지사항 작성자
+
+#### LabNotice ↔ Lab (ManyToOne)
+
+- **페치 전략**: LAZY
+- **조인 컬럼**: lab_id
+- **Cascade**: NONE (수동 관리)
+- **역할**: 공지사항이 속한 랩실
+
 ## 🛡️ 도메인 불변 조건 상세
 
 ### User Aggregate 불변 조건
@@ -196,12 +235,21 @@ public enum ImageType {
 3. **소유권 확인**: 지원자 본인만 지원서 수정/삭제 가능
 4. **일회성 전이**: 승인/거부 후 상태 변경 불가
 
+### LabNotice Aggregate 불변 조건
+
+1. **제목 필수성**: 제목은 반드시 존재하며 100자 이내
+2. **내용 필수성**: 내용은 반드시 존재하며 2000자 이내
+3. **작성자 유효성**: 반드시 유효한 사용자가 작성자로 지정
+4. **랩실 연결성**: 반드시 유효한 랩실에 속해야 함
+5. **권한 기반 수정**: 작성자, 랩실 관리자, 교수, 관리자만 수정 가능
+
 ## 📋 도메인별 컨벤션 가이드
 
 각 도메인의 구체적인 코딩 컨벤션과 구현 패턴은 다음 파일을 참조하세요:
 
 - **User 도메인**: `@user/CONVENTIONS.md`
 - **Lab 도메인**: `@lab/CONVENTIONS.md`
+- **Notice 도메인**: `@notice/CLAUDE.md`
 
 ## 🧪 도메인 모델 테스트
 

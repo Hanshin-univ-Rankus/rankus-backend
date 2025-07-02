@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.univ.rankus.testutil.mock.TestPasswordEncoder;
-import org.univ.rankus.domain.model.user.exception.UserValidationException;
-import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.user.exception.UserErrorCode;
+import org.univ.rankus.domain.model.user.exception.UserValidationException;
 import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
+import org.univ.rankus.testutil.mock.TestPasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -384,12 +384,12 @@ class UserTest {
                 java.lang.reflect.Constructor<Lab> constructor = Lab.class.getDeclaredConstructor();
                 constructor.setAccessible(true);
                 Lab lab = constructor.newInstance();
-                
+
                 // ID 설정을 위한 리플렉션
                 java.lang.reflect.Field idField = Lab.class.getDeclaredField("id");
                 idField.setAccessible(true);
                 idField.set(lab, id);
-                
+
                 return lab;
             } catch (Exception e) {
                 throw new RuntimeException("테스트용 Lab 객체 생성 실패", e);
