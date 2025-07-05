@@ -1,4 +1,4 @@
-package org.univ.rankus.domain.model.lab;
+package org.univ.rankus.domain.model.lab.creation;
 
 /**
  * 랩실 생성 신청 상태

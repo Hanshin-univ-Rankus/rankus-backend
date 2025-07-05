@@ -1,4 +1,7 @@
-# 공통 네이밍 컨벤션
+# 공통 네이밍 컨벤션 (상세 가이드)
+
+> 📋 **AI 최적화 가이드**: @core/ai-essentials.md (AI 개발자 우선 참조)  
+> ⚠️ **ErrorCode 관리**: @core/error-codes.md (중앙 집중식 관리)
 
 ## 📛 클래스 네이밍
 

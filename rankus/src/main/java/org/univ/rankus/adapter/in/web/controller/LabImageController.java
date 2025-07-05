@@ -19,7 +19,7 @@ import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;
 import org.univ.rankus.adapter.in.web.dto.response.LabImageResponseDto;
 import org.univ.rankus.application.port.in.command.LabImageCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabImageQueryUseCase;
-import org.univ.rankus.domain.model.lab.LabImage;
+import org.univ.rankus.domain.model.lab.core.LabImage;
 
 import java.net.URI;
 import java.util.List;

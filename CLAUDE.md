@@ -54,7 +54,13 @@ docker-compose up -d
 @test = rankus/src/test/java/org/univ/rankus
 ```
 
-### 공통 패턴 (모든 개발자 필독)
+### AI 최적화 가이드 (우선 참조 ⭐)
+- **AI 개발 필수**: @core/ai-essentials.md (300줄, 핵심 패턴)
+- **테스트 패턴**: @core/test-patterns.md (150줄, 프로덕션 매칭)
+- **코드 템플릿**: @core/code-templates.md (200줄, 복사-붙여넣기)
+- **ErrorCode 관리**: @core/error-codes.md (100줄, 중앙 집중식)
+
+### 상세 가이드 (참조용)
 - **코딩 패턴**: @core/patterns.md
 - **네이밍 규칙**: @core/conventions.md  
 - **테스트 가이드**: @core/testing.md

@@ -6,10 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.lab.LabCategory;
-import org.univ.rankus.domain.model.notice.exception.NoticeErrorCode;
-import org.univ.rankus.domain.model.notice.exception.NoticeValidationException;
+import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.lab.core.LabCategory;
+import org.univ.rankus.domain.model.lab.notice.LabNotice;
+import org.univ.rankus.domain.model.lab.notice.NoticeType;
+import org.univ.rankus.domain.model.lab.notice.exception.NoticeErrorCode;
+import org.univ.rankus.domain.model.lab.notice.exception.NoticeValidationException;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
 import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
@@ -181,48 +183,6 @@ class LabNoticeTest {
         }
     }
 
-    @Nested
-    @DisplayName("Factory Method 검증")
-    class FactoryMethodTests {
-
-        @Test
-        @DisplayName("create 기본 팩토리 메서드로 공지사항 생성 성공")
-        void create_basic_success() {
-            // given
-            validAuthor = DomainUserFactory.buildStudentUser();
-            validLab = DomainLabFactory.buildAiLab();
-
-            // when
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
-
-            // then
-            assertThat(notice.getTitle()).isEqualTo(validTitle);
-            assertThat(notice.getContent()).isEqualTo(validContent);
-            assertThat(notice.getAuthor()).isEqualTo(validAuthor);
-            assertThat(notice.getLab()).isEqualTo(validLab);
-            assertThat(notice.getType()).isEqualTo(NoticeType.NORMAL);
-            assertThat(notice.isPinned()).isFalse();
-        }
-
-        @Test
-        @DisplayName("create 전체 팩토리 메서드로 공지사항 생성 성공")
-        void create_full_success() {
-            // given
-            validAuthor = DomainUserFactory.buildStudentUser();
-            validLab = DomainLabFactory.buildAiLab();
-
-            // when
-            LabNotice notice = LabNotice.create(validTitle, validContent, NoticeType.URGENT, true, validAuthor, validLab);
-
-            // then
-            assertThat(notice.getTitle()).isEqualTo(validTitle);
-            assertThat(notice.getContent()).isEqualTo(validContent);
-            assertThat(notice.getType()).isEqualTo(NoticeType.URGENT);
-            assertThat(notice.isPinned()).isTrue();
-            assertThat(notice.getAuthor()).isEqualTo(validAuthor);
-            assertThat(notice.getLab()).isEqualTo(validLab);
-        }
-    }
 
     @Nested
     @DisplayName("비즈니스 로직 검증")
@@ -234,7 +194,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
 
             // when
             notice.pin();
@@ -249,7 +209,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, NoticeType.NORMAL, true, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, NoticeType.NORMAL, true, validAuthor, validLab);
 
             // when
             notice.unpin();
@@ -264,7 +224,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
             boolean initialPinnedState = notice.isPinned();
 
             // when
@@ -286,7 +246,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
 
             // when
             boolean result = notice.isAuthor(validAuthor);
@@ -302,7 +262,7 @@ class LabNoticeTest {
             validAuthor = DomainUserFactory.buildStudentUser();
             User otherAuthor = DomainUserFactory.buildLabMemberUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
 
             // when
             boolean result = notice.isAuthor(otherAuthor);
@@ -317,7 +277,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
 
             // when
             boolean result = notice.belongsToLab(validLab);
@@ -333,7 +293,7 @@ class LabNoticeTest {
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
             Lab otherLab = new Lab("다른랩", LabCategory.DB, "데이터베이스 연구실", "다른교수");
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
 
             // when
             boolean result = notice.belongsToLab(otherLab);
@@ -348,7 +308,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, NoticeType.URGENT, false, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, NoticeType.URGENT, false, validAuthor, validLab);
 
             // when
             boolean result = notice.isUrgent();
@@ -363,7 +323,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, NoticeType.NORMAL, false, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, NoticeType.NORMAL, false, validAuthor, validLab);
 
             // when
             boolean result = notice.isUrgent();
@@ -383,7 +343,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
             String newTitle = "수정된 제목";
 
             // when
@@ -399,7 +359,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
             String newContent = "수정된 내용입니다.";
 
             // when
@@ -415,7 +375,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
             NoticeType newType = NoticeType.URGENT;
 
             // when
@@ -433,7 +393,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
 
             // when & then
             assertThatThrownBy(() -> notice.updateTitle(invalidTitle))
@@ -448,7 +408,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
 
             // when & then
             assertThatThrownBy(() -> notice.updateContent(invalidContent))
@@ -461,7 +421,7 @@ class LabNoticeTest {
             // given
             validAuthor = DomainUserFactory.buildStudentUser();
             validLab = DomainLabFactory.buildAiLab();
-            LabNotice notice = LabNotice.create(validTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, validContent, validAuthor, validLab);
 
             // when & then
             assertThatThrownBy(() -> notice.updateType(null))
@@ -487,7 +447,7 @@ class LabNoticeTest {
             String contentWithSpaces = "  내용  ";
 
             // when
-            LabNotice notice = LabNotice.create(titleWithSpaces, contentWithSpaces, validAuthor, validLab);
+            LabNotice notice = new LabNotice(titleWithSpaces, contentWithSpaces, validAuthor, validLab);
 
             // then
             assertThat(notice.getTitle()).isEqualTo("제목");
@@ -503,7 +463,7 @@ class LabNoticeTest {
             String exactLengthTitle = "a".repeat(100);  // 정확히 100자
 
             // when
-            LabNotice notice = LabNotice.create(exactLengthTitle, validContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(exactLengthTitle, validContent, validAuthor, validLab);
 
             // then
             assertThat(notice.getTitle()).isEqualTo(exactLengthTitle);
@@ -519,7 +479,7 @@ class LabNoticeTest {
             String exactLengthContent = "a".repeat(2000);  // 정확히 2000자
 
             // when
-            LabNotice notice = LabNotice.create(validTitle, exactLengthContent, validAuthor, validLab);
+            LabNotice notice = new LabNotice(validTitle, exactLengthContent, validAuthor, validLab);
 
             // then
             assertThat(notice.getContent()).isEqualTo(exactLengthContent);

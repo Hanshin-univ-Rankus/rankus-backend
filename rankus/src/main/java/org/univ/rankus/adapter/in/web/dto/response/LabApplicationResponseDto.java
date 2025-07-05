@@ -2,7 +2,7 @@ package org.univ.rankus.adapter.in.web.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.univ.rankus.domain.model.lab.LabApplication;
+import org.univ.rankus.domain.model.lab.application.LabApplication;
 
 import java.time.LocalDateTime;
 import java.util.List;

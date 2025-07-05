@@ -1,7 +1,7 @@
 package org.univ.rankus.application.port.in.query;
 
 
-import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
 
 import java.util.List;

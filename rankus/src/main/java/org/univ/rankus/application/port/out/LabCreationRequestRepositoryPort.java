@@ -1,7 +1,7 @@
 package org.univ.rankus.application.port.out;
 
-import org.univ.rankus.domain.model.lab.LabCreationRequest;
-import org.univ.rankus.domain.model.lab.LabCreationStatus;
+import org.univ.rankus.domain.model.lab.creation.LabCreationRequest;
+import org.univ.rankus.domain.model.lab.creation.LabCreationStatus;
 import org.univ.rankus.domain.model.user.User;
 
 import java.util.List;

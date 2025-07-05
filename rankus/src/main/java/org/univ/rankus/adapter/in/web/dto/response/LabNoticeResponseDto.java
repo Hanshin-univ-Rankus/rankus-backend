@@ -2,8 +2,8 @@ package org.univ.rankus.adapter.in.web.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.univ.rankus.domain.model.notice.LabNotice;
-import org.univ.rankus.domain.model.notice.NoticeType;
+import org.univ.rankus.domain.model.lab.notice.LabNotice;
+import org.univ.rankus.domain.model.lab.notice.NoticeType;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.univ.rankus.domain.model.lab;
+package org.univ.rankus.domain.model.lab.application;
 
 /**
  * 랩실 가입 신청 상태

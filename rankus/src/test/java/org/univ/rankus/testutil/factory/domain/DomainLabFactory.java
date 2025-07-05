@@ -1,8 +1,8 @@
 package org.univ.rankus.testutil.factory.domain;
 
 import org.springframework.test.util.ReflectionTestUtils;
-import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.lab.LabCategory;
+import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.lab.core.LabCategory;
 
 /**
  * DomainLabFactory - 순수 도메인 단위 테스트 전용 팩토리

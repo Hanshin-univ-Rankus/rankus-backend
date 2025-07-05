@@ -256,13 +256,13 @@ public enum NoticeErrorCode implements ErrorCode {
 
 ```java
 // 기본 공지사항 생성
-LabNotice notice = LabNoticeTestFactory.createNormalNotice(lab, author);
+LabNotice notice = new LabNotice("제목", "내용", author, lab);
 
 // 긴급 공지사항 생성  
-LabNotice urgentNotice = LabNoticeTestFactory.createUrgentNotice(lab, author);
+LabNotice urgentNotice = new LabNotice("긴급 제목", "긴급 내용", NoticeType.URGENT, false, author, lab);
 
 // 고정 공지사항 생성
-LabNotice pinnedNotice = LabNoticeTestFactory.createPinnedNotice(lab, author);
+LabNotice pinnedNotice = new LabNotice("고정 제목", "고정 내용", NoticeType.NORMAL, true, author, lab);
 ```
 
 ## 🎯 핵심 설계 원칙

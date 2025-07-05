@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.univ.rankus.domain.model.notice.NoticeType;
+import org.univ.rankus.domain.model.lab.notice.NoticeType;
 
 @Getter
 @Builder

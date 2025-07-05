@@ -1,7 +1,7 @@
 package org.univ.rankus.application.port.in.command;
 
-import org.univ.rankus.domain.model.lab.ImageType;
-import org.univ.rankus.domain.model.lab.LabImage;
+import org.univ.rankus.domain.model.lab.core.ImageType;
+import org.univ.rankus.domain.model.lab.core.LabImage;
 
 /**
  * LabImage 도메인에 대한 애플리케이션 서비스 인터페이스

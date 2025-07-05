@@ -6,8 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.univ.rankus.adapter.out.persistence.jpa.SpringDataLabNoticeRepository;
 import org.univ.rankus.application.port.out.LabNoticeRepositoryPort;
-import org.univ.rankus.domain.model.notice.LabNotice;
-import org.univ.rankus.domain.model.notice.NoticeType;
+import org.univ.rankus.domain.model.lab.notice.LabNotice;
+import org.univ.rankus.domain.model.lab.notice.NoticeType;
 
 import java.util.List;
 import java.util.Optional;

@@ -25,8 +25,8 @@ import org.univ.rankus.adapter.in.web.dto.response.PageResponse;
 import org.univ.rankus.application.port.in.command.LabNoticeCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabNoticeQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
-import org.univ.rankus.domain.model.notice.LabNotice;
-import org.univ.rankus.domain.model.notice.NoticeType;
+import org.univ.rankus.domain.model.lab.notice.LabNotice;
+import org.univ.rankus.domain.model.lab.notice.NoticeType;
 
 import java.util.List;
 

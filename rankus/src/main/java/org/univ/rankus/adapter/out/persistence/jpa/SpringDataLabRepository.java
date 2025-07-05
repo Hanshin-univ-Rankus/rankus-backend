@@ -3,7 +3,7 @@ package org.univ.rankus.adapter.out.persistence.jpa;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.lab.core.Lab;
 
 /**
  * 순수 JPA 기반 Lab 저장소

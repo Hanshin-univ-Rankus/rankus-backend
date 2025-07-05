@@ -1,4 +1,4 @@
-package org.univ.rankus.domain.model.lab;
+package org.univ.rankus.domain.model.lab.core;
 
 /**
  * 랩실 이미지 종류

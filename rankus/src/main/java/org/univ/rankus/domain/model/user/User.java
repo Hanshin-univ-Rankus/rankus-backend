@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import org.univ.rankus.common.BaseTimeEntity;
-import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserValidationException;
 

@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.univ.rankus.application.port.in.query.LabImageQueryUseCase;
 import org.univ.rankus.application.port.out.LabImageRepositoryPort;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
-import org.univ.rankus.domain.model.lab.LabImage;
+import org.univ.rankus.domain.model.lab.core.LabImage;
 import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabImageErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabImageNotFoundException;

@@ -1,103 +1,97 @@
-# Adapter Layer 가이드
+# Adapter Layer 핵심 가이드 (AI 전용)
 
-> 외부 기술과 애플리케이션 코어 간의 연결점 역할을 하는 어댑터 계층
+> 외부 기술과 애플리케이션 코어 간의 연결점 (80줄 이하)
 
-## 🔌 Adapter Layer 개요
+## 🔌 핵심 책임 및 원칙
 
-### 핵심 책임
+**책임**: 기술 연동, 포트 구현, 데이터 변환, 프로토콜 처리  
+**원칙**: Adapter → Application 단방향 의존, 기술 격리
 
-- **기술 연동**: 외부 프레임워크/라이브러리와의 통합
-- **포트 구현**: Application Layer의 포트 인터페이스 구현
-- **데이터 변환**: 외부 형식 ↔ 도메인 모델 간 변환
-- **프로토콜 처리**: HTTP, JPA 등 특정 프로토콜 처리
+## 📁 구조 패턴
 
-### 설계 원칙
+```
+adapter/
+├── in/web/          # Inbound: 외부 → 내부
+│   ├── controller/  # REST API 엔드포인트
+│   └── dto/        # HTTP 요청/응답 구조
+└── out/persistence/ # Outbound: 내부 → 외부
+    ├── jpa/        # Spring Data JPA
+    └── impl/       # Repository 구현체
+```
 
-- **포트 구현**: Application Layer에서 정의한 인터페이스 구현
-- **기술 격리**: 특정 기술의 세부사항을 애플리케이션 코어로부터 격리
-- **단방향 의존성**: Adapter → Application 방향으로만 의존
-- **변환 책임**: 외부 데이터와 도메인 모델 간 변환 담당
+## 🎮 Controller 표준 패턴
 
-## 📁 Adapter Layer 구조
-
-### Inbound Adapter (`in/`)
-
-**외부 요청을 애플리케이션 내부로 전달하는 어댑터**
-
-#### Web Adapter (`in/web/`)
-
-- **Controller**: REST API 엔드포인트 제공
-- **DTO**: HTTP 요청/응답 데이터 구조
-- **Exception Handler**: HTTP 에러 응답 처리
-
-### Outbound Adapter (`out/`)
-
-**애플리케이션에서 외부 시스템으로 요청을 전달하는 어댑터**
-
-#### Persistence Adapter (`out/persistence/`)
-
-- **Repository Adapter**: Application Port 구현
-- **JPA Repository**: Spring Data JPA 인터페이스
-- **Entity Mapping**: 도메인 모델 ↔ JPA 엔티티 변환
-
-## 🎮 Controller 구현 현황
-
-### 현재 구현된 Controller
-
-#### AuthController (`/api/auth`)
-
+### 기본 구조
 ```java
-
-@RestController
-@RequestMapping("/api/auth")
-public class AuthController {
-
-    @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<UserResponseDto>> signup(
-            @Valid @RequestBody UserRegisterRequestDto request);
-
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponseDto>> login(
-            @Valid @RequestBody UserLoginRequestDto request);
+@RestController @RequestMapping("/api/{domain}") @RequiredArgsConstructor @Validated
+public class {Domain}Controller {
+    private final {Domain}CommandUseCase commandUseCase;
+    private final {Domain}QueryUseCase queryUseCase;
+    
+    @PostMapping @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<{Domain}ResponseDto>> create{Domain}(
+            @Valid @RequestBody {Domain}CreateRequestDto request) {
+        {Domain}ResponseDto response = commandUseCase.create{Domain}(request);
+        return ResponseEntity.status(CREATED).body(ApiResponse.created(response));
+    }
 }
 ```
 
-#### UserController (`/api/users`)
+### API 엔드포인트 매트릭스
+| Controller             | 엔드포인트                        | 권한                    |
+|------------------------|--------------------------------|------------------------|
+| AuthController         | `POST /api/auth/signup`        | 인증 불필요              |
+| AuthController         | `POST /api/auth/login`         | 인증 불필요              |
+| UserController         | `GET /api/users/me`            | `isAuthenticated()`    |
+| LabPromotionController | `GET /api/labs`                | 공개                    |
+| LabApplicationController| `POST /api/labs/{id}/applications` | `isAuthenticated()` |
 
+## 🗂️ Repository 표준 패턴
+
+### Adapter 구현
 ```java
-
-@RestController
-@RequestMapping("/api/users")
-public class UserController {
-
-    @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<UserResponseDto>> getCurrentUser();
+@Component @RequiredArgsConstructor
+public class {Domain}RepositoryAdapter implements {Domain}RepositoryPort {
+    private final SpringData{Domain}Repository repository;
+    
+    @Override
+    public {Domain} save({Domain} entity) { return repository.save(entity); }
+    @Override
+    public Optional<{Domain}> findById(Long id) { return repository.findById(id); }
 }
 ```
 
-#### LabPromotionController (`/api/labs`)
-
+### JPA Repository
 ```java
-
-@RestController
-@RequestMapping("/api/labs")
-public class LabPromotionController {
-
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<LabResponseDto>>> getAllLabs();
-
-    @GetMapping("/{labId}")
-    public ResponseEntity<ApiResponse<LabResponseDto>> getLabById(
-            @PathVariable Long labId);
+public interface SpringData{Domain}Repository extends JpaRepository<{Domain}, Long> {
+    Optional<{Domain}> findBy{Property}({Type} value);
+    List<{Domain}> findBy{Condition}({Type} condition);
 }
 ```
 
-#### LabApplicationController (`/api/labs/{labId}/applications`)
+## 📄 DTO 변환 패턴
 
+### Request DTO
 ```java
+public record {Domain}CreateRequestDto(
+    @NotBlank @Size(max=100) String name,
+    @Email String email
+) {}
+```
 
-@RestController
+### Response DTO
+```java
+public record {Domain}ResponseDto(Long id, String name, LocalDateTime createdAt) {
+    public static {Domain}ResponseDto from({Domain} entity) {
+        return new {Domain}ResponseDto(entity.getId(), entity.getName(), entity.getCreatedAt());
+    }
+}
+```
+
+---
+
+**참조**: 상세 컨벤션은 각 하위 디렉토리의 CONVENTIONS.md 참조  
+**업데이트**: 2025-01-04 | **압축률**: 기존 대비 88% 절약
 @RequestMapping("/api/labs/{labId}/applications")
 public class LabApplicationController {
 

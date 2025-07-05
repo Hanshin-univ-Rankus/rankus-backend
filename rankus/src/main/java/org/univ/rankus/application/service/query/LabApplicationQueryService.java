@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 import org.univ.rankus.application.port.out.LabApplicationRepositoryPort;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
-import org.univ.rankus.domain.model.lab.LabApplication;
+import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.lab.exception.LabApplicationErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabApplicationNotFoundException;
 import org.univ.rankus.domain.model.lab.exception.LabErrorCode;

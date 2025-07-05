@@ -2,8 +2,8 @@ package org.univ.rankus.application.port.out;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.univ.rankus.domain.model.notice.LabNotice;
-import org.univ.rankus.domain.model.notice.NoticeType;
+import org.univ.rankus.domain.model.lab.notice.LabNotice;
+import org.univ.rankus.domain.model.lab.notice.NoticeType;
 
 import java.util.List;
 import java.util.Optional;

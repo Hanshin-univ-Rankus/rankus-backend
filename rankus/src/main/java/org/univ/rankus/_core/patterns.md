@@ -1,4 +1,8 @@
-# 공통 코드 패턴
+# 공통 코드 패턴 (상세 가이드)
+
+> 📋 **AI 최적화 가이드**: @core/ai-essentials.md (AI 개발자 우선 참조)  
+> 📄 **코드 템플릿**: @core/code-templates.md (복사-붙여넣기용)  
+> ⚠️ **예외 관리**: @core/error-codes.md (ErrorCode 중앙 관리)
 
 ## 🏗️ 클래스 구조 템플릿
 

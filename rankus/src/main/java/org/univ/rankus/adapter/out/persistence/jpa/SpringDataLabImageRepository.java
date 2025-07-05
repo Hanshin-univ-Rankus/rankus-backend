@@ -2,8 +2,8 @@ package org.univ.rankus.adapter.out.persistence.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.univ.rankus.domain.model.lab.ImageType;
-import org.univ.rankus.domain.model.lab.LabImage;
+import org.univ.rankus.domain.model.lab.core.ImageType;
+import org.univ.rankus.domain.model.lab.core.LabImage;
 
 import java.util.List;
 

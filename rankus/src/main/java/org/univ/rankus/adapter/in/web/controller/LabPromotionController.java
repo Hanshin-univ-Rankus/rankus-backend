@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;
 import org.univ.rankus.adapter.in.web.dto.response.LabResponseDto;
 import org.univ.rankus.application.port.in.query.LabPromotionQueryUseCase;
-import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.lab.core.Lab;
 
 import java.util.List;
 

@@ -2,9 +2,9 @@ package org.univ.rankus.testutil.factory.integration;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.univ.rankus.application.port.out.LabImageRepositoryPort;
-import org.univ.rankus.domain.model.lab.ImageType;
-import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.lab.LabImage;
+import org.univ.rankus.domain.model.lab.core.ImageType;
+import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.lab.core.LabImage;
 import org.univ.rankus.testutil.factory.domain.DomainLabImageFactory;
 
 /**

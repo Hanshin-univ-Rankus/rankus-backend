@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.univ.rankus.adapter.out.persistence.jpa.SpringDataLabApplicationRepository;
 import org.univ.rankus.application.port.out.LabApplicationRepositoryPort;
-import org.univ.rankus.domain.model.lab.LabApplication;
+import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.user.User;
 
 import java.util.List;

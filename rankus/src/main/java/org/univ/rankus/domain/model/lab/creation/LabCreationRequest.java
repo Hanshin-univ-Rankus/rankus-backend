@@ -1,4 +1,4 @@
-package org.univ.rankus.domain.model.lab;
+package org.univ.rankus.domain.model.lab.creation;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import org.univ.rankus.common.BaseTimeEntity;
-import org.univ.rankus.domain.model.lab.exception.LabCreationRequestErrorCode;
-import org.univ.rankus.domain.model.lab.exception.LabCreationRequestValidationException;
+import org.univ.rankus.domain.model.lab.core.LabCategory;
 import org.univ.rankus.domain.model.user.User;
 
 import java.time.LocalDateTime;

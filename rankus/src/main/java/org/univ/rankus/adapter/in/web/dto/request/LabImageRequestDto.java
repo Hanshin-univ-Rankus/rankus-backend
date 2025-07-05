@@ -3,7 +3,7 @@ package org.univ.rankus.adapter.in.web.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import org.univ.rankus.domain.model.lab.ImageType;
+import org.univ.rankus.domain.model.lab.core.ImageType;
 
 /**
  * LabImage 등록 시 요청 파라미터를 받기 위한 DTO

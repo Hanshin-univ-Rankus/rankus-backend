@@ -1,4 +1,4 @@
-package org.univ.rankus.domain.model.notice;
+package org.univ.rankus.domain.model.lab.notice;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import org.univ.rankus.common.BaseTimeEntity;
-import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.notice.exception.NoticeErrorCode;
-import org.univ.rankus.domain.model.notice.exception.NoticeValidationException;
+import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.lab.notice.exception.NoticeErrorCode;
+import org.univ.rankus.domain.model.lab.notice.exception.NoticeValidationException;
 import org.univ.rankus.domain.model.user.User;
 
 @Getter
@@ -60,14 +60,6 @@ public class LabNotice extends BaseTimeEntity {
         this.lab = validateLab(lab);
     }
 
-    // Factory methods for better API
-    public static LabNotice create(String title, String content, User author, Lab lab) {
-        return new LabNotice(title, content, author, lab);
-    }
-
-    public static LabNotice create(String title, String content, NoticeType type, boolean pinned, User author, Lab lab) {
-        return new LabNotice(title, content, type, pinned, author, lab);
-    }
 
     private String validateTitle(String title) {
         if (!StringUtils.hasText(title)) {

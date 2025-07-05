@@ -18,9 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.univ.rankus.application.port.in.command.LabApplicationCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
-import org.univ.rankus.domain.model.lab.ApplicationStatus;
-import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.lab.LabApplication;
+import org.univ.rankus.domain.model.lab.application.ApplicationStatus;
+import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.lab.exception.*;
 import org.univ.rankus.domain.model.user.User;
 

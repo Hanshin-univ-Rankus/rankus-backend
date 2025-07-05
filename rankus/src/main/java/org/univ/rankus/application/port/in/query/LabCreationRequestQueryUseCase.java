@@ -1,7 +1,8 @@
 package org.univ.rankus.application.port.in.query;
 
-import org.univ.rankus.domain.model.lab.LabCreationRequest;
-import org.univ.rankus.domain.model.lab.LabCreationStatus;
+import org.univ.rankus.domain.model.lab.creation.LabCreationRequest;
+import org.univ.rankus.domain.model.lab.creation.LabCreationRequestNotFoundException;
+import org.univ.rankus.domain.model.lab.creation.LabCreationStatus;
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public interface LabCreationRequestQueryUseCase {
      *
      * @param requestId 조회할 신청 ID
      * @return LabCreationRequest 엔티티
-     * @throws org.univ.rankus.domain.model.lab.exception.LabCreationRequestNotFoundException 신청을 찾을 수 없는 경우
+     * @throws LabCreationRequestNotFoundException 신청을 찾을 수 없는 경우
      */
     LabCreationRequest getLabCreationRequestById(Long requestId);
 

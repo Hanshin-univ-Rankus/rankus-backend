@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.univ.rankus.application.port.in.command.LabImageCommandUseCase;
 import org.univ.rankus.application.port.out.LabImageRepositoryPort;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
-import org.univ.rankus.domain.model.lab.ImageType;
-import org.univ.rankus.domain.model.lab.LabImage;
+import org.univ.rankus.domain.model.lab.core.ImageType;
+import org.univ.rankus.domain.model.lab.core.LabImage;
 import org.univ.rankus.domain.model.lab.exception.*;
 
 @Service

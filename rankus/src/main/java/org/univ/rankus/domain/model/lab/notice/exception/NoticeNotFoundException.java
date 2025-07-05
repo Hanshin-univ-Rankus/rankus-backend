@@ -1,4 +1,4 @@
-package org.univ.rankus.domain.model.notice.exception;
+package org.univ.rankus.domain.model.lab.notice.exception;
 
 public class NoticeNotFoundException extends NoticeException {
 

@@ -2,9 +2,9 @@ package org.univ.rankus.adapter.in.web.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.univ.rankus.domain.model.lab.LabCategory;
-import org.univ.rankus.domain.model.lab.LabCreationRequest;
-import org.univ.rankus.domain.model.lab.LabCreationStatus;
+import org.univ.rankus.domain.model.lab.core.LabCategory;
+import org.univ.rankus.domain.model.lab.creation.LabCreationRequest;
+import org.univ.rankus.domain.model.lab.creation.LabCreationStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

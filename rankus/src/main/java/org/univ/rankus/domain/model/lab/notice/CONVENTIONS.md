@@ -51,9 +51,6 @@ public class LabNotice extends BaseTimeEntity {
         validate();
     }
 
-    public static LabNotice create(...) {
-        return new LabNotice(...);
-    }
 
     public void update(String title, String content, NoticeType type) { ... }
     public void pin() { this.isPinned = true; }
@@ -223,7 +220,7 @@ public boolean canBeModifiedBy(User user) {
 ```java
 @Test
 void 유효한_정보로_공지사항_생성() {
-    LabNotice notice = LabNotice.create(
+    LabNotice notice = new LabNotice(
         "공지 제목", "공지 내용", NORMAL, author, lab
     );
     assertThat(notice.getTitle()).isEqualTo("공지 제목");
@@ -233,7 +230,7 @@ void 유효한_정보로_공지사항_생성() {
 
 @Test
 void 빈_제목_공지사항_생성_예외() {
-    assertThatThrownBy(() -> LabNotice.create(
+    assertThatThrownBy(() -> new LabNotice(
         "", "공지 내용", NORMAL, author, lab
     )).isInstanceOf(NoticeValidationException.class);
 }
@@ -299,7 +296,7 @@ void 랩실_멤버_타랩실_공지_수정_권한_없음() {
 2. **검증 우선**: 모든 입력값 검증 후 상태 변경
 3. **명확한 예외**: 구체적 ErrorCode 사용
 4. **캡슐화**: private 구현, public 인터페이스
-5. **팩토리 패턴**: 정적 메서드 생성
+5. **생성자 패턴**: 직접 생성자 사용
 6. **권한 기반**: 메서드 레벨 권한 확인
 7. **연관관계**: 지연 로딩으로 성능 최적화
 8. **비즈니스 로직**: 엔티티 내부 구현으로 응집성 확보

@@ -1,7 +1,7 @@
 package org.univ.rankus.application.port.out;
 
-import org.univ.rankus.domain.model.lab.ImageType;
-import org.univ.rankus.domain.model.lab.LabImage;
+import org.univ.rankus.domain.model.lab.core.ImageType;
+import org.univ.rankus.domain.model.lab.core.LabImage;
 
 import java.util.List;
 import java.util.Optional;

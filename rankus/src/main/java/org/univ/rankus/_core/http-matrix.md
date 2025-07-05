@@ -1,5 +1,8 @@
 # HTTP 상태코드 및 권한 매트릭스
 
+> 📋 **AI 핵심 가이드**: @core/ai-essentials.md (기본 HTTP 패턴 포함)  
+> ⚠️ **ErrorCode 관리**: @core/error-codes.md (상태코드별 ErrorCode 할당)
+
 ## 📊 HTTP 상태코드 매트릭스
 
 ### 성공 응답 (2xx)

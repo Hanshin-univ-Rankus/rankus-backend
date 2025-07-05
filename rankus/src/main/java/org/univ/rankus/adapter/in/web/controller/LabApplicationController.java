@@ -21,7 +21,7 @@ import org.univ.rankus.adapter.in.web.dto.response.LabApplicationResponseDto;
 import org.univ.rankus.application.port.in.command.LabApplicationCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
-import org.univ.rankus.domain.model.lab.LabApplication;
+import org.univ.rankus.domain.model.lab.application.LabApplication;
 
 import java.net.URI;
 import java.util.List;

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
-import org.univ.rankus.domain.model.lab.LabApplication;
+import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.user.User;
 
 import java.io.Serializable;

@@ -6,8 +6,8 @@ import org.univ.rankus.application.port.in.query.LabImageQueryUseCase;
 import org.univ.rankus.application.port.in.query.LabPromotionQueryUseCase;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
-import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.lab.LabImage;
+import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.lab.core.LabImage;
 import org.univ.rankus.domain.model.user.User;
 
 import java.io.Serializable;

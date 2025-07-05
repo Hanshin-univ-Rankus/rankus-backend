@@ -2,7 +2,7 @@ package org.univ.rankus.adapter.out.persistence.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.univ.rankus.domain.model.lab.LabApplication;
+import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.user.User;
 
 import java.util.List;

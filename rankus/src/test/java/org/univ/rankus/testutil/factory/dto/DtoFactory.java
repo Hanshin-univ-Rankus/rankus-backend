@@ -7,7 +7,7 @@ import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
 import org.univ.rankus.adapter.in.web.dto.response.LabApplicationResponseDto;
 import org.univ.rankus.adapter.in.web.dto.response.LabResponseDto;
 import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
-import org.univ.rankus.domain.model.lab.ApplicationStatus;
+import org.univ.rankus.domain.model.lab.application.ApplicationStatus;
 import org.univ.rankus.domain.model.user.Role;
 
 import java.time.LocalDateTime;

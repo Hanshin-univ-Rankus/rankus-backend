@@ -2,7 +2,7 @@ package org.univ.rankus.testutil.factory.integration;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
-import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
 
 /**
@@ -25,12 +25,12 @@ public final class IntegrationLabFactory {
         return lab;
     }
 
-    public static Lab persistCustomLab(LabRepositoryPort repo, String name, org.univ.rankus.domain.model.lab.LabCategory category, String desc, String prof) {
+    public static Lab persistCustomLab(LabRepositoryPort repo, String name, org.univ.rankus.domain.model.lab.core.LabCategory category, String desc, String prof) {
         Lab lab = DomainLabFactory.buildCustomLab(name, category, desc, prof);
         return repo.save(lab);
     }
 
-    public static Lab persistCustomLab(TestEntityManager em, String name, org.univ.rankus.domain.model.lab.LabCategory category, String desc, String prof) {
+    public static Lab persistCustomLab(TestEntityManager em, String name, org.univ.rankus.domain.model.lab.core.LabCategory category, String desc, String prof) {
         Lab lab = DomainLabFactory.buildCustomLab(name, category, desc, prof);
         em.persist(lab);
         em.flush();

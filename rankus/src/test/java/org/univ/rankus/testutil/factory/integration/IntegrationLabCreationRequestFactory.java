@@ -1,8 +1,8 @@
 package org.univ.rankus.testutil.factory.integration;
 
 import org.univ.rankus.application.port.out.LabCreationRequestRepositoryPort;
-import org.univ.rankus.domain.model.lab.LabCategory;
-import org.univ.rankus.domain.model.lab.LabCreationRequest;
+import org.univ.rankus.domain.model.lab.core.LabCategory;
+import org.univ.rankus.domain.model.lab.creation.LabCreationRequest;
 import org.univ.rankus.domain.model.user.User;
 
 /**

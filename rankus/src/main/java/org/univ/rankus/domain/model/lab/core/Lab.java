@@ -1,4 +1,4 @@
-package org.univ.rankus.domain.model.lab;
+package org.univ.rankus.domain.model.lab.core;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

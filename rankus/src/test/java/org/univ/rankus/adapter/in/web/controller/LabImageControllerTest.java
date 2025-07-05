@@ -14,9 +14,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.univ.rankus.application.port.in.command.LabImageCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabImageQueryUseCase;
-import org.univ.rankus.domain.model.lab.ImageType;
-import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.lab.LabImage;
+import org.univ.rankus.domain.model.lab.core.ImageType;
+import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.lab.core.LabImage;
 import org.univ.rankus.domain.model.lab.exception.*;
 
 import java.util.HashMap;

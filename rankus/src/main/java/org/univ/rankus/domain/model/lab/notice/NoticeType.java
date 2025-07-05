@@ -1,4 +1,4 @@
-package org.univ.rankus.domain.model.notice;
+package org.univ.rankus.domain.model.lab.notice;
 
 public enum NoticeType {
     NORMAL("일반 공지"),

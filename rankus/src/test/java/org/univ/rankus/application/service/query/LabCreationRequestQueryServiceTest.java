@@ -9,9 +9,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.univ.rankus.application.port.out.LabCreationRequestRepositoryPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
-import org.univ.rankus.domain.model.lab.LabCreationRequest;
-import org.univ.rankus.domain.model.lab.LabCreationStatus;
-import org.univ.rankus.domain.model.lab.exception.LabCreationRequestNotFoundException;
+import org.univ.rankus.domain.model.lab.creation.LabCreationRequest;
+import org.univ.rankus.domain.model.lab.creation.LabCreationStatus;
+import org.univ.rankus.domain.model.lab.creation.LabCreationRequestNotFoundException;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
@@ -93,7 +93,7 @@ class LabCreationRequestQueryServiceTest {
             LabCreationStatus status = LabCreationStatus.PENDING;
             List<LabCreationRequest> pendingRequests = Arrays.asList(
                     DomainLabCreationRequestFactory.buildValidPendingRequest(),
-                    DomainLabCreationRequestFactory.buildRequestWithCategory(org.univ.rankus.domain.model.lab.LabCategory.DB)
+                    DomainLabCreationRequestFactory.buildRequestWithCategory(org.univ.rankus.domain.model.lab.core.LabCategory.DB)
             );
 
             when(labCreationRequestRepositoryPort.findByStatusOrderByCreatedAtDesc(status)).thenReturn(pendingRequests);
@@ -284,7 +284,7 @@ class LabCreationRequestQueryServiceTest {
             // given
             List<LabCreationRequest> pendingRequests = Arrays.asList(
                     DomainLabCreationRequestFactory.buildValidPendingRequest(),
-                    DomainLabCreationRequestFactory.buildRequestWithCategory(org.univ.rankus.domain.model.lab.LabCategory.SECURITY),
+                    DomainLabCreationRequestFactory.buildRequestWithCategory(org.univ.rankus.domain.model.lab.core.LabCategory.SECURITY),
                     DomainLabCreationRequestFactory.buildAiLabRequest()
             );
 

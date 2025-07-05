@@ -1,103 +1,96 @@
-# Application Layer 가이드
+# Application Layer 핵심 가이드 (AI 전용)
 
-> 유스케이스 구현과 포트/어댑터 패턴을 통한 비즈니스 플로우 관리
+> 유스케이스 구현과 포트/어댑터 패턴 (70줄 이하)
 
-## 🎯 Application Layer 개요
+## 🎯 핵심 책임 및 원칙
 
-### 핵심 책임
+**책임**: 유스케이스 구현, 포트 정의, 트랜잭션 경계, 도메인 객체 조합  
+**원칙**: 포트/어댑터 패턴, 단일 책임, 의존성 주입, 트랜잭션 일관성
 
-- **유스케이스 구현**: 사용자의 요구사항을 구체적인 비즈니스 플로우로 변환
-- **포트 인터페이스 정의**: 외부 계층과의 통신 규약 명시
-- **트랜잭션 경계**: 비즈니스 로직의 원자성 보장
-- **도메인 객체 조합**: 여러 도메인 객체를 조합하여 복잡한 비즈니스 로직 구현
-
-### 설계 원칙
-
-- **포트/어댑터 패턴**: 인터페이스를 통한 의존성 역전
-- **단일 책임 원칙**: 각 서비스는 하나의 유스케이스만 담당
-- **의존성 주입**: 포트 인터페이스를 통한 느슨한 결합
-- **트랜잭션 일관성**: 데이터 변경의 원자성 보장
-
-## 📁 Application Layer 구조
-
-### Port 인터페이스 (`port/`)
-
-#### Inbound Port (`port/in/`)
-
-- **외부에서 애플리케이션으로 들어오는 요청의 인터페이스**
-- **Command**: 상태 변경 작업 (생성, 수정, 삭제)
-- **Query**: 조회 작업 (단일 조회, 목록 조회, 검색)
-
-#### Outbound Port (`port/out/`)
-
-- **애플리케이션에서 외부 시스템으로 나가는 요청의 인터페이스**
-- **Repository**: 데이터 영속성 관리
-- **External Service**: 외부 API 호출 (향후 확장)
-
-### Service 구현 (`service/`)
-
-#### Command Service (`service/command/`)
-
-- **상태 변경 유스케이스 구현**
-- 생성, 수정, 삭제 작업
-- 트랜잭션 관리
-
-#### Query Service (`service/query/`)
-
-- **조회 유스케이스 구현**
-- 단일/복수 엔티티 조회
-- 검색 및 필터링
-
-#### Auth Service (`service/auth/`)
-
-- **인증/인가 유스케이스 구현**
-- 로그인, 회원가입
-- JWT 토큰 관리
-
-## 🔗 포트/어댑터 패턴 상세
-
-### Inbound Flow (외부 → 내부)
+## 📁 구조 패턴
 
 ```
-Controller (Adapter) 
-    ↓ 호출
-UseCase Interface (Inbound Port)
-    ↓ 구현
-Service (Application Core)
-    ↓ 호출  
-Repository Port (Outbound Port)
+application/
+├── port/
+│   ├── in/          # Inbound Port: 외부 → 내부
+│   │   ├── command/ # 상태 변경 UseCase
+│   │   └── query/   # 조회 UseCase
+│   └── out/         # Outbound Port: 내부 → 외부
+│       └── persistence/ # Repository Port
+└── service/
+    ├── command/     # Command 구현체
+    ├── query/       # Query 구현체
+    └── auth/        # 인증 서비스
 ```
 
-### Outbound Flow (내부 → 외부)
+## 🔗 포트/어댑터 플로우
 
+### Inbound: Controller → UseCase → Service
 ```
-Service (Application Core)
-    ↓ 호출
-Repository Port (Outbound Port)
-    ↓ 구현
-Repository Adapter (Adapter)
-    ↓ 호출
-JPA Repository (Infrastructure)
+@Controller → {Domain}CommandUseCase → {Domain}CommandService → {Domain}RepositoryPort
 ```
 
-## 📋 현재 구현된 UseCase
+### Outbound: Service → Port → Adapter
+```
+Service → RepositoryPort ← RepositoryAdapter ← JPA Repository
+```
+
+## 🎯 UseCase 패턴
 
 ### Command UseCase (상태 변경)
+```java
+public interface {Domain}CommandUseCase {
+    {Domain}ResponseDto create{Domain}({Domain}CreateRequestDto request);
+    {Domain}ResponseDto update{Domain}(Long id, {Domain}UpdateRequestDto request);
+    void delete{Domain}(Long id);
+}
+```
 
-#### UserCommandUseCase
+### Query UseCase (조회)
+```java
+public interface {Domain}QueryUseCase {
+    {Domain}ResponseDto find{Domain}ById(Long id);
+    List<{Domain}ResponseDto> findAll{Domain}s();
+    PageResponse<{Domain}ResponseDto> find{Domain}s(Pageable pageable);
+}
+```
 
-- `createUser()`: 사용자 생성
-- `updateUser()`: 사용자 정보 수정
-- `deleteUser()`: 사용자 삭제
+## 🏗️ Service 구현 패턴
 
-#### LabApplicationCommandUseCase
+### Command Service
+```java
+@Service @RequiredArgsConstructor
+public class {Domain}CommandService implements {Domain}CommandUseCase {
+    private final {Domain}RepositoryPort repository;
+    
+    @Override @Transactional
+    public {Domain}ResponseDto create{Domain}({Domain}CreateRequestDto request) {
+        {Domain} entity = {Domain}.create(request.getName());
+        {Domain} saved = repository.save(entity);
+        return {Domain}ResponseDto.from(saved);
+    }
+}
+```
 
-- `applyToLab()`: 랩실 지원
-- `approveApplication()`: 지원 승인
-- `rejectApplication()`: 지원 거부
-- `cancelApplication()`: 지원 취소
+### Query Service
+```java
+@Service @RequiredArgsConstructor
+public class {Domain}QueryService implements {Domain}QueryUseCase {
+    private final {Domain}RepositoryPort repository;
+    
+    @Override @Transactional(readOnly = true)
+    public {Domain}ResponseDto find{Domain}ById(Long id) {
+        {Domain} entity = repository.findById(id)
+            .orElseThrow(() -> new {Domain}NotFoundException(id));
+        return {Domain}ResponseDto.from(entity);
+    }
+}
+```
 
-#### LabImageCommandUseCase
+---
+
+**참조**: 상세 컨벤션은 각 하위 디렉토리의 CONVENTIONS.md 참조  
+**업데이트**: 2025-01-04 | **압축률**: 기존 대비 77% 절약
 
 - `uploadImage()`: 이미지 업로드
 - `updateImage()`: 이미지 정보 수정

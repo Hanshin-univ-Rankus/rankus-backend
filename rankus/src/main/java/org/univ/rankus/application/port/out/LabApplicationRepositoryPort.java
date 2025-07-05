@@ -1,6 +1,6 @@
 package org.univ.rankus.application.port.out;
 
-import org.univ.rankus.domain.model.lab.LabApplication;
+import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.user.User;
 
 import java.util.List;

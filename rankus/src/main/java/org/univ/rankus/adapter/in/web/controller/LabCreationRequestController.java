@@ -21,7 +21,7 @@ import org.univ.rankus.adapter.in.web.dto.response.LabCreationRequestResponseDto
 import org.univ.rankus.application.port.in.command.LabCreationRequestCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabCreationRequestQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
-import org.univ.rankus.domain.model.lab.LabCreationRequest;
+import org.univ.rankus.domain.model.lab.creation.LabCreationRequest;
 
 import java.net.URI;
 import java.util.List;

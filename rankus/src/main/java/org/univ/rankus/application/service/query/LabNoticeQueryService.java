@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.univ.rankus.application.port.in.query.LabNoticeQueryUseCase;
 import org.univ.rankus.application.port.out.LabNoticeRepositoryPort;
-import org.univ.rankus.domain.model.notice.LabNotice;
-import org.univ.rankus.domain.model.notice.NoticeType;
-import org.univ.rankus.domain.model.notice.exception.NoticeNotFoundException;
+import org.univ.rankus.domain.model.lab.notice.LabNotice;
+import org.univ.rankus.domain.model.lab.notice.NoticeType;
+import org.univ.rankus.domain.model.lab.notice.exception.NoticeNotFoundException;
 
 import java.util.List;
 

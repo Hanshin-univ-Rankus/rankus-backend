@@ -2,8 +2,8 @@ package org.univ.rankus.testutil.factory.integration;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.univ.rankus.application.port.out.LabApplicationRepositoryPort;
-import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.lab.LabApplication;
+import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.testutil.factory.domain.DomainLabApplicationFactory;
 
@@ -29,12 +29,12 @@ public final class IntegrationLabApplicationFactory {
         return app;
     }
 
-    public static LabApplication persistWithStatus(LabApplicationRepositoryPort repo, Lab lab, User user, LocalDateTime time, org.univ.rankus.domain.model.lab.ApplicationStatus status) {
+    public static LabApplication persistWithStatus(LabApplicationRepositoryPort repo, Lab lab, User user, LocalDateTime time, org.univ.rankus.domain.model.lab.application.ApplicationStatus status) {
         LabApplication app = DomainLabApplicationFactory.buildWithStatus(lab, user, status);
         return repo.save(app);
     }
 
-    public static LabApplication persistWithStatus(TestEntityManager em, Lab lab, User user, LocalDateTime time, org.univ.rankus.domain.model.lab.ApplicationStatus status) {
+    public static LabApplication persistWithStatus(TestEntityManager em, Lab lab, User user, LocalDateTime time, org.univ.rankus.domain.model.lab.application.ApplicationStatus status) {
         LabApplication app = DomainLabApplicationFactory.buildWithStatus(lab, user, status);
         em.persist(app);
         em.flush();

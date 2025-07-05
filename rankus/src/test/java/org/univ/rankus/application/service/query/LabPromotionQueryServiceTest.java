@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
-import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
 

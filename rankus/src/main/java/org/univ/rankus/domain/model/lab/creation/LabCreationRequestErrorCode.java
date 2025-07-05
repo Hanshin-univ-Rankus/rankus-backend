@@ -1,4 +1,4 @@
-package org.univ.rankus.domain.model.lab.exception;
+package org.univ.rankus.domain.model.lab.creation;
 
 import org.springframework.http.HttpStatus;
 import org.univ.rankus.common.exception.ErrorCode;

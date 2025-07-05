@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.lab.core.LabCategory;
 import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabValidationException;
 import org.univ.rankus.testutil.factory.domain.DomainLabFactory;

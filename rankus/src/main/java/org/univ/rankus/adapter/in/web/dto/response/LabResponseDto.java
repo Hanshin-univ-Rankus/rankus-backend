@@ -2,7 +2,7 @@ package org.univ.rankus.adapter.in.web.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.univ.rankus.domain.model.lab.Lab;
+import org.univ.rankus.domain.model.lab.core.Lab;
 
 import java.util.List;
 import java.util.stream.Collectors;

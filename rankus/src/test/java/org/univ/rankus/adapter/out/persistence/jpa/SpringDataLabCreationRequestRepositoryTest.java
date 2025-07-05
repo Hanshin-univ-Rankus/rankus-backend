@@ -10,9 +10,9 @@ import org.univ.rankus.adapter.out.persistence.impl.LabCreationRequestRepository
 import org.univ.rankus.adapter.out.persistence.impl.UserRepositoryAdapter;
 import org.univ.rankus.application.port.out.LabCreationRequestRepositoryPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
-import org.univ.rankus.domain.model.lab.LabCategory;
-import org.univ.rankus.domain.model.lab.LabCreationRequest;
-import org.univ.rankus.domain.model.lab.LabCreationStatus;
+import org.univ.rankus.domain.model.lab.core.LabCategory;
+import org.univ.rankus.domain.model.lab.creation.LabCreationRequest;
+import org.univ.rankus.domain.model.lab.creation.LabCreationStatus;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.testutil.config.BaseRepositoryTest;
 import org.univ.rankus.testutil.factory.integration.IntegrationLabCreationRequestFactory;

@@ -1,10 +1,11 @@
-package org.univ.rankus.domain.model.lab;
+package org.univ.rankus.domain.model.lab.application;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.univ.rankus.common.BaseTimeEntity;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.exception.LabApplicationErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabApplicationValidationException;
 import org.univ.rankus.domain.model.lab.exception.LabErrorCode;

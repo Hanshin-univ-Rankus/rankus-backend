@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.univ.rankus.adapter.out.persistence.impl.LabRepositoryAdapter;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
-import org.univ.rankus.domain.model.lab.Lab;
-import org.univ.rankus.domain.model.lab.LabCategory;
+import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.lab.core.LabCategory;
 import org.univ.rankus.testutil.config.BaseRepositoryTest;
 import org.univ.rankus.testutil.factory.integration.IntegrationLabFactory;
 

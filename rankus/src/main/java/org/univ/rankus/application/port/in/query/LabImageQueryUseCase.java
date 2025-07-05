@@ -1,6 +1,6 @@
 package org.univ.rankus.application.port.in.query;
 
-import org.univ.rankus.domain.model.lab.LabImage;
+import org.univ.rankus.domain.model.lab.core.LabImage;
 
 import java.util.List;
 

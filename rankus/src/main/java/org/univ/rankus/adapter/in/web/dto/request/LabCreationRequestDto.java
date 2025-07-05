@@ -3,7 +3,7 @@ package org.univ.rankus.adapter.in.web.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.univ.rankus.domain.model.lab.LabCategory;
+import org.univ.rankus.domain.model.lab.core.LabCategory;
 
 /**
  * 랩실 생성 신청 시 요청 파라미터를 받기 위한 DTO

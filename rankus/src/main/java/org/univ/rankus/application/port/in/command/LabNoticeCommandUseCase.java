@@ -1,7 +1,7 @@
 package org.univ.rankus.application.port.in.command;
 
-import org.univ.rankus.domain.model.notice.LabNotice;
-import org.univ.rankus.domain.model.notice.NoticeType;
+import org.univ.rankus.domain.model.lab.notice.LabNotice;
+import org.univ.rankus.domain.model.lab.notice.NoticeType;
 
 public interface LabNoticeCommandUseCase {
 
