@@ -4,13 +4,13 @@
 
 ## 🎯 Prefix 할당 현황
 
-| 도메인                | Prefix | 할당 범위   | 현재 사용 | 예시             |
-|--------------------|--------|---------|---------|----------------|
-| User               | `USER` | 001~099 | 001~010 | USER_001       |
-| Lab                | `LAB`  | 001~099 | 001~015 | LAB_001        |
-| LabApplication     | `LAP`  | 001~099 | 001~012 | LAP_001        |
-| LabImage           | `LIM`  | 001~099 | 001~008 | LIM_001        |
-| LabCreationRequest | `LCR`  | 001~099 | 001~010 | LCR_001        |
+| 도메인                | Prefix | 할당 범위   | 현재 사용   | 예시           |
+|--------------------|--------|---------|---------|--------------|
+| User               | `USER` | 001~099 | 001~010 | USER_001     |
+| Lab                | `LAB`  | 001~099 | 001~015 | LAB_001      |
+| LabApplication     | `LAP`  | 001~099 | 001~012 | LAP_001      |
+| LabImage           | `LIM`  | 001~099 | 001~008 | LIM_001      |
+| LabCreationRequest | `LCR`  | 001~099 | 001~010 | LCR_001      |
 | Notice             | `NOT`  | 001~099 | 미할당     | NOT_001 (예약) |
 | Ranking            | `RNK`  | 001~099 | 미할당     | RNK_001 (예약) |
 
@@ -28,6 +28,7 @@
 ## 🔤 ErrorCode 네이밍 패턴
 
 ### 필수 검증 오류 (400)
+
 ```java
 {FIELD}_REQUIRED        // 필수값 누락
 {FIELD}_TOO_LONG        // 길이 초과
@@ -37,6 +38,7 @@
 ```
 
 ### 비즈니스 규칙 오류 (422)
+
 ```java
 CANNOT_CHANGE_STATUS           // 상태 변경 불가
 CANNOT_DELETE_REFERENCED       // 참조된 리소스 삭제 불가
@@ -46,12 +48,14 @@ DEADLINE_PASSED                // 마감일 지나감
 ```
 
 ### 조회 실패 (404)
+
 ```java
 {DOMAIN}_NOT_FOUND      // 도메인 엔티티 없음
 {FIELD}_NOT_FOUND       // 특정 필드 기준 조회 실패
 ```
 
 ### 중복 오류 (409)
+
 ```java
 {FIELD}_DUPLICATED      // 중복 생성
 {FIELD}_ALREADY_EXISTS  // 이미 존재함
@@ -98,6 +102,7 @@ public enum {Domain}ErrorCode implements ErrorCode {
 ## 📋 코드 할당 체크리스트
 
 ### 새 도메인 추가 시
+
 ```
 □ Prefix 중복 확인
 □ 코드 범위 할당 (001~099)
@@ -106,6 +111,7 @@ public enum {Domain}ErrorCode implements ErrorCode {
 ```
 
 ### 새 ErrorCode 추가 시
+
 ```
 □ HTTP 상태코드 매핑 확인
 □ 동일 도메인 내 코드 중복 확인
@@ -116,12 +122,14 @@ public enum {Domain}ErrorCode implements ErrorCode {
 ## 🔧 메시지 작성 규칙
 
 ### 필수 규칙
+
 - **언어**: 한국어
 - **종결어미**: 명사형 ("~습니다", "~입니다")
 - **구체성**: 최대/최소값 명시
 - **일관성**: 동일 도메인 내 톤 통일
 
 ### 예시
+
 ```java
 // ✅ 올바른 메시지
 "이름은 필수입니다"

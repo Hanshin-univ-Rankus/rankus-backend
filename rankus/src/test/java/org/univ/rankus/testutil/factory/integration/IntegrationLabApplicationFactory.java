@@ -2,8 +2,8 @@ package org.univ.rankus.testutil.factory.integration;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.univ.rankus.application.port.out.LabApplicationRepositoryPort;
-import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.application.LabApplication;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.testutil.factory.domain.DomainLabApplicationFactory;
 

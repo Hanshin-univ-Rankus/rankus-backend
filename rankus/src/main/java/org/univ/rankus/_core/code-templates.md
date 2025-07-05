@@ -41,6 +41,7 @@ public class {Domain} extends BaseTimeEntity {
 ## 🎯 Service 템플릿
 
 ### Command Service
+
 ```java
 @Service
 @RequiredArgsConstructor
@@ -80,6 +81,7 @@ public class {Domain}CommandService implements {Domain}CommandUseCase {
 ```
 
 ### Query Service
+
 ```java
 @Service
 @RequiredArgsConstructor
@@ -162,6 +164,7 @@ public class {Domain}Controller {
 ## 🗂️ Repository 템플릿
 
 ### Port Interface
+
 ```java
 public interface {Domain}RepositoryPort {
     {Domain} save({Domain} {domain});
@@ -173,6 +176,7 @@ public interface {Domain}RepositoryPort {
 ```
 
 ### Adapter Implementation
+
 ```java
 @Component
 @RequiredArgsConstructor
@@ -209,6 +213,7 @@ public class {Domain}RepositoryAdapter implements {Domain}RepositoryPort {
 ## 📄 DTO 템플릿
 
 ### Request DTO
+
 ```java
 public record {Domain}CreateRequestDto(
     @NotBlank(message = "{필드}는 필수입니다")
@@ -224,6 +229,7 @@ public record {Domain}UpdateRequestDto(
 ```
 
 ### Response DTO
+
 ```java
 public record {Domain}ResponseDto(
     Long id,
@@ -245,6 +251,7 @@ public record {Domain}ResponseDto(
 ## ⚠️ 예외 템플릿
 
 ### ValidationException
+
 ```java
 public class {Domain}ValidationException extends BaseCustomException {
     public {Domain}ValidationException({Domain}ErrorCode errorCode) {
@@ -258,6 +265,7 @@ public class {Domain}ValidationException extends BaseCustomException {
 ```
 
 ### NotFoundException
+
 ```java
 public class {Domain}NotFoundException extends BaseCustomException {
     public {Domain}NotFoundException() {
@@ -272,6 +280,7 @@ public class {Domain}NotFoundException extends BaseCustomException {
 ```
 
 ### ErrorCode Enum
+
 ```java
 public enum {Domain}ErrorCode implements ErrorCode {
     // 400 Bad Request

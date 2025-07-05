@@ -14,50 +14,57 @@
 ## 📊 핵심 Aggregate 구조
 
 ### User Aggregate
+
 ```
 User (Root) → Password (VO) → Role (Enum) → UserException
 ```
 
-### Lab Aggregate  
+### Lab Aggregate
+
 ```
 Lab (Root) → LabApplication, LabImage, LabNotice → LabException
 ```
 
 ### Notice Aggregate
+
 ```
 LabNotice (Root) → NoticeType (Enum) → NoticeException
 ```
 
 ## 🗄️ 엔티티 매트릭스
 
-| 엔티티                | 핵심 비즈니스 메서드                                  | 상태 전이              |
-|--------------------|----------------------------------------------|---------------------|
-| **User**           | `checkPassword()`, `assignLab()`, `canManage()` | Role 승급            |
-| **Lab**            | `autoAssignProfessor()`, `updateRanking()`    | -                   |
-| **LabApplication** | `approve()`, `reject()`, `isOwnedBy()`        | PENDING → APPROVED/REJECTED |
-| **LabNotice**      | `pin()`, `unpin()`, `isOwnedBy()`            | isPinned 토글        |
+| 엔티티                | 핵심 비즈니스 메서드                                     | 상태 전이                       |
+|--------------------|-------------------------------------------------|-----------------------------|
+| **User**           | `checkPassword()`, `assignLab()`, `canManage()` | Role 승급                     |
+| **Lab**            | `autoAssignProfessor()`, `updateRanking()`      | -                           |
+| **LabApplication** | `approve()`, `reject()`, `isOwnedBy()`          | PENDING → APPROVED/REJECTED |
+| **LabNotice**      | `pin()`, `unpin()`, `isOwnedBy()`               | isPinned 토글                 |
 
 ## 💎 Value Object 및 Enum
 
 ### Password (Value Object)
+
 ```java
+
 @Embeddable
 public class Password {
     private final String value; // 암호화된 값만 저장
-    
-    public static Password fromRaw(String raw, PasswordEncoder encoder) { ... }
-    public boolean matches(String raw, PasswordEncoder encoder) { ... }
+
+    public static Password fromRaw(String raw, PasswordEncoder encoder) { ...}
+
+    public boolean matches(String raw, PasswordEncoder encoder) { ...}
 }
 ```
 
 ### 핵심 Enum 정정
+
 ```java
-Role: STUDENT < LAB_MEMBER < LAB_MANAGER < LAB_LEADER < PROFESSOR < ADMIN
-ApplicationStatus: PENDING → APPROVED/REJECTED
-LabCreationStatus: PENDING → APPROVED/REJECTED
-NoticeType: NORMAL ↔ URGENT  // 정정: GENERAL 아닌 NORMAL
-ImageType: REPRESENTATIVE, ADDITIONAL
-LabCategory: AI, CV, DB, WEB, NETWORK, SECURITY, IOT, MOBILE, GAME, ROBOTICS, COMPUTER_SCIENCE, ETC
+Role:STUDENT<LAB_MEMBER<LAB_MANAGER<LAB_LEADER<PROFESSOR<ADMIN
+ApplicationStatus:PENDING →APPROVED/REJECTED
+LabCreationStatus:PENDING →APPROVED/REJECTED
+NoticeType:NORMAL ↔URGENT  // 정정: GENERAL 아닌 NORMAL
+ImageType:REPRESENTATIVE,ADDITIONAL
+LabCategory:AI,CV,DB,WEB,NETWORK,SECURITY,IOT,MOBILE,GAME,ROBOTICS,COMPUTER_SCIENCE,ETC
 ```
 
 ## 🛡️ 도메인 불변 조건

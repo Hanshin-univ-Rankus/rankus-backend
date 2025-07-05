@@ -25,7 +25,6 @@ import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.notice.LabNotice;
 import org.univ.rankus.domain.model.lab.notice.NoticeType;
-import org.univ.rankus.domain.model.lab.notice.exception.NoticeErrorCode;
 import org.univ.rankus.domain.model.lab.notice.exception.NoticeNotFoundException;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
@@ -39,7 +38,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(LabNoticeController.class)
 @AutoConfigureMockMvc(addFilters = false)

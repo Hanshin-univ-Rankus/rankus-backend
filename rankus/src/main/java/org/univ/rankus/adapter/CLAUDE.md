@@ -22,6 +22,7 @@ adapter/
 ## 🎮 Controller 표준 패턴
 
 ### 기본 구조
+
 ```java
 @RestController @RequestMapping("/api/{domain}") @RequiredArgsConstructor @Validated
 public class {Domain}Controller {
@@ -38,17 +39,19 @@ public class {Domain}Controller {
 ```
 
 ### API 엔드포인트 매트릭스
-| Controller             | 엔드포인트                        | 권한                    |
-|------------------------|--------------------------------|------------------------|
-| AuthController         | `POST /api/auth/signup`        | 인증 불필요              |
-| AuthController         | `POST /api/auth/login`         | 인증 불필요              |
-| UserController         | `GET /api/users/me`            | `isAuthenticated()`    |
-| LabPromotionController | `GET /api/labs`                | 공개                    |
-| LabApplicationController| `POST /api/labs/{id}/applications` | `isAuthenticated()` |
+
+| Controller               | 엔드포인트                              | 권한                  |
+|--------------------------|------------------------------------|---------------------|
+| AuthController           | `POST /api/auth/signup`            | 인증 불필요              |
+| AuthController           | `POST /api/auth/login`             | 인증 불필요              |
+| UserController           | `GET /api/users/me`                | `isAuthenticated()` |
+| LabPromotionController   | `GET /api/labs`                    | 공개                  |
+| LabApplicationController | `POST /api/labs/{id}/applications` | `isAuthenticated()` |
 
 ## 🗂️ Repository 표준 패턴
 
 ### Adapter 구현
+
 ```java
 @Component @RequiredArgsConstructor
 public class {Domain}RepositoryAdapter implements {Domain}RepositoryPort {
@@ -62,6 +65,7 @@ public class {Domain}RepositoryAdapter implements {Domain}RepositoryPort {
 ```
 
 ### JPA Repository
+
 ```java
 public interface SpringData{Domain}Repository extends JpaRepository<{Domain}, Long> {
     Optional<{Domain}> findBy{Property}({Type} value);
@@ -72,6 +76,7 @@ public interface SpringData{Domain}Repository extends JpaRepository<{Domain}, Lo
 ## 📄 DTO 변환 패턴
 
 ### Request DTO
+
 ```java
 public record {Domain}CreateRequestDto(
     @NotBlank @Size(max=100) String name,
@@ -80,6 +85,7 @@ public record {Domain}CreateRequestDto(
 ```
 
 ### Response DTO
+
 ```java
 public record {Domain}ResponseDto(Long id, String name, LocalDateTime createdAt) {
     public static {Domain}ResponseDto from({Domain} entity) {
@@ -115,7 +121,9 @@ public class LabApplicationController {
     @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #appId, 'LabApplication', 'DELETE')")
     public ResponseEntity<ApiResponse<Void>> cancelApplication(
             @PathVariable Long labId, @PathVariable Long appId);
+
 }
+
 ```
 
 #### LabImageController (`/api/labs/{labId}/images`)

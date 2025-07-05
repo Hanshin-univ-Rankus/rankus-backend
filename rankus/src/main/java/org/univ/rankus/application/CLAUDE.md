@@ -26,11 +26,13 @@ application/
 ## 🔗 포트/어댑터 플로우
 
 ### Inbound: Controller → UseCase → Service
+
 ```
 @Controller → {Domain}CommandUseCase → {Domain}CommandService → {Domain}RepositoryPort
 ```
 
 ### Outbound: Service → Port → Adapter
+
 ```
 Service → RepositoryPort ← RepositoryAdapter ← JPA Repository
 ```
@@ -38,6 +40,7 @@ Service → RepositoryPort ← RepositoryAdapter ← JPA Repository
 ## 🎯 UseCase 패턴
 
 ### Command UseCase (상태 변경)
+
 ```java
 public interface {Domain}CommandUseCase {
     {Domain}ResponseDto create{Domain}({Domain}CreateRequestDto request);
@@ -47,6 +50,7 @@ public interface {Domain}CommandUseCase {
 ```
 
 ### Query UseCase (조회)
+
 ```java
 public interface {Domain}QueryUseCase {
     {Domain}ResponseDto find{Domain}ById(Long id);
@@ -58,6 +62,7 @@ public interface {Domain}QueryUseCase {
 ## 🏗️ Service 구현 패턴
 
 ### Command Service
+
 ```java
 @Service @RequiredArgsConstructor
 public class {Domain}CommandService implements {Domain}CommandUseCase {
@@ -73,6 +78,7 @@ public class {Domain}CommandService implements {Domain}CommandUseCase {
 ```
 
 ### Query Service
+
 ```java
 @Service @RequiredArgsConstructor
 public class {Domain}QueryService implements {Domain}QueryUseCase {

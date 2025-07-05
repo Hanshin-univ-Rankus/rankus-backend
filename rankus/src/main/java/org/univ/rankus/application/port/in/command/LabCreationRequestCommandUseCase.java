@@ -19,8 +19,8 @@ public interface LabCreationRequestCommandUseCase {
      * @param requestedDescription 신청할 랩실 설명 (선택)
      * @param requesterId          신청자 ID
      * @return 생성된 LabCreationRequest 엔티티
-     * @throws org.univ.rankus.domain.model.user.exception.UserNotFoundException                신청자를 찾을 수 없는 경우
-     * @throws LabCreationRequestValidationException 중복 신청 등 검증 실패 시
+     * @throws org.univ.rankus.domain.model.user.exception.UserNotFoundException 신청자를 찾을 수 없는 경우
+     * @throws LabCreationRequestValidationException                             중복 신청 등 검증 실패 시
      */
     LabCreationRequest createLabCreationRequest(String requestedLabName, LabCategory requestedCategory,
                                                 String requestedDescription, Long requesterId);
@@ -31,10 +31,10 @@ public interface LabCreationRequestCommandUseCase {
      *
      * @param requestId  승인할 신청 ID
      * @param approverId 승인자 ID (ADMIN 또는 PROFESSOR)
-     * @throws LabCreationRequestNotFoundException   신청을 찾을 수 없는 경우
-     * @throws LabCreationRequestValidationException 승인할 수 없는 상태인 경우
-     * @throws org.univ.rankus.domain.model.user.exception.UserNotFoundException                승인자를 찾을 수 없는 경우
-     * @throws LabCreationRequestValidationException 권한이 없는 경우
+     * @throws LabCreationRequestNotFoundException                               신청을 찾을 수 없는 경우
+     * @throws LabCreationRequestValidationException                             승인할 수 없는 상태인 경우
+     * @throws org.univ.rankus.domain.model.user.exception.UserNotFoundException 승인자를 찾을 수 없는 경우
+     * @throws LabCreationRequestValidationException                             권한이 없는 경우
      */
     void approveLabCreationRequest(Long requestId, Long approverId);
 
@@ -44,10 +44,10 @@ public interface LabCreationRequestCommandUseCase {
      * @param requestId       거절할 신청 ID
      * @param rejectorId      거절자 ID (ADMIN 또는 PROFESSOR)
      * @param rejectionReason 거절 사유 (선택)
-     * @throws LabCreationRequestNotFoundException   신청을 찾을 수 없는 경우
-     * @throws LabCreationRequestValidationException 거절할 수 없는 상태인 경우
-     * @throws org.univ.rankus.domain.model.user.exception.UserNotFoundException                거절자를 찾을 수 없는 경우
-     * @throws LabCreationRequestValidationException 권한이 없는 경우
+     * @throws LabCreationRequestNotFoundException                               신청을 찾을 수 없는 경우
+     * @throws LabCreationRequestValidationException                             거절할 수 없는 상태인 경우
+     * @throws org.univ.rankus.domain.model.user.exception.UserNotFoundException 거절자를 찾을 수 없는 경우
+     * @throws LabCreationRequestValidationException                             권한이 없는 경우
      */
     void rejectLabCreationRequest(Long requestId, Long rejectorId, String rejectionReason);
 

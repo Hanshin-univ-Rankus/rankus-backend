@@ -11,8 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
-import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.application.LabApplication;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.User;
 
 import static org.assertj.core.api.Assertions.assertThat;

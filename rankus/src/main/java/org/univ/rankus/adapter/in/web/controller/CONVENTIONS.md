@@ -106,15 +106,29 @@ public class {Domain}Controller {
 ```java
 // ❌ 금지: 수동 빌더 패턴
 ApiResponse.builder()
-    .status(200)
-    .message("성공")
-    .data(data)
-    .build();
+    .
+
+status(200)
+    .
+
+message("성공")
+    .
+
+data(data)
+    .
+
+build();
 
 // ❌ 금지: 하드코딩된 상태코드
-ApiResponse.builder()
-    .status(HttpStatus.OK.value())
-    .build();
+ApiResponse.
+
+builder()
+    .
+
+status(HttpStatus.OK.value())
+        .
+
+build();
 ```
 
 ### ✅ 표준 패턴 (현재 적용됨)
@@ -122,8 +136,12 @@ ApiResponse.builder()
 ```java
 // ✅ 권장: 팩토리 메서드 사용
 ApiResponse.success(data, "조회 성공");
-ApiResponse.created(data, "생성 성공");
-ApiResponse.success(data); // 기본 메시지
+ApiResponse.
+
+created(data, "생성 성공");
+ApiResponse.
+
+success(data); // 기본 메시지
 ```
 
 ## 📦 처리 플로우

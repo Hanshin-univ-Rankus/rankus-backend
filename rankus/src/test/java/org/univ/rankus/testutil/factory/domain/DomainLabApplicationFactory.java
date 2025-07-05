@@ -2,8 +2,8 @@ package org.univ.rankus.testutil.factory.domain;
 
 import org.springframework.test.util.ReflectionTestUtils;
 import org.univ.rankus.domain.model.lab.application.ApplicationStatus;
-import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.application.LabApplication;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.User;
 
 import java.time.LocalDateTime;

@@ -5,16 +5,19 @@
 ## 🏗️ 아키텍처 원칙 (20줄)
 
 ### 계층 구조
+
 ```
 Adapter(Controller) → Application(Service) → Domain(Entity) → Adapter(Repository)
 ```
 
 ### 의존성 방향
+
 - **Inbound**: Controller → UseCase ← Service
 - **Outbound**: Service → RepositoryPort ← Repository
 - **원칙**: 도메인이 인프라에 의존하지 않음
 
 ### 트랜잭션 패턴
+
 - **Command**: `@Transactional`
 - **Query**: `@Transactional(readOnly = true)`
 - **위치**: Service 각 메서드에 적용
@@ -22,6 +25,7 @@ Adapter(Controller) → Application(Service) → Domain(Entity) → Adapter(Repo
 ## 📛 네이밍 규칙 (30줄)
 
 ### 클래스 네이밍
+
 ```
 Entity:     {Domain}                           # User, Lab
 Service:    {Domain}{Command|Query}Service     # UserCommandService
@@ -32,6 +36,7 @@ ErrorCode:  {Domain}ErrorCode                  # UserErrorCode
 ```
 
 ### 메서드 네이밍
+
 ```
 Service:    create{Domain}(), find{Domain}ById(), update{Domain}()
 Controller: create{Domain}(), get{Domain}(), update{Domain}()
@@ -39,6 +44,7 @@ Repository: save(), findById(), findBy{Property}()
 ```
 
 ### ErrorCode 네이밍
+
 ```
 Prefix: USER, LAB, LAP, LIM, LCR
 Pattern: {PREFIX}_{CODE}  # USER_001, LAB_404
@@ -48,6 +54,7 @@ Fields: {FIELD}_REQUIRED, {FIELD}_TOO_LONG, {DOMAIN}_NOT_FOUND
 ## 🏗️ 클래스 구조 템플릿 (50줄)
 
 ### Entity 템플릿
+
 ```java
 @Entity @Table(name = "{table}")
 public class {Domain} extends BaseTimeEntity {
@@ -66,6 +73,7 @@ public class {Domain} extends BaseTimeEntity {
 ```
 
 ### Service 템플릿
+
 ```java
 @Service @RequiredArgsConstructor
 public class {Domain}{Command|Query}Service implements {Domain}{Command|Query}UseCase {
@@ -80,6 +88,7 @@ public class {Domain}{Command|Query}Service implements {Domain}{Command|Query}Us
 ```
 
 ### Controller 템플릿
+
 ```java
 @RestController @RequestMapping("/api/{domains}") @RequiredArgsConstructor @Validated
 public class {Domain}Controller {
@@ -97,6 +106,7 @@ public class {Domain}Controller {
 ## ⚠️ 예외 처리 패턴 (40줄)
 
 ### 예외 계층
+
 ```
 BaseCustomException
 └── {Domain}Exception (optional)
@@ -106,6 +116,7 @@ BaseCustomException
 ```
 
 ### ErrorCode 템플릿
+
 ```java
 public enum {Domain}ErrorCode implements ErrorCode {
     // 400 Bad Request
@@ -123,6 +134,7 @@ public enum {Domain}ErrorCode implements ErrorCode {
 ```
 
 ### 예외 발생 패턴
+
 ```java
 // 검증 실패
 if (condition) {
@@ -137,6 +149,7 @@ return repository.findById(id)
 ## 🧪 테스트 작성 체크리스트 (30줄)
 
 ### 필수 테스트 구조
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class {Class}Test {
@@ -153,6 +166,7 @@ class {Class}Test {
 ```
 
 ### Mock 패턴
+
 ```java
 // 성공 케이스
 when(repository.findById(1L)).thenReturn(Optional.of(domain));
@@ -163,6 +177,7 @@ when(repository.findById(999L)).thenReturn(Optional.empty());
 ```
 
 ### 검증 패턴
+
 ```java
 // 예외 검증
 assertThatThrownBy(() -> service.method())
@@ -175,6 +190,7 @@ assertThat(result.getStatus()).isEqualTo(EXPECTED_STATUS);
 ## 🔍 최신 코드 스타일 검증 (30줄)
 
 ### 작성 전 필수 체크리스트
+
 ```
 □ 네이밍: 기존 Domain 클래스들의 네이밍 패턴 준수
 □ 구조: Entity/Service/Controller 템플릿 정확히 적용
@@ -186,6 +202,7 @@ assertThat(result.getStatus()).isEqualTo(EXPECTED_STATUS);
 ```
 
 ### 코드 품질 규칙
+
 ```
 □ Import: Explicit imports only (wildcard 금지)
 □ 생성자: Entity는 protected 기본 생성자 + static factory method
@@ -195,6 +212,7 @@ assertThat(result.getStatus()).isEqualTo(EXPECTED_STATUS);
 ```
 
 ### 자동 검증 대상
+
 - 최근 20개 클래스의 네이밍 패턴 일치
 - ErrorCode 할당 중복 여부
 - 테스트 클래스 존재 여부

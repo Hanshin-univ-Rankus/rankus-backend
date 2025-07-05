@@ -2,15 +2,15 @@
 
 ## 📛 네이밍
 
-| 구분           | 패턴                                           | 예시                        |
-|--------------|----------------------------------------------|---------------------------|
-| Entity       | Domain명                                      | `LabNotice`               |
-| Enum         | 기능명                                          | `NoticeType`              |
-| Exception    | `Notice{Type}Exception`                      | `NoticeValidationException` |
-| Method-조회    | `get{Property}()`, `is{Condition}()`         | `getTitle()`, `isPinned()` |
-| Method-검증    | `check{Condition}()`, `validate{Property}()` | `checkOwnership()`        |
-| Method-변경    | `change{Property}()`, `update{Property}()`   | `updateContent()`, `pin()` |
-| Field        | camelCase / UPPER_SNAKE_CASE                 | `title` / `MAX_TITLE_LENGTH` |
+| 구분        | 패턴                                           | 예시                           |
+|-----------|----------------------------------------------|------------------------------|
+| Entity    | Domain명                                      | `LabNotice`                  |
+| Enum      | 기능명                                          | `NoticeType`                 |
+| Exception | `Notice{Type}Exception`                      | `NoticeValidationException`  |
+| Method-조회 | `get{Property}()`, `is{Condition}()`         | `getTitle()`, `isPinned()`   |
+| Method-검증 | `check{Condition}()`, `validate{Property}()` | `checkOwnership()`           |
+| Method-변경 | `change{Property}()`, `update{Property}()`   | `updateContent()`, `pin()`   |
+| Field     | camelCase / UPPER_SNAKE_CASE                 | `title` / `MAX_TITLE_LENGTH` |
 
 ## 🏗️ 구조 패턴
 
