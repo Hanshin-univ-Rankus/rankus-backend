@@ -40,6 +40,7 @@ void createUser_정상_입력시_사용자_생성됨() {
 ### Unit Test 표준 구조
 ```java
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)  // UnnecessaryStubbingException 방지
 class {ProductionClass}Test {
     @Mock private {Dependency} dependency;
     @InjectMocks private {ProductionClass} target;
@@ -77,6 +78,35 @@ class {ProductionController}Test {
 ```
 
 ## 🎭 Mock 패턴 (프로덕션 매칭)
+
+### MockitoExtension 베스트 프랙티스
+```java
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)  // 필수: UnnecessaryStubbingException 방지
+class ServiceTest {
+    
+    // ✅ 좋은 예: 실제 사용되는 Mock만 설정
+    @Test
+    void 사용자_생성_성공() {
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        
+        User result = service.createUser(request);
+        
+        verify(userRepository).save(any(User.class));  // 실제 호출 검증
+    }
+    
+    // ❌ 나쁜 예: 사용되지 않는 Mock 설정
+    @Test
+    void 사용자_생성_실패() {
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);      // 사용안됨
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty()); // 사용안됨
+        
+        assertThatThrownBy(() -> service.createUser(invalidRequest))
+            .isInstanceOf(ValidationException.class);
+        // 위의 Mock들은 실제로 호출되지 않음 → UnnecessaryStubbingException
+    }
+}
+```
 
 ### Repository Mock
 ```java
@@ -122,9 +152,15 @@ void {실제검증조건}_시_{실제ErrorCode}_반환() {
     {ActualException} exception = assertThrows({ActualException}.class, 
         () -> service.actualMethod(invalidInput));
     
-    // then - 실제 ErrorCode 확인
+    // then - 실제 ErrorCode 확인 (실제 Enum 값과 매칭)
     assertThat(exception.getErrorCode()).isEqualTo({ActualErrorCode}.{ACTUAL_CODE});
 }
+
+// ⚠️ 주요 ErrorCode 매핑
+// LabCreationRequest: LCR_XXX (LCR_006: 중복, LCR_007: 상태변경불가, LCR_009: 미존재)
+// LabNotice: LNT_XXX (LNT_404: 미존재)
+// User: USER_XXX
+// Lab: LAB_XXX
 ```
 
 ## 📊 검증 패턴 (실제 상태 매칭)

@@ -50,11 +50,14 @@ public class Password {
 }
 ```
 
-### 핵심 Enum
+### 핵심 Enum 정정
 ```java
 Role: STUDENT < LAB_MEMBER < LAB_MANAGER < LAB_LEADER < PROFESSOR < ADMIN
 ApplicationStatus: PENDING → APPROVED/REJECTED
-NoticeType: NORMAL ↔ URGENT
+LabCreationStatus: PENDING → APPROVED/REJECTED
+NoticeType: NORMAL ↔ URGENT  // 정정: GENERAL 아닌 NORMAL
+ImageType: REPRESENTATIVE, ADDITIONAL
+LabCategory: AI, CV, DB, WEB, NETWORK, SECURITY, IOT, MOBILE, GAME, ROBOTICS, COMPUTER_SCIENCE, ETC
 ```
 
 ## 🛡️ 도메인 불변 조건

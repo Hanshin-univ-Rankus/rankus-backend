@@ -1,13 +1,12 @@
 package org.univ.rankus.testutil.factory.dto;
 
-import org.univ.rankus.adapter.in.web.dto.request.LabApplicationRequestDto;
-import org.univ.rankus.adapter.in.web.dto.request.UserLoginRequestDto;
-import org.univ.rankus.adapter.in.web.dto.request.UserRegisterRequestDto;
-import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
-import org.univ.rankus.adapter.in.web.dto.response.LabApplicationResponseDto;
-import org.univ.rankus.adapter.in.web.dto.response.LabResponseDto;
-import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
+import org.univ.rankus.adapter.in.web.dto.request.*;
+import org.univ.rankus.adapter.in.web.dto.response.*;
 import org.univ.rankus.domain.model.lab.application.ApplicationStatus;
+import org.univ.rankus.domain.model.lab.core.ImageType;
+import org.univ.rankus.domain.model.lab.core.LabCategory;
+import org.univ.rankus.domain.model.lab.creation.LabCreationStatus;
+import org.univ.rankus.domain.model.lab.notice.NoticeType;
 import org.univ.rankus.domain.model.user.Role;
 
 import java.time.LocalDateTime;
@@ -154,6 +153,157 @@ public final class DtoFactory {
         return AuthResponseDto.builder()
                 .token(token)
                 .user(user)
+                .build();
+    }
+
+    // Lab Notice Request DTOs
+    public static LabNoticeCreateRequestDto buildLabNoticeCreateRequest() {
+        return LabNoticeCreateRequestDto.builder()
+                .title("테스트 공지사항")
+                .content("테스트 공지사항 내용입니다.")
+                .type(NoticeType.NORMAL)
+                .pinned(false)
+                .build();
+    }
+
+    public static LabNoticeCreateRequestDto buildLabNoticeCreateRequest(String title, String content, NoticeType type, boolean pinned) {
+        return LabNoticeCreateRequestDto.builder()
+                .title(title)
+                .content(content)
+                .type(type)
+                .pinned(pinned)
+                .build();
+    }
+
+    public static LabNoticeUpdateRequestDto buildLabNoticeUpdateRequest() {
+        return LabNoticeUpdateRequestDto.builder()
+                .title("수정된 공지사항")
+                .content("수정된 공지사항 내용입니다.")
+                .type(NoticeType.URGENT)
+                .pinned(true)
+                .build();
+    }
+
+    public static LabNoticeUpdateRequestDto buildLabNoticeUpdateRequest(String title, String content, NoticeType type, boolean pinned) {
+        return LabNoticeUpdateRequestDto.builder()
+                .title(title)
+                .content(content)
+                .type(type)
+                .pinned(pinned)
+                .build();
+    }
+
+    // Lab Creation Request DTOs - Record 타입이므로 생성자 방식 사용
+    public static LabCreationRequestDto buildLabCreationRequest() {
+        return new LabCreationRequestDto(
+                "AI 연구실",
+                LabCategory.AI,
+                "인공지능 관련 연구를 수행하는 연구실입니다."
+        );
+    }
+
+    public static LabCreationRequestDto buildLabCreationRequest(String labName, LabCategory category, String description) {
+        return new LabCreationRequestDto(labName, category, description);
+    }
+
+    public static LabCreationRequestRejectDto buildLabCreationRequestRejectDto() {
+        return new LabCreationRequestRejectDto(
+                "요청하신 연구실의 연구 분야가 명확하지 않습니다."
+        );
+    }
+
+    public static LabCreationRequestRejectDto buildLabCreationRequestRejectDto(String rejectionReason) {
+        return new LabCreationRequestRejectDto(rejectionReason);
+    }
+
+    // Lab Notice Response DTOs
+    public static LabNoticeResponseDto buildLabNoticeResponseDto() {
+        return LabNoticeResponseDto.builder()
+                .id(1L)
+                .title("테스트 공지사항")
+                .content("테스트 공지사항 내용")
+                .type(NoticeType.NORMAL)
+                .pinned(false)
+                .authorId(1L)
+                .authorName("작성자")
+                .labId(1L)
+                .labName("AI 연구실")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static LabNoticeResponseDto buildLabNoticeResponseDto(Long id, String title, NoticeType type, boolean pinned) {
+        return LabNoticeResponseDto.builder()
+                .id(id)
+                .title(title)
+                .content("테스트 공지사항 내용")
+                .type(type)
+                .pinned(pinned)
+                .authorId(1L)
+                .authorName("작성자")
+                .labId(1L)
+                .labName("AI 연구실")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    // Lab Creation Request Response DTOs
+    public static LabCreationRequestResponseDto buildLabCreationRequestResponseDto() {
+        return LabCreationRequestResponseDto.builder()
+                .id(1L)
+                .requestedLabName("AI 연구실")
+                .requestedCategory(LabCategory.AI)
+                .requestedDescription("인공지능 관련 연구를 수행하는 연구실입니다.")
+                .status(LabCreationStatus.PENDING)
+                .requester(buildUserResponseDto())
+                .requestedAt(LocalDateTime.now())
+                .processedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static LabCreationRequestResponseDto buildLabCreationRequestResponseDto(Long id, String labName, String status) {
+        return LabCreationRequestResponseDto.builder()
+                .id(id)
+                .requestedLabName(labName)
+                .requestedCategory(LabCategory.AI)
+                .requestedDescription("인공지능 관련 연구를 수행하는 연구실입니다.")
+                .status(LabCreationStatus.PENDING)  // 기본값으로 설정
+                .requester(buildUserResponseDto())
+                .requestedAt(LocalDateTime.now())
+                .processedAt(LocalDateTime.now())
+                .build();
+    }
+
+    // Lab Image Request DTOs
+    public static LabImageRequestDto buildLabImageRequest() {
+        // LabImageRequestDto는 @Builder가 없으므로 생성자 사용 불가
+        // 실제 사용 시에는 리플렉션 또는 다른 방법 필요
+        throw new UnsupportedOperationException("LabImageRequestDto는 builder 패턴을 지원하지 않습니다");
+    }
+
+    public static LabImageRequestDto buildLabImageRequest(String imageUrl, String imageType, String description) {
+        // LabImageRequestDto는 @Builder가 없으므로 생성자 사용 불가
+        throw new UnsupportedOperationException("LabImageRequestDto는 builder 패턴을 지원하지 않습니다");
+    }
+
+    // Lab Image Response DTOs
+    public static LabImageResponseDto buildLabImageResponseDto() {
+        return LabImageResponseDto.builder()
+                .id(1L)
+                .imageUrl("https://example.com/test-image.jpg")
+                .type(ImageType.REPRESENTATIVE)
+                .labId(1L)
+                .build();
+    }
+
+    public static LabImageResponseDto buildLabImageResponseDto(Long id, String imageUrl, String imageType) {
+        return LabImageResponseDto.builder()
+                .id(id)
+                .imageUrl(imageUrl)
+                .type(ImageType.valueOf(imageType))
+                .labId(1L)
                 .build();
     }
 }

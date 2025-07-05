@@ -85,7 +85,8 @@ public class LabNoticeController {
         List<LabNotice> notices = labNoticeQueryUseCase.getNoticesByLabIdAndType(labId, type);
         List<LabNoticeResponseDto> responseList = LabNoticeResponseDto.fromList(notices);
 
-        return ResponseEntity.ok(ApiResponse.success(responseList, type.getDescription() + " 공지사항 조회 성공"));
+        String message = type == NoticeType.URGENT ? "긴급 공지사항 조회 성공" : "일반 공지사항 조회 성공";
+        return ResponseEntity.ok(ApiResponse.success(responseList, message));
     }
 
     @Operation(summary = "고정 공지사항 조회", description = "특정 랩실의 고정된 공지사항만 조회합니다.")

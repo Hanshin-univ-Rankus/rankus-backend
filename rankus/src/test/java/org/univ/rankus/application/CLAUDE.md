@@ -341,6 +341,28 @@ class AuthServiceTest {
 
 ## 🧩 Mock 활용 전략
 
+### MockitoExtension 설정 (중요)
+
+```java
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)  // ✅ 필수: UnnecessaryStubbingException 방지
+class UserCommandServiceTest {
+    
+    @Mock
+    private UserRepositoryPort userRepositoryPort;
+    
+    @InjectMocks
+    private UserCommandService userCommandService;
+    
+    // 테스트 메서드들...
+}
+```
+
+**주의사항**:
+- `@MockitoSettings(strictness = Strictness.LENIENT)` 어노테이션 필수
+- 사용되지 않는 Mock stubbing으로 인한 UnnecessaryStubbingException 방지
+- 테스트 안정성 향상
+
 ### 1. Mock 객체 설정 패턴
 
 ```java
