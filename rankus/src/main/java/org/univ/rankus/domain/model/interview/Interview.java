@@ -5,11 +5,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.univ.rankus.common.BaseTimeEntity;
+import org.univ.rankus.domain.model.interview.exception.InterviewErrorCode;
+import org.univ.rankus.domain.model.interview.exception.InterviewValidationException;
 import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
-import org.univ.rankus.domain.model.interview.exception.InterviewErrorCode;
-import org.univ.rankus.domain.model.interview.exception.InterviewValidationException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,15 +58,15 @@ public class Interview extends BaseTimeEntity {
     /**
      * 면접 설정 생성자
      *
-     * @param lab                    면접을 진행할 랩실
-     * @param startDate              면접 시작일
-     * @param endDate                면접 종료일
-     * @param durationMinutes        면접 소요 시간 (분)
-     * @param maxApplicantsPerSlot   슬롯당 최대 지원자 수
+     * @param lab                  면접을 진행할 랩실
+     * @param startDate            면접 시작일
+     * @param endDate              면접 종료일
+     * @param durationMinutes      면접 소요 시간 (분)
+     * @param maxApplicantsPerSlot 슬롯당 최대 지원자 수
      */
-    public Interview(Lab lab, LocalDate startDate, LocalDate endDate, 
-                    Integer durationMinutes, Integer maxApplicantsPerSlot) {
-        
+    public Interview(Lab lab, LocalDate startDate, LocalDate endDate,
+                     Integer durationMinutes, Integer maxApplicantsPerSlot) {
+
         validateLab(lab);
         validateDates(startDate, endDate);
         validateDuration(durationMinutes);
@@ -87,7 +87,7 @@ public class Interview extends BaseTimeEntity {
         if (this.status == InterviewStatus.ACTIVE) {
             throw new InterviewValidationException(InterviewErrorCode.ALREADY_ACTIVATED);
         }
-        
+
         if (this.status == InterviewStatus.CLOSED) {
             throw new InterviewValidationException(InterviewErrorCode.CANNOT_ACTIVATE_CLOSED);
         }
@@ -103,7 +103,7 @@ public class Interview extends BaseTimeEntity {
         if (this.status == InterviewStatus.INACTIVE) {
             throw new InterviewValidationException(InterviewErrorCode.ALREADY_DEACTIVATED);
         }
-        
+
         if (this.status == InterviewStatus.CLOSED) {
             throw new InterviewValidationException(InterviewErrorCode.CANNOT_DEACTIVATE_CLOSED);
         }
@@ -131,7 +131,7 @@ public class Interview extends BaseTimeEntity {
         if (slot == null) {
             throw new InterviewValidationException(InterviewErrorCode.SLOT_REQUIRED);
         }
-        
+
         validateSlotTime(slot);
         this.slots.add(slot);
     }
@@ -233,7 +233,7 @@ public class Interview extends BaseTimeEntity {
     private void validateSlotTime(InterviewSlot slot) {
         LocalDateTime slotStart = slot.getStartTime();
         LocalDate slotDate = slotStart.toLocalDate();
-        
+
         if (slotDate.isBefore(startDate) || slotDate.isAfter(endDate)) {
             throw new InterviewValidationException(InterviewErrorCode.SLOT_OUTSIDE_INTERVIEW_PERIOD);
         }

@@ -1,6 +1,7 @@
 # Adapter Layer 가이드 (AI 코딩용)
 
 ## 🔌 구조 패턴
+
 ```
 adapter/
 ├── in/web/          # Controller + DTO
@@ -36,12 +37,12 @@ public class {Domain}Controller {
 
 ## 🔐 권한 패턴
 
-| 패턴 | 코드 | 사용 케이스 |
-|------|------|------------|
-| 인증만 | `@PreAuthorize("isAuthenticated()")` | 기본 CRUD |
-| 역할 | `@PreAuthorize("hasRole('ADMIN')")` | 관리 기능 |
-| 소유권 | `@PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #id, 'Domain', 'ACTION')")` | 개인 리소스 |
-| 랩실 권한 | `@PreAuthorize("@labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'ACTION')")` | 랩실 관련 |
+| 패턴    | 코드                                                                                                             | 사용 케이스  |
+|-------|----------------------------------------------------------------------------------------------------------------|---------|
+| 인증만   | `@PreAuthorize("isAuthenticated()")`                                                                           | 기본 CRUD |
+| 역할    | `@PreAuthorize("hasRole('ADMIN')")`                                                                            | 관리 기능   |
+| 소유권   | `@PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #id, 'Domain', 'ACTION')")`          | 개인 리소스  |
+| 랩실 권한 | `@PreAuthorize("@labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'ACTION')")` | 랩실 관련   |
 
 ## 📝 Notice Controller 패턴
 

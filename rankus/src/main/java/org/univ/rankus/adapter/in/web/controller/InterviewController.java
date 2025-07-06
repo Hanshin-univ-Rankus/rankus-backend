@@ -14,7 +14,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.univ.rankus.adapter.in.web.dto.request.*;
+import org.univ.rankus.adapter.in.web.dto.request.InterviewCreateRequestDto;
+import org.univ.rankus.adapter.in.web.dto.request.InterviewSlotBatchCreateRequestDto;
+import org.univ.rankus.adapter.in.web.dto.request.InterviewSlotCreateRequestDto;
+import org.univ.rankus.adapter.in.web.dto.request.InterviewUpdateRequestDto;
 import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;
 import org.univ.rankus.adapter.in.web.dto.response.InterviewResponseDto;
 import org.univ.rankus.adapter.in.web.dto.response.InterviewSlotResponseDto;
@@ -77,7 +80,7 @@ public class InterviewController {
 
         InterviewResponseDto responseDto = InterviewResponseDto.from(interview);
         URI location = URI.create("/api/labs/" + labId + "/interviews/" + interview.getId());
-        
+
         return ResponseEntity.created(location)
                 .body(ApiResponse.created(responseDto));
     }
@@ -200,7 +203,7 @@ public class InterviewController {
 
         InterviewSlotResponseDto responseDto = InterviewSlotResponseDto.from(slot);
         URI location = URI.create("/api/labs/" + labId + "/interviews/" + interviewId + "/slots/" + slot.getId());
-        
+
         return ResponseEntity.created(location)
                 .body(ApiResponse.created(responseDto));
     }

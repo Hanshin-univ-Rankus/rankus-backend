@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Getter
 @Builder
 public class InterviewCreateRequestDto {
-    
+
     @NotNull(message = "면접 시작일은 필수입니다.")
     @Future(message = "면접 시작일은 미래여야 합니다.")
     private final LocalDate startDate;

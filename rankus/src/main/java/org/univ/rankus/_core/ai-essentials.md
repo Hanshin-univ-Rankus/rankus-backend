@@ -9,18 +9,19 @@ Controller → {Domain}QueryUseCase → {Domain}QueryService → {Domain}Reposit
 
 ## 📛 네이밍 규칙
 
-| 타입 | 패턴 | 예시 |
-|------|------|------|
-| Entity | `{Domain}` | `User`, `LabNotice` |
-| Service | `{Domain}{Command\|Query}Service` | `UserCommandService` |
-| Controller | `{Domain}Controller` | `LabNoticeController` |
-| UseCase | `{Domain}{Command\|Query}UseCase` | `LabNoticeCommandUseCase` |
-| DTO | `{Domain}{Action}RequestDto` | `UserCreateRequestDto` |
-| ErrorCode | `{Domain}ErrorCode` | `NoticeErrorCode` |
+| 타입         | 패턴                                | 예시                                                        |
+|------------|-----------------------------------|-----------------------------------------------------------|
+| Entity     | `{Domain}`                        | `User`, `Lab`, `LabApplication`, `LabNotice`, `Interview` |
+| Service    | `{Domain}{Command\|Query}Service` | `UserCommandService`, `InterviewQueryService`             |
+| Controller | `{Domain}Controller`              | `LabNoticeController`, `InterviewController`              |
+| UseCase    | `{Domain}{Command\|Query}UseCase` | `LabApplicationCommandUseCase`, `InterviewCommandUseCase` |
+| DTO        | `{Domain}{Action}RequestDto`      | `UserCreateRequestDto`, `InterviewSlotCreateRequestDto`   |
+| ErrorCode  | `{Domain}ErrorCode`               | `NoticeErrorCode`, `InterviewErrorCode`                   |
 
 ## 🔧 코딩 패턴
 
 ### Service 반환값
+
 ```java
 // ✅ 올바른 패턴: Entity 반환
 @Transactional
@@ -33,6 +34,7 @@ public UserResponseDto createUser(...) { /* DTO 반환 금지 */ }
 ```
 
 ### Controller DTO 변환
+
 ```java
 // ✅ Controller에서 변환
 @PostMapping
@@ -43,6 +45,7 @@ public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid @RequestBo
 ```
 
 ### 권한 패턴
+
 ```java
 // 인증만
 @PreAuthorize("isAuthenticated()")
@@ -50,17 +53,27 @@ public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid @RequestBo
 // 소유권 체크
 @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #id, 'LabNotice', 'UPDATE')")
 
-// 랩실 권한
+// 랩실 권한 - Notice
 @PreAuthorize("@labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_NOTICES')")
+
+// 랩실 권한 - Interview
+@PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+
+// 랩실 권한 - Application
+@PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #labId, 'Lab', 'MANAGE_APPLICATIONS')")
 ```
 
 ## 📝 ErrorCode 패턴
 
-| Prefix | 도메인 | 현재 사용 |
-|--------|--------|---------|
-| `USER` | User | 001~010 |
-| `LAB` | Lab | 001~015 |
-| `LNT` | Notice | 001~007 |
+| Prefix | 도메인                | 현재 사용   |
+|--------|--------------------|---------|
+| `USER` | User               | 001~010 |
+| `LAB`  | Lab                | 001~015 |
+| `LAP`  | LabApplication     | 001~012 |
+| `LIM`  | LabImage           | 001~008 |
+| `LCR`  | LabCreationRequest | 001~010 |
+| `LNT`  | LabNotice          | 001~007 |
+| `INT`  | Interview          | 001~034 |
 
 ```java
 // ErrorCode 템플릿
@@ -71,12 +84,14 @@ public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid @RequestBo
 ## 🔍 테스트 품질 체크리스트
 
 ### 코드 작성 후 확인사항
+
 - [ ] Factory는 외부 상태에 의존하지 않는가?
 - [ ] DTO 변환에서 연관 객체 null 처리 포함되었는가?
 - [ ] 테스트간 상태 격리가 보장되는가?
 - [ ] Mock 설정이 완전한가?
 
 ### 안전한 설계 패턴
+
 ```java
 // ✅ 상태 독립적 Factory
 public static Entity create() {
@@ -97,6 +112,7 @@ public static Entity create() {
 ## ✅ 컨텍스트 파일 업데이트 의무사항
 
 ### 🚨 개발 완료 후 필수 수행
+
 새 기능 개발 또는 기존 기능 수정 후 **반드시** 다음 파일들을 업데이트해야 함:
 
 1. **error-codes.md**: 새 ErrorCode 추가/수정
@@ -106,9 +122,11 @@ public static Entity create() {
 5. **adapter/CLAUDE.md**: Controller 보안 패턴 업데이트
 
 ### 📋 체크리스트 활용
+
 개발 완료 후 `@core/context-update-checklist.md` 파일의 체크리스트를 사용하여 누락없이 문서 업데이트 수행
 
 ### ⚠️ 중요 원칙
+
 - **문서와 코드 불일치** 절대 금지
 - **AI 최적화**: 50줄 이하, 테이블 중심, 코드 템플릿 포함
 - **즉시 업데이트**: 개발 완료 즉시 문서 업데이트

@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Builder
 public class InterviewSlotBatchCreateRequestDto {
-    
+
     @NotEmpty(message = "슬롯 정보는 하나 이상 필요합니다.")
     @Valid
     private final List<InterviewSlotCreateRequestDto> slots;

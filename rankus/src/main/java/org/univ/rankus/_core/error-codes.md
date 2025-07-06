@@ -2,16 +2,16 @@
 
 ## 📊 Prefix 할당
 
-| 도메인 | Prefix | 현재 사용 | 예시 |
-|-------|--------|---------|------|
-| User | `USER` | 001~010 | USER_001 |
-| Lab | `LAB` | 001~015 | LAB_001 |
-| LabApplication | `LAP` | 001~012 | LAP_001 |
-| LabImage | `LIM` | 001~008 | LIM_001 |
-| LabCreationRequest | `LCR` | 001~010 | LCR_001 |
-| **Notice** | **`LNT`** | **001~007** | **LNT_001** |
-| **Interview** | **`INT`** | **001~034** | **INT_001** |
-| Ranking | `RNK` | 미할당 | RNK_001 |
+| 도메인                | Prefix    | 현재 사용       | 예시          |
+|--------------------|-----------|-------------|-------------|
+| User               | `USER`    | 001~010     | USER_001    |
+| Lab                | `LAB`     | 001~015     | LAB_001     |
+| LabApplication     | `LAP`     | 001~012     | LAP_001     |
+| LabImage           | `LIM`     | 001~008     | LIM_001     |
+| LabCreationRequest | `LCR`     | 001~010     | LCR_001     |
+| **Notice**         | **`LNT`** | **001~007** | **LNT_001** |
+| **Interview**      | **`INT`** | **001~034** | **INT_001** |
+| Ranking            | `RNK`     | 미할당         | RNK_001     |
 
 ## 🎯 ErrorCode 템플릿
 

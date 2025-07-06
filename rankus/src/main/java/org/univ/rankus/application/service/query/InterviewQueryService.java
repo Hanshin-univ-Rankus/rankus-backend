@@ -34,7 +34,7 @@ public class InterviewQueryService implements InterviewQueryUseCase {
     @Override
     public Interview getInterviewById(Long id) {
         return interviewRepositoryPort.findById(id)
-            .orElseThrow(() -> new InterviewNotFoundException(InterviewErrorCode.INTERVIEW_NOT_FOUND));
+                .orElseThrow(() -> new InterviewNotFoundException(InterviewErrorCode.INTERVIEW_NOT_FOUND));
     }
 
     @Override
@@ -67,7 +67,7 @@ public class InterviewQueryService implements InterviewQueryUseCase {
     @Override
     public InterviewSlot getInterviewSlotById(Long id) {
         return slotRepositoryPort.findById(id)
-            .orElseThrow(() -> new InterviewNotFoundException(InterviewErrorCode.SLOT_NOT_FOUND));
+                .orElseThrow(() -> new InterviewNotFoundException(InterviewErrorCode.SLOT_NOT_FOUND));
     }
 
     @Override
@@ -90,8 +90,8 @@ public class InterviewQueryService implements InterviewQueryUseCase {
         // Repository에 구현된 메서드가 있다면 사용, 없다면 기본 조회 후 정렬
         List<InterviewSlot> slots = slotRepositoryPort.findByInterviewId(interviewId);
         return slots.stream()
-            .sorted((a, b) -> a.getStartTime().compareTo(b.getStartTime()))
-            .toList();
+                .sorted((a, b) -> a.getStartTime().compareTo(b.getStartTime()))
+                .toList();
     }
 
     @Override

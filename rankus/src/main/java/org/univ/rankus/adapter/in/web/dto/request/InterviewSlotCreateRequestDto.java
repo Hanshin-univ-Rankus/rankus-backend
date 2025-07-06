@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class InterviewSlotCreateRequestDto {
-    
+
     @NotNull(message = "슬롯 시작 시간은 필수입니다.")
     @Future(message = "슬롯 시작 시간은 미래여야 합니다.")
     private final LocalDateTime startTime;

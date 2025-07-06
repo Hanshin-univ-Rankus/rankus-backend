@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.univ.rankus.common.BaseTimeEntity;
+import org.univ.rankus.domain.model.interview.InterviewSlot;
+import org.univ.rankus.domain.model.interview.exception.InterviewErrorCode;
+import org.univ.rankus.domain.model.interview.exception.InterviewNotFoundException;
 import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.exception.LabApplicationErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabApplicationValidationException;
@@ -13,9 +16,6 @@ import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
-import org.univ.rankus.domain.model.interview.InterviewSlot;
-import org.univ.rankus.domain.model.interview.exception.InterviewErrorCode;
-import org.univ.rankus.domain.model.interview.exception.InterviewNotFoundException;
 
 import java.time.LocalDateTime;
 
@@ -69,17 +69,17 @@ public class LabApplication extends BaseTimeEntity {
         if (interviewSlot == null) {
             throw new InterviewNotFoundException(InterviewErrorCode.SLOT_NOT_FOUND);
         }
-        
+
         // 면접 슬롯의 면접이 해당 랩실과 일치하는지 확인
         if (!interviewSlot.getInterview().getLab().getId().equals(lab.getId())) {
             throw new LabApplicationValidationException(LabApplicationErrorCode.INVALID_INTERVIEW_TIME);
         }
-        
+
         // 면접 슬롯이 예약 가능한지 확인
         if (!interviewSlot.isAvailable()) {
             throw new LabApplicationValidationException(LabApplicationErrorCode.INVALID_INTERVIEW_TIME);
         }
-        
+
         this.interviewSlot = interviewSlot;
         this.status = ApplicationStatus.PENDING;  // 기본 상태
 
@@ -112,7 +112,7 @@ public class LabApplication extends BaseTimeEntity {
         if (this.status != ApplicationStatus.PENDING) {
             throw new LabApplicationValidationException(LabApplicationErrorCode.ALREADY_PROCESSED);
         }
-        
+
         // 슬롯 예약 취소 처리
         if (this.interviewSlot != null) {
             this.interviewSlot.cancelReservation();

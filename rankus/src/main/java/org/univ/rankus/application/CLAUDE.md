@@ -10,6 +10,7 @@ Controller → {Domain}QueryUseCase → {Domain}QueryService → {Domain}Reposit
 ## 🔗 UseCase 템플릿
 
 ### Command UseCase (상태 변경)
+
 ```java
 public interface {Domain}CommandUseCase {
     {Domain} create{Domain}({Domain}CreateRequestDto request);
@@ -19,6 +20,7 @@ public interface {Domain}CommandUseCase {
 ```
 
 ### Query UseCase (조회)
+
 ```java
 public interface {Domain}QueryUseCase {
     {Domain} find{Domain}ById(Long id);
@@ -30,6 +32,7 @@ public interface {Domain}QueryUseCase {
 ## 🏗️ Service 구현 패턴
 
 ### Command Service
+
 ```java
 @Service @RequiredArgsConstructor
 public class {Domain}CommandService implements {Domain}CommandUseCase {
@@ -44,6 +47,7 @@ public class {Domain}CommandService implements {Domain}CommandUseCase {
 ```
 
 ### Query Service
+
 ```java
 @Service @RequiredArgsConstructor  
 public class {Domain}QueryService implements {Domain}QueryUseCase {
@@ -60,6 +64,7 @@ public class {Domain}QueryService implements {Domain}QueryUseCase {
 ## 📝 Notice UseCase 패턴
 
 ### LabNoticeCommandUseCase
+
 ```java
 public interface LabNoticeCommandUseCase {
     LabNotice createNotice(String title, String content, Long authorId, Long labId, NoticeType type, boolean pinned);
@@ -70,6 +75,7 @@ public interface LabNoticeCommandUseCase {
 ```
 
 ### LabNoticeQueryUseCase
+
 ```java
 public interface LabNoticeQueryUseCase {
     Page<LabNotice> getNoticesByLabId(Long labId, Pageable pageable);
@@ -82,15 +88,16 @@ public interface LabNoticeQueryUseCase {
 
 ## 📊 구현된 UseCase
 
-| 도메인 | Command | Query | 상태 |
-|-------|---------|-------|------|
-| User | ✅ | ✅ | 완료 |
-| Lab | ✅ | ✅ | 완료 |
-| LabApplication | ✅ | ✅ | 완료 |
-| LabImage | ✅ | ✅ | 완료 |
-| LabCreationRequest | ✅ | ✅ | 완료 |
-| **LabNotice** | **✅** | **✅** | **완료** |
-| Auth | ✅ | ❌ | 부분 |
+| 도메인                | Command | Query | 상태     |
+|--------------------|---------|-------|--------|
+| User               | ✅       | ✅     | 완료     |
+| Lab                | ✅       | ✅     | 완료     |
+| LabApplication     | ✅       | ✅     | 완료     |
+| LabImage           | ✅       | ✅     | 완료     |
+| LabCreationRequest | ✅       | ✅     | 완료     |
+| **LabNotice**      | **✅**   | **✅** | **완료** |
+| **Interview**      | **✅**   | **✅** | **완료** |
+| Auth               | ✅       | ❌     | 부분     |
 
 ## 🔧 핵심 규칙
 

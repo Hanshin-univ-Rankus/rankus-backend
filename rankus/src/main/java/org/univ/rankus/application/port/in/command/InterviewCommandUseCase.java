@@ -16,15 +16,15 @@ public interface InterviewCommandUseCase {
     /**
      * 새로운 면접을 생성합니다.
      *
-     * @param labId                  면접을 진행할 랩실 ID
-     * @param startDate              면접 시작일
-     * @param endDate                면접 종료일
-     * @param durationMinutes        면접 소요 시간 (분)
-     * @param maxApplicantsPerSlot   슬롯당 최대 지원자 수
+     * @param labId                면접을 진행할 랩실 ID
+     * @param startDate            면접 시작일
+     * @param endDate              면접 종료일
+     * @param durationMinutes      면접 소요 시간 (분)
+     * @param maxApplicantsPerSlot 슬롯당 최대 지원자 수
      * @return 생성된 Interview 엔티티
      */
-    Interview createInterview(Long labId, LocalDate startDate, LocalDate endDate, 
-                             Integer durationMinutes, Integer maxApplicantsPerSlot);
+    Interview createInterview(Long labId, LocalDate startDate, LocalDate endDate,
+                              Integer durationMinutes, Integer maxApplicantsPerSlot);
 
     /**
      * 면접을 활성화합니다.
@@ -59,18 +59,18 @@ public interface InterviewCommandUseCase {
      * @param maxApplicants 최대 지원자 수 (null일 경우 면접 설정값 사용)
      * @return 생성된 InterviewSlot 엔티티
      */
-    InterviewSlot createInterviewSlot(Long interviewId, LocalDateTime startTime, 
-                                     LocalDateTime endTime, Integer maxApplicants);
+    InterviewSlot createInterviewSlot(Long interviewId, LocalDateTime startTime,
+                                      LocalDateTime endTime, Integer maxApplicants);
 
     /**
      * 여러 면접 슬롯을 일괄 생성합니다.
      *
-     * @param interviewId   슬롯을 추가할 면접 ID
-     * @param slotInfos     슬롯 정보 리스트 (시작시간, 종료시간, 최대지원자수)
+     * @param interviewId 슬롯을 추가할 면접 ID
+     * @param slotInfos   슬롯 정보 리스트 (시작시간, 종료시간, 최대지원자수)
      * @return 생성된 InterviewSlot 리스트
      */
-    List<InterviewSlot> createMultipleInterviewSlots(Long interviewId, 
-                                                    List<SlotCreationInfo> slotInfos);
+    List<InterviewSlot> createMultipleInterviewSlots(Long interviewId,
+                                                     List<SlotCreationInfo> slotInfos);
 
     /**
      * 면접 슬롯을 취소합니다.
@@ -105,22 +105,23 @@ public interface InterviewCommandUseCase {
     /**
      * 면접 설정을 수정합니다.
      *
-     * @param interviewId            수정할 면접 ID
-     * @param startDate              면접 시작일
-     * @param endDate                면접 종료일
-     * @param durationMinutes        면접 소요 시간 (분)
-     * @param maxApplicantsPerSlot   슬롯당 최대 지원자 수
+     * @param interviewId          수정할 면접 ID
+     * @param startDate            면접 시작일
+     * @param endDate              면접 종료일
+     * @param durationMinutes      면접 소요 시간 (분)
+     * @param maxApplicantsPerSlot 슬롯당 최대 지원자 수
      * @return 수정된 Interview 엔티티
      */
-    Interview updateInterview(Long interviewId, LocalDate startDate, LocalDate endDate, 
-                             Integer durationMinutes, Integer maxApplicantsPerSlot);
+    Interview updateInterview(Long interviewId, LocalDate startDate, LocalDate endDate,
+                              Integer durationMinutes, Integer maxApplicantsPerSlot);
 
     /**
      * 슬롯 생성 정보를 담는 내부 클래스
      */
     record SlotCreationInfo(
-        LocalDateTime startTime,
-        LocalDateTime endTime,
-        Integer maxApplicants
-    ) {}
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            Integer maxApplicants
+    ) {
+    }
 }

@@ -23,8 +23,8 @@ public class LabApplicationResponseDto {
                 .id(labApplication.getId())
                 .labId(labApplication.getLab().getId())
                 .applicant(UserResponseDto.from(labApplication.getUser()))
-                .interviewSlot(labApplication.getInterviewSlot() != null ? 
-                    InterviewSlotResponseDto.from(labApplication.getInterviewSlot()) : null)
+                .interviewSlot(labApplication.getInterviewSlot() != null ?
+                        InterviewSlotResponseDto.from(labApplication.getInterviewSlot()) : null)
                 .interviewTime(labApplication.getInterviewTime()) // 호환성을 위한 필드
                 .status(labApplication.getStatus().name())
                 .build();

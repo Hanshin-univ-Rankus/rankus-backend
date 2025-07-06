@@ -39,7 +39,7 @@ public interface InterviewRepositoryPort {
     /**
      * 특정 랩실의 특정 상태인 Interview를 조회합니다.
      *
-     * @param labId 랩실 ID
+     * @param labId  랩실 ID
      * @param status 면접 상태
      * @return 해당 조건에 맞는 Interview 리스트
      */

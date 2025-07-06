@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class LabApplicationSlotRequestDto {
-    
+
     @NotNull(message = "면접 슬롯 ID는 필수입니다.")
     private final Long slotId;
 }

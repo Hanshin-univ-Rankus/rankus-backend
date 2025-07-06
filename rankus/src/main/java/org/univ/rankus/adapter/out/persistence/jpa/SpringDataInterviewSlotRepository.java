@@ -53,11 +53,11 @@ public interface SpringDataInterviewSlotRepository extends JpaRepository<Intervi
      * 특정 시간 범위에 겹치는 슬롯이 있는지 확인합니다.
      */
     @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM InterviewSlot s " +
-           "WHERE s.interview.id = :interviewId " +
-           "AND ((s.startTime <= :endTime AND s.endTime >= :startTime))")
-    boolean existsByInterviewIdAndTimeRange(@Param("interviewId") Long interviewId, 
-                                          @Param("startTime") LocalDateTime startTime, 
-                                          @Param("endTime") LocalDateTime endTime);
+            "WHERE s.interview.id = :interviewId " +
+            "AND ((s.startTime <= :endTime AND s.endTime >= :startTime))")
+    boolean existsByInterviewIdAndTimeRange(@Param("interviewId") Long interviewId,
+                                            @Param("startTime") LocalDateTime startTime,
+                                            @Param("endTime") LocalDateTime endTime);
 
     /**
      * 면접 ID로 모든 슬롯을 삭제합니다.
@@ -80,13 +80,13 @@ public interface SpringDataInterviewSlotRepository extends JpaRepository<Intervi
      * 시간 범위와 상태로 슬롯을 조회합니다.
      */
     @Query("SELECT s FROM InterviewSlot s WHERE s.interview.id = :interviewId " +
-           "AND s.startTime >= :startTime AND s.endTime <= :endTime " +
-           "AND s.status = :status " +
-           "ORDER BY s.startTime ASC")
+            "AND s.startTime >= :startTime AND s.endTime <= :endTime " +
+            "AND s.status = :status " +
+            "ORDER BY s.startTime ASC")
     List<InterviewSlot> findByInterviewIdAndTimeRangeAndStatus(@Param("interviewId") Long interviewId,
-                                                             @Param("startTime") LocalDateTime startTime,
-                                                             @Param("endTime") LocalDateTime endTime,
-                                                             @Param("status") SlotStatus status);
+                                                               @Param("startTime") LocalDateTime startTime,
+                                                               @Param("endTime") LocalDateTime endTime,
+                                                               @Param("status") SlotStatus status);
 
     /**
      * 특정 면접의 모든 슬롯을 시간순으로 조회합니다.

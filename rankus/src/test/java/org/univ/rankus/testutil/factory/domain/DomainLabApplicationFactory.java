@@ -18,28 +18,31 @@ public final class DomainLabApplicationFactory {
     }
 
     public static LabApplication buildValidPendingApplication(Lab lab, User user, InterviewSlot slot) {
-        // ID가 없는 객체들에게 ID 설정 (테스트 환경에서만)
+        // ID 설정 헬퍼 활용
+        ensureEntityIds(lab, user, slot);
+        return new LabApplication(lab, user, slot);
+    }
+    
+    private static void ensureEntityIds(Lab lab, User user, InterviewSlot slot) {
         if (lab.getId() == null) {
-            org.springframework.test.util.ReflectionTestUtils.setField(lab, "id", 1L);
+            ReflectionTestUtils.setField(lab, "id", 1L);
         }
         if (user.getId() == null) {
-            org.springframework.test.util.ReflectionTestUtils.setField(user, "id", 1L);
+            ReflectionTestUtils.setField(user, "id", 1L);
         }
         if (slot.getId() == null) {
-            org.springframework.test.util.ReflectionTestUtils.setField(slot, "id", 1L);
+            ReflectionTestUtils.setField(slot, "id", 1L);
         }
         
-        // InterviewSlot의 Interview에도 ID 설정
-        if (slot.getInterview() != null && slot.getInterview().getId() == null) {
-            org.springframework.test.util.ReflectionTestUtils.setField(slot.getInterview(), "id", 1L);
+        // Interview 연관 관계 ID 설정
+        if (slot.getInterview() != null) {
+            if (slot.getInterview().getId() == null) {
+                ReflectionTestUtils.setField(slot.getInterview(), "id", 1L);
+            }
+            if (slot.getInterview().getLab() != null) {
+                ReflectionTestUtils.setField(slot.getInterview().getLab(), "id", lab.getId());
+            }
         }
-        
-        // InterviewSlot의 Interview의 Lab에도 같은 ID 설정 (검증 통과를 위해)
-        if (slot.getInterview() != null && slot.getInterview().getLab() != null) {
-            org.springframework.test.util.ReflectionTestUtils.setField(slot.getInterview().getLab(), "id", lab.getId());
-        }
-        
-        return new LabApplication(lab, user, slot);
     }
 
     public static LabApplication buildValidPendingWithId(Long id, Lab lab, User user, InterviewSlot slot) {
@@ -60,9 +63,6 @@ public final class DomainLabApplicationFactory {
         return new LabApplication(lab, user, null);
     }
 
-    public static LabApplication buildInvalidApp_NullTime(Lab lab, User user) {
-        return new LabApplication(lab, user, null);
-    }
 
     public static LabApplication buildWithStatus(Lab lab, User user, ApplicationStatus status) {
         InterviewSlot slot = DomainInterviewSlotFactory.buildValidSlot();
@@ -86,15 +86,13 @@ public final class DomainLabApplicationFactory {
         return buildValidPendingApplication(lab, user, slot);
     }
 
-    // 레거시 호환용 메서드들 (LocalDateTime 기반) - 수정됨
-    @Deprecated
+    // 간소화된 헬퍼 메서드들
     public static LabApplication buildValidPendingApplication(Lab lab, User user, LocalDateTime time) {
         Lab commonLab = (lab != null) ? lab : DomainLabFactory.buildValidLab();
         InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(time, commonLab);
         return new LabApplication(commonLab, user, slot);
     }
 
-    @Deprecated
     public static LabApplication buildInvalidApp_PastTime(Lab lab, User user) {
         Lab commonLab = (lab != null) ? lab : DomainLabFactory.buildValidLab();
         InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(LocalDateTime.now().minusDays(1), commonLab);

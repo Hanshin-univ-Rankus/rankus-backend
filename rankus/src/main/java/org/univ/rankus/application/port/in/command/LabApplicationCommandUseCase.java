@@ -8,6 +8,7 @@ public interface LabApplicationCommandUseCase {
 
     /**
      * 랩실 지원 신청 (레거시 - 시간 기반)
+     *
      * @deprecated 면접 슬롯 시스템으로 대체됨. applyToLabWithSlot() 사용 권장
      */
     @Deprecated

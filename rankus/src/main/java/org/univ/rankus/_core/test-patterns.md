@@ -50,35 +50,87 @@ void {검증조건}_시_{ErrorCode}_반환() {
 }
 
 // 주요 ErrorCode 매핑
+// User: USER_001~010(입력값), USER_404(미존재), USER_409(중복)
+// Lab: LAB_001~015(입력값), LAB_404(미존재), LAB_409(중복)
+// LabApplication: LAP_001~012(입력값), LAP_404(미존재), LAP_422(상태변경불가)
 // LabNotice: LNT_001~007(입력값), LNT_403(권한), LNT_404(미존재)
+// Interview: INT_001~034(입력값/상태), INT_028~029(권한), INT_030~032(미존재)
 // LabCreationRequest: LCR_006(중복), LCR_007(상태변경불가), LCR_009(미존재)
 ```
 
-## 📝 Notice 테스트 예시
+## 📝 다양한 도메인 테스트 예시
+
+### Entity 테스트 패턴
 
 ```java
-// Entity 테스트
+// 기본 Entity 생성 테스트
 @Test
-void LabNotice_생성_성공() {
-    LabNotice notice = LabNotice.create(title, content, author, lab, NoticeType.NORMAL);
-    assertThat(notice.getType()).isEqualTo(NoticeType.NORMAL);
-    assertThat(notice.isPinned()).isFalse();
+void {Domain}_생성_성공() {
+    {Domain} entity = {Domain}.create(validParams);
+    assertThat(entity.get{Field}()).isEqualTo(expectedValue);
 }
 
-// 권한 테스트
+// 상태 전이 테스트 (상태 관리 Entity용)
+@Test
+void {Domain}_상태변경_성공() {
+    {Domain} entity = {Domain}.create(validParams);
+    entity.approve(); // or activate(), reject() 등
+    assertThat(entity.getStatus()).isEqualTo({Status}.APPROVED);
+}
+
+// 연관관계 테스트
+@Test
+void {Domain}_연관관계_설정_성공() {
+    {Domain} entity = {Domain}.create(parentEntity, childParams);
+    assertThat(entity.getParent()).isEqualTo(parentEntity);
+}
+```
+
+### Controller 권한 테스트 패턴
+
+```java
+// 도메인별 권한 테스트
 @Test @WithMockUser(roles = "USER")
-void 공지사항_생성_권한_있음() throws Exception {
-    mockMvc.perform(post("/api/labs/{labId}/notices", 1L)
+void {Domain}_생성_권한_있음() throws Exception {
+    mockMvc.perform(post("/api/{domains}")
             .content(objectMapper.writeValueAsString(request)))
             .andExpected(status().isCreated());
 }
 
-// ErrorCode 테스트
+// 랩실 권한 테스트
+@Test @WithMockUser(roles = "LAB_MANAGER")
+void {Domain}_관리_권한_있음() throws Exception {
+    mockMvc.perform(post("/api/labs/{labId}/{domains}", 1L)
+            .content(objectMapper.writeValueAsString(request)))
+            .andExpected(status().isCreated());
+}
+```
+
+### ErrorCode 테스트 패턴
+
+```java
+// 입력값 검증 테스트
 @Test
-void 제목_누락시_LNT_001_반환() {
-    NoticeException exception = assertThrows(NoticeException.class,
-        () -> service.createLabNotice(invalidRequest));
-    assertThat(exception.getErrorCode()).isEqualTo(NoticeErrorCode.TITLE_REQUIRED);
+void {필드}_누락시_{PREFIX}_001_반환() {
+    {Domain}Exception exception = assertThrows({Domain}Exception.class,
+        () -> service.create{Domain}(invalidRequest));
+    assertThat(exception.getErrorCode()).isEqualTo({Domain}ErrorCode.{FIELD}_REQUIRED);
+}
+
+// 상태 변경 불가 테스트
+@Test
+void 잘못된_상태에서_변경시_{PREFIX}_422_반환() {
+    {Domain}Exception exception = assertThrows({Domain}Exception.class,
+        () -> entity.changeStatus());
+    assertThat(exception.getErrorCode()).isEqualTo({Domain}ErrorCode.CANNOT_CHANGE_STATUS);
+}
+
+// 조회 실패 테스트
+@Test
+void 존재하지않는_{Domain}_조회시_{PREFIX}_404_반환() {
+    {Domain}Exception exception = assertThrows({Domain}Exception.class,
+        () -> service.find{Domain}ById(999L));
+    assertThat(exception.getErrorCode()).isEqualTo({Domain}ErrorCode.{DOMAIN}_NOT_FOUND);
 }
 ```
 
@@ -96,12 +148,12 @@ verify(repository).save(any({Entity}.class));
 
 ## 🛡️ 테스트 안전성 원칙
 
-| 계층 | 원칙 | 적용 패턴 |
-|-----|-----|---------|
-| Factory | 순수성 유지 | 외부 상태 변경 금지, ID/시간 등 자동 설정 금지 |
-| DTO | Null 안전성 | 모든 연관 객체 null 체크 필수 |
-| Entity | 상태 독립성 | 테스트간 엔티티 상태 격리 보장 |
-| Mock | 완전성 검증 | 모든 의존성 Mock 설정 완료 확인 |
+| 계층      | 원칙       | 적용 패턴                         |
+|---------|----------|-------------------------------|
+| Factory | 순수성 유지   | 외부 상태 변경 금지, ID/시간 등 자동 설정 금지 |
+| DTO     | Null 안전성 | 모든 연관 객체 null 체크 필수           |
+| Entity  | 상태 독립성   | 테스트간 엔티티 상태 격리 보장             |
+| Mock    | 완전성 검증   | 모든 의존성 Mock 설정 완료 확인          |
 
 ```java
 // ✅ Factory 순수성: 외부 상태 의존 금지

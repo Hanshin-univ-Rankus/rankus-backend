@@ -41,7 +41,7 @@ public interface InterviewSlotRepositoryPort {
      * 특정 면접의 특정 상태인 InterviewSlot을 조회합니다.
      *
      * @param interviewId 면접 ID
-     * @param status 슬롯 상태
+     * @param status      슬롯 상태
      * @return 해당 조건에 맞는 InterviewSlot 리스트
      */
     List<InterviewSlot> findByInterviewIdAndStatus(Long interviewId, SlotStatus status);
@@ -58,8 +58,8 @@ public interface InterviewSlotRepositoryPort {
      * 특정 시간 범위의 슬롯이 존재하는지 확인합니다.
      *
      * @param interviewId 면접 ID
-     * @param startTime 시작 시간
-     * @param endTime 종료 시간
+     * @param startTime   시작 시간
+     * @param endTime     종료 시간
      * @return 해당 시간 범위에 슬롯이 있으면 true
      */
     boolean existsByInterviewIdAndTimeRange(Long interviewId, LocalDateTime startTime, LocalDateTime endTime);

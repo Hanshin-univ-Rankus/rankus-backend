@@ -36,7 +36,7 @@ public interface InterviewQueryUseCase {
     /**
      * 특정 랩실의 특정 상태 면접을 조회합니다.
      *
-     * @param labId 랩실 ID
+     * @param labId  랩실 ID
      * @param status 면접 상태
      * @return Interview 리스트
      */
@@ -95,7 +95,7 @@ public interface InterviewQueryUseCase {
      * 특정 면접의 특정 상태 슬롯을 조회합니다.
      *
      * @param interviewId 면접 ID
-     * @param status 슬롯 상태
+     * @param status      슬롯 상태
      * @return InterviewSlot 리스트
      */
     List<InterviewSlot> getSlotsByInterviewIdAndStatus(Long interviewId, SlotStatus status);
@@ -144,8 +144,8 @@ public interface InterviewQueryUseCase {
      * 특정 시간 범위에 겹치는 슬롯이 있는지 확인합니다.
      *
      * @param interviewId 면접 ID
-     * @param startTime 시작 시간
-     * @param endTime 종료 시간
+     * @param startTime   시작 시간
+     * @param endTime     종료 시간
      * @return 겹치는 슬롯이 있으면 true
      */
     boolean hasConflictingSlots(Long interviewId, LocalDateTime startTime, LocalDateTime endTime);

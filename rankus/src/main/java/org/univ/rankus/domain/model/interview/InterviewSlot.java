@@ -54,9 +54,9 @@ public class InterviewSlot extends BaseTimeEntity {
      * @param endTime       슬롯 종료 시간
      * @param maxApplicants 최대 지원자 수
      */
-    public InterviewSlot(Interview interview, LocalDateTime startTime, 
-                        LocalDateTime endTime, Integer maxApplicants) {
-        
+    public InterviewSlot(Interview interview, LocalDateTime startTime,
+                         LocalDateTime endTime, Integer maxApplicants) {
+
         validateInterview(interview);
         validateTimes(startTime, endTime);
         validateMaxApplicants(maxApplicants);
@@ -86,7 +86,7 @@ public class InterviewSlot extends BaseTimeEntity {
         }
 
         this.currentApplicants++;
-        
+
         if (this.currentApplicants >= this.maxApplicants) {
             this.status = SlotStatus.FULL;
         }
@@ -101,7 +101,7 @@ public class InterviewSlot extends BaseTimeEntity {
         }
 
         this.currentApplicants--;
-        
+
         if (this.status == SlotStatus.FULL && this.currentApplicants < this.maxApplicants) {
             this.status = SlotStatus.AVAILABLE;
         }

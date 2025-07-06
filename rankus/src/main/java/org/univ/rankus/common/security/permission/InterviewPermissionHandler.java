@@ -3,12 +3,12 @@ package org.univ.rankus.common.security.permission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.univ.rankus.application.port.in.query.InterviewQueryUseCase;
-import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.application.port.in.query.LabPromotionQueryUseCase;
+import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.interview.Interview;
-import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.user.User;
 
 /**
  * Interview 도메인 권한 처리 핸들러
