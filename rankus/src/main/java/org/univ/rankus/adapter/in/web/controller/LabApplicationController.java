@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.univ.rankus.adapter.in.web.dto.request.LabApplicationRequestDto;
+import org.univ.rankus.adapter.in.web.dto.request.LabApplicationSlotRequestDto;
 import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;
 import org.univ.rankus.adapter.in.web.dto.response.LabApplicationResponseDto;
 import org.univ.rankus.application.port.in.command.LabApplicationCommandUseCase;
@@ -37,7 +38,7 @@ public class LabApplicationController {
     private final LabApplicationCommandUseCase commandUseCase;
     private final LabApplicationQueryUseCase queryUseCase;
 
-    @Operation(summary = "랩실 가입 신청", description = "로그인 사용자가 해당 랩실에 가입 신청을 합니다.")
+    @Operation(summary = "랩실 가입 신청 (레거시)", description = "로그인 사용자가 해당 랩실에 가입 신청을 합니다. (구형 시간 기반 - 호환성용)")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "201", description = "가입 신청 성공",
@@ -46,7 +47,7 @@ public class LabApplicationController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400", description = "입력 검증 실패",
+                    responseCode = "400", description = "입력 검증 실패 또는 면접 시스템 사용 필요",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(allOf = {ApiResponse.class})
                     )
@@ -184,5 +185,49 @@ public class LabApplicationController {
     ) {
         commandUseCase.rejectApplication(appId);
         return ResponseEntity.noContent().build();
+    }
+
+    // ====== 새로운 슬롯 기반 지원 API ======
+
+    @Operation(summary = "랩실 가입 신청 (슬롯 기반)", description = "면접 슬롯을 선택하여 랩실에 가입 신청을 합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "201", description = "가입 신청 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(allOf = {ApiResponse.class, LabApplicationResponseDto.class})
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400", description = "입력 검증 실패 또는 슬롯 예약 불가",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "409", description = "중복 신청",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class))
+            )
+    })
+    @PostMapping("/slot-based")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<LabApplicationResponseDto>> applyToLabWithSlot(
+            @PathVariable @Positive Long labId,
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestBody @Valid LabApplicationSlotRequestDto dto
+    ) {
+        LabApplication created = commandUseCase.applyToLabWithSlot(
+                labId,
+                principal.getUserId(),
+                dto.getSlotId()
+        );
+        LabApplicationResponseDto respDto = LabApplicationResponseDto.from(created);
+        ApiResponse<LabApplicationResponseDto> body = ApiResponse.created(respDto, "가입 신청 성공");
+        URI location = URI.create("/api/labs/" + labId + "/applications/" + created.getId());
+        return ResponseEntity.created(location)
+                .cacheControl(CacheControl.noStore())
+                .body(body);
     }
 }

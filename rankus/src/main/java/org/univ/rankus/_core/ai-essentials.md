@@ -68,6 +68,32 @@ public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid @RequestBo
 {DOMAIN}_NOT_FOUND("{PREFIX}_404", NOT_FOUND, "{도메인}을 찾을 수 없습니다"),
 ```
 
+## 🔍 테스트 품질 체크리스트
+
+### 코드 작성 후 확인사항
+- [ ] Factory는 외부 상태에 의존하지 않는가?
+- [ ] DTO 변환에서 연관 객체 null 처리 포함되었는가?
+- [ ] 테스트간 상태 격리가 보장되는가?
+- [ ] Mock 설정이 완전한가?
+
+### 안전한 설계 패턴
+```java
+// ✅ 상태 독립적 Factory
+public static Entity create() {
+    return new Entity(defaultValidData); // 외부 상태 비의존
+}
+
+// ✅ 방어적 DTO 변환
+.relation(entity.getRelation() != null ? 
+    RelationDto.from(entity.getRelation()) : null)
+
+// ✅ 테스트별 상태 조정
+@Test void test() {
+    Entity entity = Factory.create();
+    // 테스트에 필요한 상태만 조정
+}
+```
+
 ## ✅ 컨텍스트 파일 업데이트 의무사항
 
 ### 🚨 개발 완료 후 필수 수행
@@ -87,4 +113,4 @@ public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid @RequestBo
 - **AI 최적화**: 50줄 이하, 테이블 중심, 코드 템플릿 포함
 - **즉시 업데이트**: 개발 완료 즉시 문서 업데이트
 
-**업데이트**: 2025-01-05 | **50줄** | AI 코딩 최적화
+**업데이트**: 2025-07-06 | **65줄** | 테스트 품질 체크리스트 추가

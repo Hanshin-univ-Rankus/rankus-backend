@@ -752,6 +752,29 @@ public abstract class BaseWebTest {
 }
 ```
 
+## 🏗️ 테스트 설계 원칙
+
+### Factory 책임 분리
+| Factory 타입 | 책임 범위 | 상태 관리 | 의존성 |
+|-------------|----------|---------|--------|
+| Domain Factory | 비즈니스 객체 생성 | 상태 무관 | 외부 의존 금지 |
+| Integration Factory | DB 연동 객체 | 영속성 관리 | Spring 의존 |
+| DTO Factory | API 계약 객체 | 프로토콜 준수 | 구조 일치성 |
+
+### 테스트 격리 전략
+```java
+// ✅ 상태 독립적 객체 생성
+public static Entity createValid() {
+    return new Entity(defaultValues); // 외부 상태 비의존
+}
+
+// ✅ 필요시에만 테스트별 상태 조정
+@Test void 특정_상태_검증() {
+    Entity entity = createValid();
+    setTestSpecificState(entity); // 테스트에서만 조정
+}
+```
+
 ## 🎯 TestUtil 활용 베스트 프랙티스
 
 ### 1. Factory 사용 원칙
@@ -766,7 +789,7 @@ public abstract class BaseWebTest {
 
 #### 핵심 원칙
 
-- **도메인 Factory**: 순수 객체 생성, 외부 의존성 없음
+- **도메인 Factory**: 순수 객체 생성, 외부 의존성 없음, **상태 중립성 유지**
 - **Integration Factory**: 실제 DB 연동, @Component로 Spring 관리
 - **DTO Factory**: 실제 DTO 구조와 정확히 일치, 타입 안전성 확보
 - **빌더 패턴**: 복잡한 객체 생성 시 가독성 향상

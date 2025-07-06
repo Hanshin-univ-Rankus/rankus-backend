@@ -94,4 +94,29 @@ verify(repository).save(any({Entity}.class));
 @WithMockUser(roles = "ADMIN") // 실제 권한 설정
 ```
 
-**업데이트**: 2025-01-05 | **60줄** | AI 코딩 최적화
+## 🛡️ 테스트 안전성 원칙
+
+| 계층 | 원칙 | 적용 패턴 |
+|-----|-----|---------|
+| Factory | 순수성 유지 | 외부 상태 변경 금지, ID/시간 등 자동 설정 금지 |
+| DTO | Null 안전성 | 모든 연관 객체 null 체크 필수 |
+| Entity | 상태 독립성 | 테스트간 엔티티 상태 격리 보장 |
+| Mock | 완전성 검증 | 모든 의존성 Mock 설정 완료 확인 |
+
+```java
+// ✅ Factory 순수성: 외부 상태 의존 금지
+public static Entity createEntity() {
+    return new Entity(validData); // ID, 타임스탬프 등 설정 금지
+}
+
+// ✅ DTO Null 안전성: 연관 객체 검증
+.relation(entity.getRelation() != null ? 
+    RelationDto.from(entity.getRelation()) : null)
+
+// ✅ 테스트 격리: 필요시에만 상태 설정
+if (테스트_검증_필요시) {
+    ReflectionTestUtils.setField(entity, "field", value);
+}
+```
+
+**업데이트**: 2025-07-06 | **75줄** | 테스트 안전성 원칙 추가

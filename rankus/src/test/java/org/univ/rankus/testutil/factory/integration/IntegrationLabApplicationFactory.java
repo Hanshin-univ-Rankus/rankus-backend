@@ -5,7 +5,9 @@ import org.univ.rankus.application.port.out.LabApplicationRepositoryPort;
 import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.User;
+import org.univ.rankus.domain.model.interview.InterviewSlot;
 import org.univ.rankus.testutil.factory.domain.DomainLabApplicationFactory;
+import org.univ.rankus.testutil.factory.domain.DomainInterviewSlotFactory;
 
 import java.time.LocalDateTime;
 
@@ -18,12 +20,19 @@ public final class IntegrationLabApplicationFactory {
     }
 
     public static LabApplication persistValidPendingApplication(LabApplicationRepositoryPort repo, Lab lab, User user, LocalDateTime time) {
-        LabApplication app = DomainLabApplicationFactory.buildValidPendingApplication(lab, user, time);
-        return repo.save(app);
+        // Note: 현재 Repository를 통한 저장은 복잡하므로 TestEntityManager 버전 사용 권장
+        throw new UnsupportedOperationException("Repository를 통한 LabApplication 저장은 Interview/InterviewSlot 의존성으로 인해 복잡합니다. TestEntityManager 버전을 사용하세요.");
     }
 
     public static LabApplication persistValidPendingApplication(TestEntityManager em, Lab lab, User user, LocalDateTime time) {
-        LabApplication app = DomainLabApplicationFactory.buildValidPendingApplication(lab, user, time);
+        InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(time, lab);
+        
+        // Interview와 InterviewSlot을 먼저 영속화
+        em.persist(slot.getInterview());
+        em.persist(slot);
+        em.flush();
+        
+        LabApplication app = DomainLabApplicationFactory.buildValidPendingApplication(lab, user, slot);
         em.persist(app);
         em.flush();
         return app;

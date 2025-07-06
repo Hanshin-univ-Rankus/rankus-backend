@@ -13,6 +13,9 @@ import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
+import org.univ.rankus.domain.model.interview.InterviewSlot;
+import org.univ.rankus.domain.model.interview.exception.InterviewErrorCode;
+import org.univ.rankus.domain.model.interview.exception.InterviewNotFoundException;
 
 import java.time.LocalDateTime;
 
@@ -39,8 +42,9 @@ public class LabApplication extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "interview_time", nullable = false)
-    private LocalDateTime interviewTime;  // 면접 예정 시간 (필수)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "interview_slot_id", nullable = false)
+    private InterviewSlot interviewSlot;  // 면접 슬롯 참조 (필수)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -48,10 +52,10 @@ public class LabApplication extends BaseTimeEntity {
 
     /**
      * 변경된 생성자:
-     * - 기존: (Lab lab, Long userId, String userName, LocalDateTime interviewTime)
-     * - 삭제: userId, userName → 대신 User 엔티티 전체를 넘겨받음
+     * - 기존: (Lab lab, User user, LocalDateTime interviewTime)
+     * - 변경: interviewTime → InterviewSlot 참조로 변경
      */
-    public LabApplication(Lab lab, User user, LocalDateTime interviewTime) {
+    public LabApplication(Lab lab, User user, InterviewSlot interviewSlot) {
         if (lab == null) {
             throw new LabNotFoundException(LabErrorCode.LAB_NOT_FOUND);
         }
@@ -62,20 +66,26 @@ public class LabApplication extends BaseTimeEntity {
         }
         this.user = user;
 
-        if (interviewTime == null || interviewTime.isBefore(LocalDateTime.now())) {
+        if (interviewSlot == null) {
+            throw new InterviewNotFoundException(InterviewErrorCode.SLOT_NOT_FOUND);
+        }
+        
+        // 면접 슬롯의 면접이 해당 랩실과 일치하는지 확인
+        if (!interviewSlot.getInterview().getLab().getId().equals(lab.getId())) {
             throw new LabApplicationValidationException(LabApplicationErrorCode.INVALID_INTERVIEW_TIME);
         }
-        this.interviewTime = interviewTime;
-
-
+        
+        // 면접 슬롯이 예약 가능한지 확인
+        if (!interviewSlot.isAvailable()) {
+            throw new LabApplicationValidationException(LabApplicationErrorCode.INVALID_INTERVIEW_TIME);
+        }
+        
+        this.interviewSlot = interviewSlot;
         this.status = ApplicationStatus.PENDING;  // 기본 상태
 
-        // (필요 시) 도메인 내부에서 “자기 랩에 이미 신청했는지” 검증 로직을 추가할 수도 있습니다.
+        // 슬롯 예약 처리
+        interviewSlot.reserve();
     }
-
-    // interviewTime 검증을 원한다면 private 메서드로 분리해도 무방합니다.
-    // 예:
-    // private LocalDateTime validateInterviewTime(LocalDateTime interviewTime) { … }
 
     public void approve() {
         if (this.status != ApplicationStatus.PENDING) {
@@ -93,5 +103,26 @@ public class LabApplication extends BaseTimeEntity {
 
     public boolean isOwnedBy(Long userId) {
         return user != null && user.getId().equals(userId);
+    }
+
+    /**
+     * 지원서 취소 시 슬롯 예약도 함께 취소
+     */
+    public void cancel() {
+        if (this.status != ApplicationStatus.PENDING) {
+            throw new LabApplicationValidationException(LabApplicationErrorCode.ALREADY_PROCESSED);
+        }
+        
+        // 슬롯 예약 취소 처리
+        if (this.interviewSlot != null) {
+            this.interviewSlot.cancelReservation();
+        }
+    }
+
+    /**
+     * 면접 시간 조회 (호환성을 위한 메서드)
+     */
+    public LocalDateTime getInterviewTime() {
+        return interviewSlot != null ? interviewSlot.getStartTime() : null;
     }
 }

@@ -14,27 +14,20 @@ public class LabApplicationResponseDto {
     private final Long id;
     private final Long labId;
     private final UserResponseDto applicant;
-    private final LocalDateTime interviewTime;
+    private final InterviewSlotResponseDto interviewSlot;
+    private final LocalDateTime interviewTime; // 호환성을 위한 필드
     private final String status;
 
-    public static LabApplicationResponseDto from(Long id, Long labId, UserResponseDto applicant, LocalDateTime interviewTime, String status) {
-        return LabApplicationResponseDto.builder()
-                .id(id)
-                .labId(labId)
-                .applicant(applicant)
-                .interviewTime(interviewTime)
-                .status(status)
-                .build();
-    }
-
     public static LabApplicationResponseDto from(LabApplication labApplication) {
-        return from(
-                labApplication.getId(),
-                labApplication.getLab().getId(),
-                UserResponseDto.from(labApplication.getUser()),
-                labApplication.getInterviewTime(),
-                labApplication.getStatus().name()
-        );
+        return LabApplicationResponseDto.builder()
+                .id(labApplication.getId())
+                .labId(labApplication.getLab().getId())
+                .applicant(UserResponseDto.from(labApplication.getUser()))
+                .interviewSlot(labApplication.getInterviewSlot() != null ? 
+                    InterviewSlotResponseDto.from(labApplication.getInterviewSlot()) : null)
+                .interviewTime(labApplication.getInterviewTime()) // 호환성을 위한 필드
+                .status(labApplication.getStatus().name())
+                .build();
     }
 
     public static List<LabApplicationResponseDto> fromList(List<LabApplication> labApplications) {

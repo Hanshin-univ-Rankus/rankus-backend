@@ -23,6 +23,10 @@
 | **LabNotice** | VIEW | Lab | Lab | Lab | Lab | All |
 | **LabNotice** | CREATE | ❌ | Lab | Lab | Lab | All |
 | **LabNotice** | UPDATE/DELETE | ❌ | Own | Own | Own | All |
+| **Interview** | VIEW | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Interview** | MANAGE | ❌ | ❌ | Lab | Lab | All |
+| **InterviewSlot** | VIEW | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **InterviewSlot** | MANAGE | ❌ | ❌ | Lab | Lab | All |
 
 ## 🎯 @PreAuthorize 패턴
 
@@ -38,6 +42,9 @@
 
 // Notice 권한
 @PreAuthorize("@labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_NOTICES')")
+
+// Interview 권한
+@PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
 ```
 
 ## 📝 Notice API 엔드포인트
@@ -49,5 +56,21 @@
 | POST | `/api/labs/{labId}/notices` | MANAGE_NOTICES | 생성 |
 | PUT | `/api/labs/{labId}/notices/{noticeId}` | LabNotice.UPDATE | 수정 |
 | DELETE | `/api/labs/{labId}/notices/{noticeId}` | LabNotice.DELETE | 삭제 |
+
+## 📝 Interview API 엔드포인트
+
+| HTTP | 엔드포인트 | 권한 | 용도 |
+|------|----------|------|------|
+| GET | `/api/labs/{labId}/interviews` | VIEW_INTERVIEWS | 목록 조회 |
+| GET | `/api/labs/{labId}/interviews/{id}` | VIEW_INTERVIEWS | 상세 조회 |
+| POST | `/api/labs/{labId}/interviews` | MANAGE_INTERVIEWS | 면접 생성 |
+| POST | `/api/labs/{labId}/interviews/{id}/activate` | MANAGE_INTERVIEWS | 면접 활성화 |
+| PUT | `/api/labs/{labId}/interviews/{id}` | MANAGE_INTERVIEWS | 면접 수정 |
+| DELETE | `/api/labs/{labId}/interviews/{id}` | MANAGE_INTERVIEWS | 면접 삭제 |
+| GET | `/api/labs/{labId}/interviews/{id}/slots` | VIEW_INTERVIEWS | 슬롯 조회 |
+| GET | `/api/labs/{labId}/interviews/{id}/slots/available` | VIEW_INTERVIEWS | 예약 가능 슬롯 |
+| POST | `/api/labs/{labId}/interviews/{id}/slots` | MANAGE_INTERVIEWS | 슬롯 생성 |
+| DELETE | `/api/labs/{labId}/interviews/{id}/slots/{slotId}` | MANAGE_INTERVIEWS | 슬롯 삭제 |
+| POST | `/api/labs/{labId}/applications/slot-based` | isAuthenticated() | 슬롯 기반 지원 |
 
 **업데이트**: 2025-01-05 | **50줄** | AI 코딩 최적화

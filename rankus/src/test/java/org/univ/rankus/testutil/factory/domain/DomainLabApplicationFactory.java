@@ -1,6 +1,7 @@
 package org.univ.rankus.testutil.factory.domain;
 
 import org.springframework.test.util.ReflectionTestUtils;
+import org.univ.rankus.domain.model.interview.InterviewSlot;
 import org.univ.rankus.domain.model.lab.application.ApplicationStatus;
 import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.lab.core.Lab;
@@ -16,34 +17,56 @@ public final class DomainLabApplicationFactory {
     private DomainLabApplicationFactory() {
     }
 
-    public static LabApplication buildValidPendingApplication(Lab lab, User user, LocalDateTime time) {
-        return new LabApplication(lab, user, time);
+    public static LabApplication buildValidPendingApplication(Lab lab, User user, InterviewSlot slot) {
+        // ID가 없는 객체들에게 ID 설정 (테스트 환경에서만)
+        if (lab.getId() == null) {
+            org.springframework.test.util.ReflectionTestUtils.setField(lab, "id", 1L);
+        }
+        if (user.getId() == null) {
+            org.springframework.test.util.ReflectionTestUtils.setField(user, "id", 1L);
+        }
+        if (slot.getId() == null) {
+            org.springframework.test.util.ReflectionTestUtils.setField(slot, "id", 1L);
+        }
+        
+        // InterviewSlot의 Interview에도 ID 설정
+        if (slot.getInterview() != null && slot.getInterview().getId() == null) {
+            org.springframework.test.util.ReflectionTestUtils.setField(slot.getInterview(), "id", 1L);
+        }
+        
+        // InterviewSlot의 Interview의 Lab에도 같은 ID 설정 (검증 통과를 위해)
+        if (slot.getInterview() != null && slot.getInterview().getLab() != null) {
+            org.springframework.test.util.ReflectionTestUtils.setField(slot.getInterview().getLab(), "id", lab.getId());
+        }
+        
+        return new LabApplication(lab, user, slot);
     }
 
-    public static LabApplication buildValidPendingWithId(Long id, Lab lab, User user, LocalDateTime time) {
-        LabApplication app = buildValidPendingApplication(lab, user, time);
+    public static LabApplication buildValidPendingWithId(Long id, Lab lab, User user, InterviewSlot slot) {
+        LabApplication app = buildValidPendingApplication(lab, user, slot);
         ReflectionTestUtils.setField(app, "id", id);
         return app;
     }
 
-    public static LabApplication buildInvalidApp_NullLab(User user, LocalDateTime time) {
-        return new LabApplication(null, user, time);
+    public static LabApplication buildInvalidApp_NullLab(User user, InterviewSlot slot) {
+        return new LabApplication(null, user, slot);
     }
 
-    public static LabApplication buildInvalidApp_NullUser(Lab lab, LocalDateTime time) {
-        return new LabApplication(lab, null, time);
+    public static LabApplication buildInvalidApp_NullUser(Lab lab, InterviewSlot slot) {
+        return new LabApplication(lab, null, slot);
+    }
+
+    public static LabApplication buildInvalidApp_NullSlot(Lab lab, User user) {
+        return new LabApplication(lab, user, null);
     }
 
     public static LabApplication buildInvalidApp_NullTime(Lab lab, User user) {
         return new LabApplication(lab, user, null);
     }
 
-    public static LabApplication buildInvalidApp_PastTime(Lab lab, User user) {
-        return new LabApplication(lab, user, LocalDateTime.now().minusDays(1));
-    }
-
     public static LabApplication buildWithStatus(Lab lab, User user, ApplicationStatus status) {
-        LabApplication app = new LabApplication(lab, user, LocalDateTime.now().plusDays(1));
+        InterviewSlot slot = DomainInterviewSlotFactory.buildValidSlot();
+        LabApplication app = buildValidPendingApplication(lab, user, slot);
         ReflectionTestUtils.setField(app, "status", status);
         return app;
     }
@@ -59,6 +82,22 @@ public final class DomainLabApplicationFactory {
     public static LabApplication buildDefaultPendingApplication() {
         Lab lab = DomainLabFactory.buildValidLab();
         User user = DomainUserFactory.buildValidUser();
-        return buildValidPendingApplication(lab, user, LocalDateTime.now().plusDays(1));
+        InterviewSlot slot = DomainInterviewSlotFactory.buildValidSlot();
+        return buildValidPendingApplication(lab, user, slot);
+    }
+
+    // 레거시 호환용 메서드들 (LocalDateTime 기반) - 수정됨
+    @Deprecated
+    public static LabApplication buildValidPendingApplication(Lab lab, User user, LocalDateTime time) {
+        Lab commonLab = (lab != null) ? lab : DomainLabFactory.buildValidLab();
+        InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(time, commonLab);
+        return new LabApplication(commonLab, user, slot);
+    }
+
+    @Deprecated
+    public static LabApplication buildInvalidApp_PastTime(Lab lab, User user) {
+        Lab commonLab = (lab != null) ? lab : DomainLabFactory.buildValidLab();
+        InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(LocalDateTime.now().minusDays(1), commonLab);
+        return new LabApplication(commonLab, user, slot);
     }
 }

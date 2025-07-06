@@ -10,6 +10,7 @@
 | LabImage | `LIM` | 001~008 | LIM_001 |
 | LabCreationRequest | `LCR` | 001~010 | LCR_001 |
 | **Notice** | **`LNT`** | **001~007** | **LNT_001** |
+| **Interview** | **`INT`** | **001~034** | **INT_001** |
 | Ranking | `RNK` | 미할당 | RNK_001 |
 
 ## 🎯 ErrorCode 템플릿
@@ -48,6 +49,30 @@ NOT_NOTICE_AUTHOR("LNT_403_AUTH", FORBIDDEN, "본인이 작성한 공지사항�
 
 // LNT_404: 조회 실패
 NOTICE_NOT_FOUND("LNT_404", NOT_FOUND, "공지사항을 찾을 수 없습니다")
+```
+
+## 📝 Interview ErrorCode 예시
+
+```java
+// INT_001~013: 입력값 검증
+DATE_REQUIRED("INT_001", BAD_REQUEST, "면접 시작일과 종료일은 필수입니다"),
+INVALID_DURATION("INT_004", BAD_REQUEST, "면접 소요 시간은 1분 이상이어야 합니다"),
+ALREADY_ACTIVATED("INT_008", BAD_REQUEST, "이미 활성화된 면접입니다"),
+
+// INT_019~024: 슬롯 상태 관련
+SLOT_FULL("INT_019", BAD_REQUEST, "면접 슬롯이 가득 찼습니다"),
+SLOT_CANCELLED("INT_020", BAD_REQUEST, "취소된 면접 슬롯입니다"),
+
+// INT_028~029: 권한 오류
+UNAUTHORIZED_INTERVIEW_ACCESS("INT_028", UNAUTHORIZED, "면접 관리 권한이 없습니다"),
+
+// INT_030~032: 조회 실패
+INTERVIEW_NOT_FOUND("INT_030", NOT_FOUND, "해당 면접을 찾을 수 없습니다"),
+SLOT_NOT_FOUND("INT_031", NOT_FOUND, "해당 면접 슬롯을 찾을 수 없습니다"),
+
+// INT_033~034: 중복/충돌 오류
+DUPLICATE_INTERVIEW("INT_033", CONFLICT, "해당 랩실에 이미 활성화된 면접이 있습니다"),
+SLOT_TIME_CONFLICT("INT_034", CONFLICT, "중복된 시간대의 면접 슬롯이 있습니다")
 ```
 
 ## ✅ 체크리스트

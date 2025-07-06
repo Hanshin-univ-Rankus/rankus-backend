@@ -13,7 +13,8 @@ public final class DomainLabFactory {
     }
 
     public static Lab buildValidLab() {
-        return new Lab("TestLab", LabCategory.AI, "Description", "ProfX");
+        Lab lab = new Lab("TestLab", LabCategory.AI, "Description", "ProfX");
+        return lab;
     }
 
     public static Lab buildValidLabWithId(Long id) {
@@ -53,14 +54,17 @@ public final class DomainLabFactory {
     }
 
     public static Lab buildAiLab() {
-        return new Lab("AI Lab", LabCategory.AI, "Artificial Intelligence Research Lab", "Dr. Smith");
+        Lab lab = new Lab("AI Lab", LabCategory.AI, "Artificial Intelligence Research Lab", "Dr. Smith");
+        return lab;
     }
 
     public static Lab buildDbLab() {
-        return new Lab("DB Lab", LabCategory.DB, "Database Research Lab", "Dr. Jones");
+        Lab lab = new Lab("DB Lab", LabCategory.DB, "Database Research Lab", "Dr. Jones");
+        return lab;
     }
 
     public static Lab buildSecurityLab() {
-        return new Lab("Security Lab", LabCategory.SECURITY, "Security Research Lab", "Dr. Brown");
+        Lab lab = new Lab("Security Lab", LabCategory.SECURITY, "Security Research Lab", "Dr. Brown");
+        return lab;
     }
 }
