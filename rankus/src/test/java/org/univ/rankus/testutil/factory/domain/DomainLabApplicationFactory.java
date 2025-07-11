@@ -18,31 +18,7 @@ public final class DomainLabApplicationFactory {
     }
 
     public static LabApplication buildValidPendingApplication(Lab lab, User user, InterviewSlot slot) {
-        // ID 설정 헬퍼 활용
-        ensureEntityIds(lab, user, slot);
         return new LabApplication(lab, user, slot);
-    }
-    
-    private static void ensureEntityIds(Lab lab, User user, InterviewSlot slot) {
-        if (lab.getId() == null) {
-            ReflectionTestUtils.setField(lab, "id", 1L);
-        }
-        if (user.getId() == null) {
-            ReflectionTestUtils.setField(user, "id", 1L);
-        }
-        if (slot.getId() == null) {
-            ReflectionTestUtils.setField(slot, "id", 1L);
-        }
-        
-        // Interview 연관 관계 ID 설정
-        if (slot.getInterview() != null) {
-            if (slot.getInterview().getId() == null) {
-                ReflectionTestUtils.setField(slot.getInterview(), "id", 1L);
-            }
-            if (slot.getInterview().getLab() != null) {
-                ReflectionTestUtils.setField(slot.getInterview().getLab(), "id", lab.getId());
-            }
-        }
     }
 
     public static LabApplication buildValidPendingWithId(Long id, Lab lab, User user, InterviewSlot slot) {
@@ -65,7 +41,16 @@ public final class DomainLabApplicationFactory {
 
 
     public static LabApplication buildWithStatus(Lab lab, User user, ApplicationStatus status) {
-        InterviewSlot slot = DomainInterviewSlotFactory.buildValidSlot();
+        // Lab ID가 없으면 설정 (LabApplication 생성자 검증 통과를 위해)
+        if (lab.getId() == null) {
+            ReflectionTestUtils.setField(lab, "id", 1L);
+        }
+
+        // Lab 일치성을 보장하는 슬롯 생성
+        InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(
+                LocalDateTime.now().plusDays(1).withHour(14).withMinute(0),
+                lab
+        );
         LabApplication app = buildValidPendingApplication(lab, user, slot);
         ReflectionTestUtils.setField(app, "status", status);
         return app;
@@ -82,11 +67,15 @@ public final class DomainLabApplicationFactory {
     public static LabApplication buildDefaultPendingApplication() {
         Lab lab = DomainLabFactory.buildValidLab();
         User user = DomainUserFactory.buildValidUser();
-        InterviewSlot slot = DomainInterviewSlotFactory.buildValidSlot();
+        // Lab 일치성을 보장하는 슬롯 생성
+        InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(
+                LocalDateTime.now().plusDays(1).withHour(14).withMinute(0),
+                lab
+        );
         return buildValidPendingApplication(lab, user, slot);
     }
 
-    // 간소화된 헬퍼 메서드들
+    // 간소화된 헬퍼 메서드들 - Lab 일치성 보장
     public static LabApplication buildValidPendingApplication(Lab lab, User user, LocalDateTime time) {
         Lab commonLab = (lab != null) ? lab : DomainLabFactory.buildValidLab();
         InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(time, commonLab);
@@ -97,5 +86,15 @@ public final class DomainLabApplicationFactory {
         Lab commonLab = (lab != null) ? lab : DomainLabFactory.buildValidLab();
         InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(LocalDateTime.now().minusDays(1), commonLab);
         return new LabApplication(commonLab, user, slot);
+    }
+
+    // Lab 일치성을 보장하는 새로운 헬퍼 메서드
+    public static LabApplication buildValidPendingApplicationWithLabConsistency(Lab lab, User user) {
+        // 항상 같은 Lab을 사용하는 InterviewSlot 생성
+        InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(
+                LocalDateTime.now().plusDays(1).withHour(14).withMinute(0),
+                lab
+        );
+        return new LabApplication(lab, user, slot);
     }
 }

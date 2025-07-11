@@ -13,8 +13,7 @@ public final class DomainLabFactory {
     }
 
     public static Lab buildValidLab() {
-        Lab lab = new Lab("TestLab", LabCategory.AI, "Description", "ProfX");
-        return lab;
+        return new Lab("TestLab", LabCategory.AI, "Description", "ProfX");
     }
 
     public static Lab buildValidLabWithId(Long id) {
@@ -54,17 +53,32 @@ public final class DomainLabFactory {
     }
 
     public static Lab buildAiLab() {
-        Lab lab = new Lab("AI Lab", LabCategory.AI, "Artificial Intelligence Research Lab", "Dr. Smith");
-        return lab;
+        return new Lab("AI Lab", LabCategory.AI, "Artificial Intelligence Research Lab", "Dr. Smith");
     }
 
     public static Lab buildDbLab() {
-        Lab lab = new Lab("DB Lab", LabCategory.DB, "Database Research Lab", "Dr. Jones");
-        return lab;
+        return new Lab("DB Lab", LabCategory.DB, "Database Research Lab", "Dr. Jones");
     }
 
     public static Lab buildSecurityLab() {
-        Lab lab = new Lab("Security Lab", LabCategory.SECURITY, "Security Research Lab", "Dr. Brown");
+        return new Lab("Security Lab", LabCategory.SECURITY, "Security Research Lab", "Dr. Brown");
+    }
+
+    public static Lab buildAiLabWithId(Long id) {
+        Lab lab = buildAiLab();
+        ReflectionTestUtils.setField(lab, "id", id);
+        return lab;
+    }
+
+    public static Lab buildDbLabWithId(Long id) {
+        Lab lab = buildDbLab();
+        ReflectionTestUtils.setField(lab, "id", id);
+        return lab;
+    }
+
+    public static Lab buildSecurityLabWithId(Long id) {
+        Lab lab = buildSecurityLab();
+        ReflectionTestUtils.setField(lab, "id", id);
         return lab;
     }
 }

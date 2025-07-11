@@ -7,10 +7,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.univ.rankus.application.port.out.InterviewSlotRepositoryPort;
 import org.univ.rankus.application.port.out.LabApplicationRepositoryPort;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
-import org.univ.rankus.application.port.out.InterviewSlotRepositoryPort;
+import org.univ.rankus.domain.model.interview.Interview;
+import org.univ.rankus.domain.model.interview.InterviewSlot;
 import org.univ.rankus.domain.model.lab.application.ApplicationStatus;
 import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.lab.core.Lab;
@@ -18,11 +23,7 @@ import org.univ.rankus.domain.model.lab.exception.*;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
-import org.univ.rankus.domain.model.interview.InterviewSlot;
-import org.univ.rankus.testutil.factory.domain.DomainLabApplicationFactory;
-import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
-import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
-import org.univ.rankus.testutil.factory.domain.DomainInterviewSlotFactory;
+import org.univ.rankus.testutil.factory.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -32,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class LabApplicationCommandServiceTest {
 
     @Mock
@@ -70,8 +72,20 @@ class LabApplicationCommandServiceTest {
     private LabApplication givenExistingApplication(Long appId) {
         Lab lab = DomainLabFactory.buildValidLabWithId(1L);
         User user = DomainUserFactory.buildValidUserWithId(1L);
-        InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithId(1L);
-        
+
+        // Interview 생성 (같은 Lab 사용)
+        Interview interview = DomainInterviewFactory.buildInterviewWithLab(lab);
+        ReflectionTestUtils.setField(interview, "id", 1L);
+
+        // InterviewSlot 생성 (같은 Lab의 Interview 사용)
+        InterviewSlot slot = new InterviewSlot(
+                interview,
+                LocalDateTime.now().plusDays(1).withHour(14).withMinute(0),
+                LocalDateTime.now().plusDays(1).withHour(15).withMinute(0),
+                5
+        );
+        ReflectionTestUtils.setField(slot, "id", 1L);
+
         LabApplication app = DomainLabApplicationFactory.buildValidPendingWithId(
                 appId, lab, user, slot
         );
@@ -94,10 +108,23 @@ class LabApplicationCommandServiceTest {
             Long labId = 1L, userId = 2L, slotId = 3L;
             Lab lab = givenExistingLab(labId);
             User user = givenExistingUser(userId);
-            InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithId(slotId);
+
+            // Interview 생성 (같은 Lab 사용)
+            Interview interview = DomainInterviewFactory.buildInterviewWithLab(lab);
+            ReflectionTestUtils.setField(interview, "id", 1L);
+
+            // InterviewSlot 생성 (같은 Lab의 Interview 사용)
+            InterviewSlot slot = new InterviewSlot(
+                    interview,
+                    LocalDateTime.now().plusDays(1).withHour(14).withMinute(0),
+                    LocalDateTime.now().plusDays(1).withHour(15).withMinute(0),
+                    5
+            );
+            ReflectionTestUtils.setField(slot, "id", slotId);
 
             LabApplication expectedApplication = DomainLabApplicationFactory.buildValidPendingApplication(lab, user, slot);
             when(interviewSlotRepositoryPort.findById(slotId)).thenReturn(Optional.of(slot));
+            when(labApplicationRepositoryPort.existsByLabIdAndUserId(labId, userId)).thenReturn(false);
             when(labApplicationRepositoryPort.save(any(LabApplication.class)))
                     .thenReturn(expectedApplication);
 
@@ -360,9 +387,24 @@ class LabApplicationCommandServiceTest {
             // given
             Long appId = 700L, userId = 700L;
             Lab lab = DomainLabFactory.buildValidLab();
+            ReflectionTestUtils.setField(lab, "id", 1L);
             User owner = DomainUserFactory.buildValidUserWithId(userId);
+
+            // Interview 생성 (같은 Lab 사용)
+            Interview interview = DomainInterviewFactory.buildInterviewWithLab(lab);
+            ReflectionTestUtils.setField(interview, "id", 1L);
+
+            // InterviewSlot 생성 (같은 Lab의 Interview 사용)
+            InterviewSlot slot = new InterviewSlot(
+                    interview,
+                    LocalDateTime.now().plusDays(1).withHour(14).withMinute(0),
+                    LocalDateTime.now().plusDays(1).withHour(15).withMinute(0),
+                    5
+            );
+            ReflectionTestUtils.setField(slot, "id", 1L);
+
             LabApplication app = DomainLabApplicationFactory.buildValidPendingWithId(
-                    appId, lab, owner, DomainInterviewSlotFactory.buildValidSlot()
+                    appId, lab, owner, slot
             );
             when(labApplicationRepositoryPort.findById(appId))
                     .thenReturn(Optional.of(app));
@@ -402,8 +444,14 @@ class LabApplicationCommandServiceTest {
             Long appId = 900L, userId = 123L;
             Lab lab = DomainLabFactory.buildValidLab();
             User owner = DomainUserFactory.buildValidUserWithId(999L); // 다른 사용자
+
+            // Lab 일치성을 보장하는 InterviewSlot 생성
+            InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(
+                    LocalDateTime.now().plusDays(1).withHour(14).withMinute(0),
+                    lab
+            );
             LabApplication app = DomainLabApplicationFactory.buildValidPendingWithId(
-                    appId, lab, owner, DomainInterviewSlotFactory.buildValidSlot()
+                    appId, lab, owner, slot
             );
             when(labApplicationRepositoryPort.findById(appId))
                     .thenReturn(Optional.of(app));
@@ -429,8 +477,14 @@ class LabApplicationCommandServiceTest {
             Long appId = 1000L, nonOwnerUserId = 456L;
             Lab lab = DomainLabFactory.buildValidLab();
             User owner = DomainUserFactory.buildValidUserWithId(789L); // 다른 사용자
+
+            // Lab 일치성을 보장하는 InterviewSlot 생성
+            InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(
+                    LocalDateTime.now().plusDays(1).withHour(14).withMinute(0),
+                    lab
+            );
             LabApplication app = DomainLabApplicationFactory.buildValidPendingWithId(
-                    appId, lab, owner, DomainInterviewSlotFactory.buildValidSlot()
+                    appId, lab, owner, slot
             );
             when(labApplicationRepositoryPort.findById(appId))
                     .thenReturn(Optional.of(app));

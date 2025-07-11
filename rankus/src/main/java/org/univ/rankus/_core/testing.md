@@ -191,21 +191,41 @@ void 일반_사용자_권한_접근_거부() { /* 테스트 */ }
 ### 상태 검증
 
 ```java
-assertThat(result.getStatus()).isEqualTo(APPROVED);
-assertThat(result.getName()).isEqualTo("예상값");
+assertThat(result.getStatus()).
+
+isEqualTo(APPROVED);
+
+assertThat(result.getName()).
+
+isEqualTo("예상값");
 ```
 
 ### Mock 호출 검증
 
 ```java
-verify(repository).save(any(User.class));
-verify(repository, times(1)).findById(1L);
-verify(repository, never()).delete(any());
+verify(repository).
+
+save(any(User.class));
+
+verify(repository, times(1)).
+
+findById(1L);
+
+verify(repository, never()).
+
+delete(any());
 ```
 
 ### 컬렉션 검증
 
 ```java
-assertThat(results).hasSize(3);
-assertThat(results).extracting("name").contains("홍길동", "김철수");
+assertThat(results).
+
+hasSize(3);
+
+assertThat(results).
+
+extracting("name").
+
+contains("홍길동","김철수");
 ```

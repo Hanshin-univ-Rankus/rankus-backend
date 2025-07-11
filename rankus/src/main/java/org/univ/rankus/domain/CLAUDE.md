@@ -31,14 +31,21 @@ Lab (Root) → LabApplication, LabImage, LabNotice → LabException
 LabNotice (Root) → NoticeType (Enum) → NoticeException
 ```
 
+### Ranking Aggregate
+
+```
+ScoreSubmission (Root) → ScoreCategory (Enum) → SubmissionStatus (Enum) → VisibilityLevel (Enum) → RankingException
+```
+
 ## 🗄️ 엔티티 매트릭스
 
-| 엔티티                | 핵심 비즈니스 메서드                                     | 상태 전이                       |
-|--------------------|-------------------------------------------------|-----------------------------|
-| **User**           | `checkPassword()`, `assignLab()`, `canManage()` | Role 승급                     |
-| **Lab**            | `autoAssignProfessor()`, `updateRanking()`      | -                           |
-| **LabApplication** | `approve()`, `reject()`, `isOwnedBy()`          | PENDING → APPROVED/REJECTED |
-| **LabNotice**      | `pin()`, `unpin()`, `isOwnedBy()`               | isPinned 토글                 |
+| 엔티티                 | 핵심 비즈니스 메서드                                                                  | 상태 전이                       |
+|---------------------|------------------------------------------------------------------------------|-----------------------------|
+| **User**            | `checkPassword()`, `assignLab()`, `canManage()`                              | Role 승급                     |
+| **Lab**             | `autoAssignProfessor()`, `updateRanking()`                                   | -                           |
+| **LabApplication**  | `approve()`, `reject()`, `isOwnedBy()`                                       | PENDING → APPROVED/REJECTED |
+| **LabNotice**       | `pin()`, `unpin()`, `isOwnedBy()`                                            | isPinned 토글                 |
+| **ScoreSubmission** | `approve()`, `reject()`, `correctStatus()`, `canBeApproved()`, `isOwnedBy()` | PENDING → APPROVED/REJECTED |
 
 ## 💎 Value Object 및 Enum
 
@@ -56,7 +63,7 @@ public class Password {
 }
 ```
 
-### 핵심 Enum 정정
+### 핵심 Enum 정의
 
 ```java
 Role:STUDENT<LAB_MEMBER<LAB_MANAGER<LAB_LEADER<PROFESSOR<ADMIN
@@ -65,6 +72,11 @@ LabCreationStatus:PENDING →APPROVED/REJECTED
 NoticeType:NORMAL ↔URGENT
 ImageType:REPRESENTATIVE,ADDITIONAL
 LabCategory:AI,CV,DB,WEB,NETWORK,SECURITY,IOT,MOBILE,GAME,ROBOTICS,COMPUTER_SCIENCE,ETC
+SubmissionStatus:PENDING →APPROVED/REJECTED
+VisibilityLevel:PUBLIC,LAB_ONLY,PRIVATE
+ScoreCategory:
+
+RESEARCH_SCI_PAPER(100),CONTEST_EXTERNAL_WINNER(50),...
 ```
 
 ## 🛡️ 도메인 불변 조건
@@ -73,8 +85,13 @@ LabCategory:AI,CV,DB,WEB,NETWORK,SECURITY,IOT,MOBILE,GAME,ROBOTICS,COMPUTER_SCIE
 2. **Lab**: 랩실명 유일성, 랭킹 0 이상
 3. **LabApplication**: 면접시간 미래, PENDING에서만 상태변경
 4. **LabNotice**: 제목/내용 필수, 작성자/랩실 유효성
+5. **ScoreSubmission**: 취득일자 미래 불가, 6개월 만료, 본인 승인 불가, 정정 1회 제한
 
 ---
 
-**참조**: 상세 컨벤션은 각 도메인별 CONVENTIONS.md 참조  
-**업데이트**: 2025-01-04 | **압축률**: 기존 대비 78% 절약
+**참조**:
+
+- **Ranking Domain**: `/domain/model/ranking/CLAUDE.md`
+- **상세 컨벤션**: 각 도메인별 CONVENTIONS.md 참조
+
+**업데이트**: 2025-01-09 | **구현 완료**: Ranking 도메인 포함

@@ -8,35 +8,74 @@
 
 ```java
 @Entity @Table(name = "{snake_case_table}")
-public class {Domain} extends BaseTimeEntity {
+public class {Domain}extends
+
+BaseTimeEntity {
     @Id @GeneratedValue(strategy = IDENTITY)
     private Long id;
     
     @Column(nullable = false)
-    private String {field};
-    
-    protected {Domain}() {} // JPA only
-    
-    private {Domain}(String {field}) {
+    private String {
+        field
+    } ;
+
+    protected {
+        Domain
+    } () {
+    } // JPA only
+
+    private {
+        Domain
+    } (String {
+        field
+    }){
         // 검증 로직
         if ({field} == null || {field}.isBlank()) {
-            throw new {Domain}ValidationException({Domain}ErrorCode.{FIELD}_REQUIRED);
+            throw new {
+                Domain
+            } ValidationException({Domain}ErrorCode. {
+                FIELD
+            } _REQUIRED);
         }
-        this.{field} = {field};
+        this. {
+            field
+        } ={
+            field
+        } ;
     }
-    
-    public static {Domain} create(String {field}) {
-        return new {Domain}({field});
+
+    public static {
+        Domain
+    } create(String {
+        field
+    }){
+        return new {
+            Domain
+        } ({field});
     }
-    
-    public void update{Field}(String {field}) {
+
+    public void update {
+        Field
+    } (String {
+        field
+    }){
         // 검증 로직
-        this.{field} = {field};
+        this. {
+            field
+        } ={
+            field
+        } ;
     }
-    
+
     // Getters only
-    public Long getId() { return id; }
-    public String get{Field}() { return {field}; }
+    public Long getId () {
+        return id;
+    }
+    public String get {
+        Field
+    } () {
+        return {field};
+    }
 }
 ```
 
@@ -44,45 +83,78 @@ public class {Domain} extends BaseTimeEntity {
 
 ```java
 @Entity @Table(name = "{snake_case_table}")
-public class {Domain} extends BaseTimeEntity {
+public class {Domain}extends
+
+BaseTimeEntity {
     @Id @GeneratedValue(strategy = IDENTITY)
     private Long id;
     
     @Column(nullable = false)
-    private String {field};
-    
+    private String {
+        field
+    } ;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private {Domain}Status status = {Domain}Status.PENDING;
-    
-    protected {Domain}() {}
-    
-    private {Domain}(String {field}) {
-        this.{field} = {field};
-        this.status = {Domain}Status.PENDING;
+    private {
+        Domain
+    } Status status = {Domain} Status.PENDING;
+
+    protected {
+        Domain
+    } () {
     }
-    
-    public static {Domain} create(String {field}) {
-        return new {Domain}({field});
+
+    private {
+        Domain
+    } (String {
+        field
+    }){
+        this. {
+            field
+        } ={
+            field
+        } ;
+        this.status = {Domain} Status.PENDING;
     }
-    
-    public void approve() {
-        if (status != {Domain}Status.PENDING) {
-            throw new {Domain}ValidationException({Domain}ErrorCode.CANNOT_CHANGE_STATUS);
+
+    public static {
+        Domain
+    } create(String {
+        field
+    }){
+        return new {
+            Domain
+        } ({field});
+    }
+
+    public void approve () {
+        if (status != {Domain} Status.PENDING){
+            throw new {
+                Domain
+            } ValidationException({Domain}ErrorCode.CANNOT_CHANGE_STATUS);
         }
-        this.status = {Domain}Status.APPROVED;
+        this.status = {Domain} Status.APPROVED;
     }
-    
-    public void reject() {
-        if (status != {Domain}Status.PENDING) {
-            throw new {Domain}ValidationException({Domain}ErrorCode.CANNOT_CHANGE_STATUS);
+
+    public void reject () {
+        if (status != {Domain} Status.PENDING){
+            throw new {
+                Domain
+            } ValidationException({Domain}ErrorCode.CANNOT_CHANGE_STATUS);
         }
-        this.status = {Domain}Status.REJECTED;
+        this.status = {Domain} Status.REJECTED;
     }
-    
-    public boolean isPending() { return status == {Domain}Status.PENDING; }
-    public boolean isApproved() { return status == {Domain}Status.APPROVED; }
-    public boolean isRejected() { return status == {Domain}Status.REJECTED; }
+
+    public boolean isPending () {
+        return status == {Domain} Status.PENDING;
+    }
+    public boolean isApproved () {
+        return status == {Domain} Status.APPROVED;
+    }
+    public boolean isRejected () {
+        return status == {Domain} Status.REJECTED;
+    }
 }
 ```
 
@@ -295,42 +367,98 @@ QueryUseCase {
 @RequestMapping("/api/{domains}")
 @RequiredArgsConstructor
 @Validated
-public class {Domain}Controller {
-    private final {Domain}CommandUseCase {domain}CommandUseCase;
-    private final {Domain}QueryUseCase {domain}QueryUseCase;
+public class {Domain}
+
+Controller {
+    private final {
+        Domain
+    } CommandUseCase {
+        domain
+    } CommandUseCase;
+    private final {
+        Domain
+    } QueryUseCase {
+        domain
+    } QueryUseCase;
     
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<{Domain}ResponseDto>> create{Domain}(
-            @Valid @RequestBody {Domain}CreateRequestDto request) {
-        {Domain} {domain} = {domain}CommandUseCase.create{Domain}(request);
-        {Domain}ResponseDto response = {Domain}ResponseDto.from({domain});
+    public ResponseEntity < ApiResponse < {Domain} ResponseDto >> create {
+        Domain
+    } (
+    @Valid @RequestBody {
+        Domain
+    } CreateRequestDto request){
+        {
+            Domain
+        } {
+            domain
+        } ={
+            domain
+        } CommandUseCase.create {
+            Domain
+        } (request);
+        {
+            Domain
+        } ResponseDto response = {Domain} ResponseDto.from({domain});
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(response));
     }
     
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<{Domain}ResponseDto>> get{Domain}(
-            @PathVariable Long id) {
-        {Domain} {domain} = {domain}QueryUseCase.find{Domain}ById(id);
-        {Domain}ResponseDto response = {Domain}ResponseDto.from({domain});
+    public ResponseEntity < ApiResponse < {Domain} ResponseDto >> get {
+        Domain
+    } (
+            @PathVariable Long id){
+        {
+            Domain
+        } {
+            domain
+        } ={
+            domain
+        } QueryUseCase.find {
+            Domain
+        } ById(id);
+        {
+            Domain
+        } ResponseDto response = {Domain} ResponseDto.from({domain});
         return ResponseEntity.ok(ApiResponse.success(response));
     }
     
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<{Domain}ResponseDto>> update{Domain}(
+    public ResponseEntity < ApiResponse < {Domain} ResponseDto >> update {
+        Domain
+    } (
             @PathVariable Long id,
-            @Valid @RequestBody {Domain}UpdateRequestDto request) {
-        {Domain} {domain} = {domain}CommandUseCase.update{Domain}(id, request);
-        {Domain}ResponseDto response = {Domain}ResponseDto.from({domain});
+    @Valid @RequestBody {
+        Domain
+    } UpdateRequestDto request){
+        {
+            Domain
+        } {
+            domain
+        } ={
+            domain
+        } CommandUseCase.update {
+            Domain
+        } (id, request);
+        {
+            Domain
+        } ResponseDto response = {Domain} ResponseDto.from({domain});
         return ResponseEntity.ok(ApiResponse.success(response));
     }
-    
+
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<Void>> delete{Domain}(@PathVariable Long id) {
-        {domain}CommandUseCase.delete{Domain}(id);
+    public ResponseEntity<ApiResponse<Void>> delete {
+        Domain
+    } (@PathVariable Long id){
+        {
+            domain
+        } CommandUseCase.delete {
+            Domain
+        } (id);
         return ResponseEntity.ok(ApiResponse.deleted());
     }
 }
@@ -343,38 +471,80 @@ public class {Domain}Controller {
 @RequestMapping("/api/labs/{labId}/{domains}")
 @RequiredArgsConstructor
 @Validated
-public class {Domain}Controller {
-    private final {Domain}CommandUseCase {domain}CommandUseCase;
-    private final {Domain}QueryUseCase {domain}QueryUseCase;
+public class {Domain}
+
+Controller {
+    private final {
+        Domain
+    } CommandUseCase {
+        domain
+    } CommandUseCase;
+    private final {
+        Domain
+    } QueryUseCase {
+        domain
+    } QueryUseCase;
     
     @PostMapping
-    @PreAuthorize("@{domain}PermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_{DOMAINS}')")
-    public ResponseEntity<ApiResponse<{Domain}ResponseDto>> create{Domain}(
+    @
+    PreAuthorize("@{domain}PermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_{DOMAINS}')")
+    public ResponseEntity < ApiResponse < {Domain} ResponseDto >> create {
+        Domain
+    } (
             @PathVariable Long labId,
-            @Valid @RequestBody {Domain}CreateRequestDto request) {
-        {Domain} {domain} = {domain}CommandUseCase.create{Domain}(labId, request);
-        {Domain}ResponseDto response = {Domain}ResponseDto.from({domain});
+    @Valid @RequestBody {
+        Domain
+    } CreateRequestDto request){
+        {
+            Domain
+        } {
+            domain
+        } ={
+            domain
+        } CommandUseCase.create {
+            Domain
+        } (labId, request);
+        {
+            Domain
+        } ResponseDto response = {Domain} ResponseDto.from({domain});
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(response));
     }
     
     @GetMapping
     @PreAuthorize("@{domain}PermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_{DOMAINS}')")
-    public ResponseEntity<ApiResponse<List<{Domain}ResponseDto>>> get{Domain}List(
+    public ResponseEntity < ApiResponse < List < {Domain} ResponseDto >>> get {
+        Domain
+    } List(
             @PathVariable Long labId) {
-        List<{Domain}> {domains} = {domain}QueryUseCase.find{Domain}sByLabId(labId);
-        List<{Domain}ResponseDto> response = {domains}.stream()
-            .map({Domain}ResponseDto::from)
-            .toList();
+        List < {Domain} > {domains} = {domain} QueryUseCase.find {
+            Domain
+        } sByLabId(labId);
+        List < {Domain} ResponseDto > response = {domains}.stream()
+                .map({Domain}ResponseDto::from)
+                .toList();
         return ResponseEntity.ok(ApiResponse.success(response));
     }
     
     @PostMapping("/{id}/activate")
-    @PreAuthorize("@{domain}PermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_{DOMAINS}')")
-    public ResponseEntity<ApiResponse<{Domain}ResponseDto>> activate{Domain}(
+    @
+    PreAuthorize("@{domain}PermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_{DOMAINS}')")
+    public ResponseEntity < ApiResponse < {Domain} ResponseDto >> activate {
+        Domain
+    } (
             @PathVariable Long labId,
-            @PathVariable Long id) {
-        {Domain} {domain} = {domain}CommandUseCase.activate{Domain}(id);
-        {Domain}ResponseDto response = {Domain}ResponseDto.from({domain});
+            @PathVariable Long id){
+        {
+            Domain
+        } {
+            domain
+        } ={
+            domain
+        } CommandUseCase.activate {
+            Domain
+        } (id);
+        {
+            Domain
+        } ResponseDto response = {Domain} ResponseDto.from({domain});
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

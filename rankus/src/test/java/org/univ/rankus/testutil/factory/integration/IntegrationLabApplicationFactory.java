@@ -2,12 +2,12 @@ package org.univ.rankus.testutil.factory.integration;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.univ.rankus.application.port.out.LabApplicationRepositoryPort;
+import org.univ.rankus.domain.model.interview.InterviewSlot;
 import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.User;
-import org.univ.rankus.domain.model.interview.InterviewSlot;
-import org.univ.rankus.testutil.factory.domain.DomainLabApplicationFactory;
 import org.univ.rankus.testutil.factory.domain.DomainInterviewSlotFactory;
+import org.univ.rankus.testutil.factory.domain.DomainLabApplicationFactory;
 
 import java.time.LocalDateTime;
 
@@ -26,12 +26,12 @@ public final class IntegrationLabApplicationFactory {
 
     public static LabApplication persistValidPendingApplication(TestEntityManager em, Lab lab, User user, LocalDateTime time) {
         InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTimeAndLab(time, lab);
-        
+
         // Interview와 InterviewSlot을 먼저 영속화
         em.persist(slot.getInterview());
         em.persist(slot);
         em.flush();
-        
+
         LabApplication app = DomainLabApplicationFactory.buildValidPendingApplication(lab, user, slot);
         em.persist(app);
         em.flush();

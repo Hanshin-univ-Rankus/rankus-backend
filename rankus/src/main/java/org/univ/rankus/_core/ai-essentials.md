@@ -9,14 +9,14 @@ Controller → {Domain}QueryUseCase → {Domain}QueryService → {Domain}Reposit
 
 ## 📛 네이밍 규칙
 
-| 타입         | 패턴                                | 예시                                                        |
-|------------|-----------------------------------|-----------------------------------------------------------|
-| Entity     | `{Domain}`                        | `User`, `Lab`, `LabApplication`, `LabNotice`, `Interview` |
-| Service    | `{Domain}{Command\|Query}Service` | `UserCommandService`, `InterviewQueryService`             |
-| Controller | `{Domain}Controller`              | `LabNoticeController`, `InterviewController`              |
-| UseCase    | `{Domain}{Command\|Query}UseCase` | `LabApplicationCommandUseCase`, `InterviewCommandUseCase` |
-| DTO        | `{Domain}{Action}RequestDto`      | `UserCreateRequestDto`, `InterviewSlotCreateRequestDto`   |
-| ErrorCode  | `{Domain}ErrorCode`               | `NoticeErrorCode`, `InterviewErrorCode`                   |
+| 타입         | 패턴                                | 예시                                                                                             |
+|------------|-----------------------------------|------------------------------------------------------------------------------------------------|
+| Entity     | `{Domain}`                        | `User`, `Lab`, `LabApplication`, `LabNotice`, `Interview`, `InterviewSlot`, `ScoreSubmission`  |
+| Service    | `{Domain}{Command\|Query}Service` | `UserCommandService`, `InterviewQueryService`, `ScoreSubmissionQueryService`                   |
+| Controller | `{Domain}Controller`              | `LabNoticeController`, `InterviewController`, `RankingController`, `ScoreSubmissionController` |
+| UseCase    | `{Domain}{Command\|Query}UseCase` | `LabApplicationCommandUseCase`, `InterviewCommandUseCase`, `RankingQueryUseCase`               |
+| DTO        | `{Domain}{Action}RequestDto`      | `UserCreateRequestDto`, `InterviewSlotCreateRequestDto`, `ScoreSubmissionCreateRequestDto`     |
+| ErrorCode  | `{Domain}ErrorCode`               | `NoticeErrorCode`, `InterviewErrorCode`, `RankingErrorCode`                                    |
 
 ## 🔧 코딩 패턴
 
@@ -61,24 +61,70 @@ public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid @RequestBo
 
 // 랩실 권한 - Application
 @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #labId, 'Lab', 'MANAGE_APPLICATIONS')")
+
+// 점수 승인 권한 - Ranking
+@PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #submissionId, 'ScoreSubmission', 'APPROVE')")
+
+// 면접 시간대 관리 권한 - Interview
+@PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #interviewId, 'Interview', 'MANAGE_SLOTS')")
+
+// 랭킹 조회 권한 - Ranking
+@PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #labId, 'Lab', 'VIEW_RANKING')")
 ```
 
 ## 📝 ErrorCode 패턴
 
-| Prefix | 도메인                | 현재 사용   |
-|--------|--------------------|---------|
-| `USER` | User               | 001~010 |
-| `LAB`  | Lab                | 001~015 |
-| `LAP`  | LabApplication     | 001~012 |
-| `LIM`  | LabImage           | 001~008 |
-| `LCR`  | LabCreationRequest | 001~010 |
-| `LNT`  | LabNotice          | 001~007 |
-| `INT`  | Interview          | 001~034 |
+| Prefix    | 도메인                | 현재 사용   |
+|-----------|--------------------|---------|
+| `USER`    | User               | 001~010 |
+| `LAB`     | Lab                | 001~015 |
+| `LAP`     | LabApplication     | 001~012 |
+| `LIM`     | LabImage           | 001~008 |
+| `LCR`     | LabCreationRequest | 001~010 |
+| `LNT`     | LabNotice          | 001~007 |
+| `INT`     | Interview          | 001~034 |
+| `RANKING` | Ranking            | 001~023 |
 
 ```java
 // ErrorCode 템플릿
-{FIELD}_REQUIRED("{PREFIX}_001", BAD_REQUEST, "{필드}는 필수입니다"),
-{DOMAIN}_NOT_FOUND("{PREFIX}_404", NOT_FOUND, "{도메인}을 찾을 수 없습니다"),
+{FIELD}
+
+_REQUIRED("{PREFIX}_001",BAD_REQUEST, "{필드}는 필수입니다"), {
+    DOMAIN
+}
+
+_NOT_FOUND("{PREFIX}_404",NOT_FOUND, "{도메인}을 찾을 수 없습니다"),
+```
+
+## 🚨 AI 개발 시 주의사항
+
+### 권한 패턴 혼용 방지
+
+```java
+// ❌ 잘못된 패턴: 권한 패턴 혼용
+@PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #labId, 'Lab', 'MANAGE_NOTICES')")
+@PreAuthorize("@labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_NOTICES')")
+
+// ✅ 올바른 패턴: 도메인별 일관된 권한 패턴
+@PreAuthorize("@labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_NOTICES')")
+```
+
+### 도메인 정책 클래스 활용 필수
+
+```java
+// ❌ 잘못된 패턴: Service에 복잡한 로직 직접 구현
+public boolean canApproveSubmission(User user, ScoreSubmission submission) {
+    if (user.getRole() == Role.STUDENT) return false;
+    if (submission.getUser().getId().equals(user.getId())) return false;
+    // 복잡한 비즈니스 로직...
+}
+
+// ✅ 올바른 패턴: Policy 클래스 활용
+private final ScoreSubmissionPolicy scoreSubmissionPolicy;
+
+public boolean canApproveSubmission(User user, ScoreSubmission submission) {
+    return scoreSubmissionPolicy.canApprove(user, submission);
+}
 ```
 
 ## 🔍 테스트 품질 체크리스트
@@ -89,6 +135,12 @@ public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid @RequestBo
 - [ ] DTO 변환에서 연관 객체 null 처리 포함되었는가?
 - [ ] 테스트간 상태 격리가 보장되는가?
 - [ ] Mock 설정이 완전한가?
+- [ ] 권한 패턴이 도메인별로 일관되게 적용되었는가?
+- [ ] 복잡한 비즈니스 로직을 Policy 클래스로 분리했는가?
+- [ ] ErrorCode가 올바른 Prefix를 사용하는가?
+- [ ] 시간 기반 로직 테스트에서 고정된 시간 값 사용했는가?
+- [ ] 복잡한 관계 객체 테스트에서 일관된 ID 매핑 사용했는가?
+- [ ] 면접/랭킹 시스템의 상태 전이 테스트 완료했는가?
 
 ### 안전한 설계 패턴
 
@@ -99,13 +151,47 @@ public static Entity create() {
 }
 
 // ✅ 방어적 DTO 변환
-.relation(entity.getRelation() != null ? 
-    RelationDto.from(entity.getRelation()) : null)
+.
+
+relation(entity.getRelation() !=null?
+        RelationDto.
+
+from(entity.getRelation()):null)
 
 // ✅ 테스트별 상태 조정
-@Test void test() {
+@Test
+void test() {
     Entity entity = Factory.create();
     // 테스트에 필요한 상태만 조정
+}
+
+// ✅ Policy 클래스 활용
+@Service
+public class SomeService {
+    private final SomePolicy somePolicy;
+
+    public void doSomething(Entity entity) {
+        if (somePolicy.canProcess(entity)) {
+            // 비즈니스 로직 실행
+        }
+    }
+}
+
+// ✅ 시간 기반 테스트 패턴
+@Test
+void 시간_기반_로직_테스트() {
+    LocalDateTime fixedTime = LocalDateTime.of(2024, 1, 15, 14, 0);
+    InterviewSlot slot = DomainInterviewSlotFactory.buildSlotWithTime(fixedTime);
+    // 고정된 시간 값으로 일관된 테스트 수행
+}
+
+// ✅ 복잡한 관계 객체 테스트
+@Test
+void 관계_객체_테스트() {
+    Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+    User user = DomainUserFactory.buildValidUserWithId(1L);
+    ScoreSubmission submission = DomainScoreSubmissionFactory.buildSubmissionWithUserAndLab(user, lab);
+    // 일관된 ID 매핑으로 관계 무결성 보장
 }
 ```
 

@@ -3,6 +3,7 @@ package org.univ.rankus.testutil.factory.integration;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
 import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.lab.core.LabCategory;
 import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
 
 /**
@@ -35,5 +36,21 @@ public final class IntegrationLabFactory {
         em.persist(lab);
         em.flush();
         return lab;
+    }
+
+    // IntegrationScoreSubmissionFactory에서 필요한 메서드들 추가
+    public static Lab createAndSaveAiLab(LabRepositoryPort repo) {
+        Lab lab = DomainLabFactory.buildCustomLab("AI 연구실", LabCategory.AI, "인공지능 연구실", "AI 교수");
+        return repo.save(lab);
+    }
+
+    public static Lab createAndSaveDbLab(LabRepositoryPort repo) {
+        Lab lab = DomainLabFactory.buildCustomLab("DB 연구실", LabCategory.DB, "데이터베이스 연구실", "DB 교수");
+        return repo.save(lab);
+    }
+
+    public static Lab createAndSaveSecurityLab(LabRepositoryPort repo) {
+        Lab lab = DomainLabFactory.buildCustomLab("보안 연구실", LabCategory.SECURITY, "정보보안 연구실", "보안 교수");
+        return repo.save(lab);
     }
 }

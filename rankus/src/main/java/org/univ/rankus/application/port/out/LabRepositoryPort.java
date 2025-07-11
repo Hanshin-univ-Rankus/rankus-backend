@@ -28,6 +28,13 @@ public interface LabRepositoryPort {
     Optional<Lab> findById(Long id);
 
     /**
+     * 모든 Lab을 조회합니다.
+     *
+     * @return 모든 Lab 리스트
+     */
+    List<Lab> findAll();
+
+    /**
      * 모든 Lab을 랭킹 내림차순으로 조회합니다.
      *
      * @return 랭킹 내림차순으로 정렬된 Lab 리스트

@@ -2,6 +2,8 @@ package org.univ.rankus.testutil.factory.integration;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
+import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
 
@@ -47,5 +49,22 @@ public final class IntegrationUserFactory {
         em.persist(u);
         em.flush();
         return u;
+    }
+
+    // IntegrationScoreSubmissionFactory에서 필요한 메서드들 추가
+    public static User createAndSaveStudent(UserRepositoryPort repo) {
+        return persistUserWithRole(repo, Role.STUDENT);
+    }
+
+    public static User createAndSaveWithRole(UserRepositoryPort repo, Role role) {
+        return persistUserWithRole(repo, role);
+    }
+
+    public static User createAndSaveLabMember(UserRepositoryPort repo, Lab lab) {
+        User user = DomainUserFactory.buildValidUserWithRole(Role.LAB_MEMBER);
+        if (lab != null) {
+            user.assignLab(lab);
+        }
+        return repo.save(user);
     }
 }

@@ -30,6 +30,11 @@ public class LabRepositoryAdapter implements LabRepositoryPort {
     }
 
     @Override
+    public List<Lab> findAll() {
+        return springDataLabRepository.findAll();
+    }
+
+    @Override
     public List<Lab> findAllByRankingDesc() {
         // SpringDataLabRepository에 default 메서드가 정의되어 있으므로, 그대로 호출
         return springDataLabRepository.findAllByRankingDesc();

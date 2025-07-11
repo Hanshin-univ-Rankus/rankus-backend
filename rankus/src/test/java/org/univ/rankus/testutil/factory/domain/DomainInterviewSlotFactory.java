@@ -86,4 +86,53 @@ public final class DomainInterviewSlotFactory {
         Interview interview = DomainInterviewFactory.buildValidInterview();
         return new InterviewSlot(interview, startTime, endTime, 5);
     }
+
+    public static InterviewSlot buildValidSlotForInterview(Interview interview) {
+        // 면접 기간 내에서 미래 시간으로 슬롯 생성
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startTime = interview.getStartDate().atTime(10, 0);
+        LocalDateTime endTime = startTime.plusHours(1);
+
+        // 만약 면접 시작 시간이 과거라면 미래 시간으로 조정
+        if (startTime.isBefore(now)) {
+            startTime = now.plusHours(1);
+            endTime = startTime.plusHours(1);
+        }
+
+        return new InterviewSlot(interview, startTime, endTime, 3);
+    }
+
+    public static InterviewSlot buildSlotOutsideInterview(Interview interview) {
+        LocalDateTime startTime = interview.getEndDate().plusDays(1).atTime(10, 0);
+        LocalDateTime endTime = startTime.plusHours(1);
+        return new InterviewSlot(interview, startTime, endTime, 3);
+    }
+
+    public static InterviewSlot buildSlotWithOneSpotLeft() {
+        InterviewSlot slot = buildSlotWithCapacity(3);
+        ReflectionTestUtils.setField(slot, "currentApplicants", 2);
+        return slot;
+    }
+
+    public static InterviewSlot buildSlotWithReservations() {
+        InterviewSlot slot = buildSlotWithCapacity(5);
+        ReflectionTestUtils.setField(slot, "currentApplicants", 2);
+        return slot;
+    }
+
+    public static InterviewSlot buildPastSlot() {
+        Interview interview = DomainInterviewFactory.buildValidInterview();
+        // Create valid slot first, then modify times using reflection
+        LocalDateTime futureStartTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime futureEndTime = futureStartTime.plusHours(1);
+        InterviewSlot slot = new InterviewSlot(interview, futureStartTime, futureEndTime, 3);
+
+        // Set past times using reflection to simulate past slot
+        LocalDateTime pastStartTime = LocalDateTime.now().minusHours(2);
+        LocalDateTime pastEndTime = pastStartTime.plusHours(1);
+        ReflectionTestUtils.setField(slot, "startTime", pastStartTime);
+        ReflectionTestUtils.setField(slot, "endTime", pastEndTime);
+
+        return slot;
+    }
 }

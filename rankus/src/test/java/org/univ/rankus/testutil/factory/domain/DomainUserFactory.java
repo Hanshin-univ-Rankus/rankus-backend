@@ -1,6 +1,7 @@
 package org.univ.rankus.testutil.factory.domain;
 
 import org.springframework.test.util.ReflectionTestUtils;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.Password;
 import org.univ.rankus.domain.model.user.PasswordEncoder;
 import org.univ.rankus.domain.model.user.Role;
@@ -49,26 +50,80 @@ public final class DomainUserFactory {
     }
 
     public static User buildProfessorUser() {
-        return buildValidUserWithRole(Role.PROFESSOR);
+        User user = buildValidUserWithRole(Role.PROFESSOR);
+        ReflectionTestUtils.setField(user, "id", generateUserId());
+        return user;
     }
 
     public static User buildStudentUser() {
-        return buildValidUserWithRole(Role.STUDENT);
+        User user = buildValidUserWithRole(Role.STUDENT);
+        ReflectionTestUtils.setField(user, "id", generateUserId());
+        return user;
     }
 
     public static User buildLabLeaderUser() {
-        return buildValidUserWithRole(Role.LAB_LEADER);
+        User user = buildValidUserWithRole(Role.LAB_LEADER);
+        ReflectionTestUtils.setField(user, "id", generateUserId());
+        return user;
     }
 
     public static User buildLabManagerUser() {
-        return buildValidUserWithRole(Role.LAB_MANAGER);
+        User user = buildValidUserWithRole(Role.LAB_MANAGER);
+        ReflectionTestUtils.setField(user, "id", generateUserId());
+        return user;
     }
 
     public static User buildLabMemberUser() {
-        return buildValidUserWithRole(Role.LAB_MEMBER);
+        User user = buildValidUserWithRole(Role.LAB_MEMBER);
+        ReflectionTestUtils.setField(user, "id", generateUserId());
+        return user;
     }
 
     public static User buildCustomUser(String name, String email, String rawPassword) {
         return new User(name, email, Password.fromRaw(rawPassword, ENCODER));
+    }
+
+    public static User buildUserWithLab(Lab lab) {
+        User user = buildValidUser();
+        user.assignLab(lab);
+        return user;
+    }
+
+    public static User buildUserWithLabAndRole(Lab lab, Role role) {
+        User user = buildValidUserWithRole(role);
+        user.assignLab(lab);
+        return user;
+    }
+
+    public static User buildLabMemberWithLab(Lab lab) {
+        User user = buildUserWithLabAndRole(lab, Role.LAB_MEMBER);
+        ReflectionTestUtils.setField(user, "id", generateUserId());
+        return user;
+    }
+
+    public static User buildLabLeaderWithLab(Lab lab) {
+        User user = buildUserWithLabAndRole(lab, Role.LAB_LEADER);
+        ReflectionTestUtils.setField(user, "id", generateUserId());
+        return user;
+    }
+
+    public static User buildLabManagerWithLab(Lab lab) {
+        User user = buildUserWithLabAndRole(lab, Role.LAB_MANAGER);
+        ReflectionTestUtils.setField(user, "id", generateUserId());
+        return user;
+    }
+
+    public static User buildProfessorWithLab(Lab lab) {
+        return buildUserWithLabAndRole(lab, Role.PROFESSOR);
+    }
+
+    public static User buildAdminUser() {
+        User user = buildValidUserWithRole(Role.ADMIN);
+        ReflectionTestUtils.setField(user, "id", generateUserId());
+        return user;
+    }
+
+    private static Long generateUserId() {
+        return (long) (Math.random() * 1000000) + 1;
     }
 }

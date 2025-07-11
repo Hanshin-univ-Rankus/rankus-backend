@@ -18,7 +18,7 @@ import org.univ.rankus.config.DomainConfig;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(DomainConfig.class)
 public abstract class BaseRepositoryTest {
-    
+
     @Autowired
     protected TestEntityManager entityManager;
 }

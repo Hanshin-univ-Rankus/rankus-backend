@@ -22,6 +22,13 @@ spring:
   sql:
     init:
       mode: always
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+      file-size-threshold: 1MB
+      location: ./temp
 
 server:
   port: 8080
@@ -30,3 +37,39 @@ security:
   jwt:
     secret: yDeGly34tDXIxkjo6MQKgBNCI+2iMFLdT0i8zD2JZuE=
     expiration-ms: 3600000
+
+file:
+  upload:
+    path: ./uploads
+    max-file-size: 10485760  # 10MB in bytes
+    max-request-size: 10485760  # 10MB in bytes
+    allowed-extensions:
+      - pdf
+      - jpg
+      - jpeg
+      - png
+    allowed-content-types:
+      - application/pdf
+      - image/jpeg
+      - image/jpg
+      - image/png
+    temp-dir: ./temp
+    file-size-threshold: 1048576  # 1MB in bytes
+    url-prefix: /api/files
+    enabled: true
+    auto-create-directories: true
+    allow-overwrite: true
+    log-enabled: true
+    proof-file-dir: proof-files
+    profile-image-dir: profile-images
+    cleanup-temp-files: true
+    cleanup-delay-seconds: 300
+    duplicate-file-name-strategy: RENAME
+    virus-scan-enabled: false
+    generate-thumbnail: false
+    thumbnail-size: 200
+    compress-images: false
+    image-compression-quality: 0.8
+    extract-metadata: false
+    calculate-file-hash: false
+    hash-algorithm: SHA-256

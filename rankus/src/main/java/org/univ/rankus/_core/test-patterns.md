@@ -4,13 +4,22 @@
 
 ```java
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-class {ProductionClass}Test {
-    @Mock private {Dependency} dependency;
-    @InjectMocks private {ProductionClass} target;
+@MockitoSettings(strictness = Strictness.LENIENT) class {ProductionClass}
+
+Test {
+    @Mock private {
+        Dependency
+    } dependency;
+    @InjectMocks private {
+        ProductionClass
+    } target;
     
     @Test
-    void {메서드명}_정상입력시_{예상결과}() {
+    void{
+        메서드명
+    } _정상입력시_ {
+        예상결과
+    } () {
         // given - 실제 파라미터 타입 사용
         // when - 실제 메서드 호출
         // then - 실제 리턴 타입 검증
@@ -21,16 +30,21 @@ class {ProductionClass}Test {
 ## 🎭 Controller Test 템플릿
 
 ```java
-@WebMvcTest({Controller}.class)
-class {Controller}Test {
+@WebMvcTest({Controller}.class) class {Controller}
+
+Test {
     @Autowired private MockMvc mockMvc;
-    @MockBean private {UseCase} useCase;
+    @MockBean private {
+        UseCase
+    } useCase;
     
     @Test @WithMockUser(roles = "USER")
-    void {엔드포인트}_호출_테스트() throws Exception {
+    void{
+        엔드포인트
+    } _호출_테스트() throws Exception {
         mockMvc.perform(post("/api/{endpoint}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
     }
 }
@@ -39,14 +53,27 @@ class {Controller}Test {
 ## ⚠️ ErrorCode 테스트 패턴
 
 ```java
+
 @Test
-void {검증조건}_시_{ErrorCode}_반환() {
+void {
+    검증조건
+}
+
+_시_ {
+    ErrorCode
+}
+
+_반환() {
     // when
-    {Exception} exception = assertThrows({Exception}.class,
-        () -> service.method(invalidInput));
-    
+    {
+        Exception
+    } exception = assertThrows({Exception}. class,
+    () -> service.method(invalidInput));
+
     // then
-    assertThat(exception.getErrorCode()).isEqualTo({ErrorCode}.{CODE});
+    assertThat(exception.getErrorCode()).isEqualTo({ErrorCode}. {
+        CODE
+    });
 }
 
 // 주요 ErrorCode 매핑
@@ -65,24 +92,179 @@ void {검증조건}_시_{ErrorCode}_반환() {
 ```java
 // 기본 Entity 생성 테스트
 @Test
-void {Domain}_생성_성공() {
-    {Domain} entity = {Domain}.create(validParams);
-    assertThat(entity.get{Field}()).isEqualTo(expectedValue);
+void {
+    Domain
+}
+
+_생성_성공() {
+    {
+        Domain
+    } entity = {Domain}.create(validParams);
+    assertThat(entity.get {
+        Field
+    } ()).isEqualTo(expectedValue);
 }
 
 // 상태 전이 테스트 (상태 관리 Entity용)
 @Test
-void {Domain}_상태변경_성공() {
-    {Domain} entity = {Domain}.create(validParams);
+void {
+    Domain
+}
+
+_상태변경_성공() {
+    {
+        Domain
+    } entity = {Domain}.create(validParams);
     entity.approve(); // or activate(), reject() 등
     assertThat(entity.getStatus()).isEqualTo({Status}.APPROVED);
 }
 
 // 연관관계 테스트
 @Test
-void {Domain}_연관관계_설정_성공() {
-    {Domain} entity = {Domain}.create(parentEntity, childParams);
+void {
+    Domain
+}
+
+_연관관계_설정_성공() {
+    {
+        Domain
+    } entity = {Domain}.create(parentEntity, childParams);
     assertThat(entity.getParent()).isEqualTo(parentEntity);
+}
+```
+
+### Interview 도메인 테스트 패턴
+
+```java
+// 면접 생성 테스트
+@Test
+void Interview_생성_성공() {
+    Lab lab = DomainLabFactory.buildValidLab();
+    LocalDate startDate = LocalDate.of(2024, 1, 15);
+    LocalDate endDate = LocalDate.of(2024, 1, 22);
+
+    Interview interview = new Interview(lab, startDate, endDate, 60, 5);
+
+    assertThat(interview.getLab()).isEqualTo(lab);
+    assertThat(interview.getStartDate()).isEqualTo(startDate);
+    assertThat(interview.getEndDate()).isEqualTo(endDate);
+    assertThat(interview.getStatus()).isEqualTo(InterviewStatus.INACTIVE);
+}
+
+// 면접 상태 전이 테스트
+@Test
+void Interview_활성화_성공() {
+    Interview interview = DomainInterviewFactory.buildInactiveInterview();
+
+    interview.activate();
+
+    assertThat(interview.getStatus()).isEqualTo(InterviewStatus.ACTIVE);
+    assertThat(interview.isActive()).isTrue();
+}
+
+// 면접 슬롯 시간 충돌 테스트
+@Test
+void InterviewSlot_시간_충돌_검증() {
+    Interview interview = DomainInterviewFactory.buildValidInterview();
+    LocalDateTime startTime = LocalDateTime.of(2024, 1, 15, 14, 0);
+    LocalDateTime endTime = LocalDateTime.of(2024, 1, 15, 15, 0);
+
+    InterviewSlot slot = new InterviewSlot(interview, startTime, endTime, 5);
+
+    assertThat(slot.getStartTime()).isEqualTo(startTime);
+    assertThat(slot.getEndTime()).isEqualTo(endTime);
+    assertThat(slot.getStatus()).isEqualTo(SlotStatus.AVAILABLE);
+}
+```
+
+### Ranking 도메인 테스트 패턴
+
+```java
+// 점수 신청 생성 테스트
+@Test
+void ScoreSubmission_생성_성공() {
+    User user = DomainUserFactory.buildValidUser();
+    Lab lab = DomainLabFactory.buildValidLab();
+    LocalDate achievementDate = LocalDate.of(2024, 1, 10);
+
+    ScoreSubmission submission = new ScoreSubmission(
+            user, lab, ScoreCategory.ACADEMIC_ACHIEVEMENT,
+            "성과 내용", achievementDate, "proof.pdf",
+            "신청 사유", null, VisibilityLevel.PUBLIC
+    );
+
+    assertThat(submission.getUser()).isEqualTo(user);
+    assertThat(submission.getLab()).isEqualTo(lab);
+    assertThat(submission.getStatus()).isEqualTo(SubmissionStatus.PENDING);
+    assertThat(submission.getScore()).isEqualTo(ScoreCategory.ACADEMIC_ACHIEVEMENT.getDefaultScore());
+}
+
+// 점수 승인 테스트
+@Test
+void ScoreSubmission_승인_성공() {
+    ScoreSubmission submission = DomainScoreSubmissionFactory.buildValidSubmission();
+    Long approverId = 999L;
+
+    submission.approve(approverId);
+
+    assertThat(submission.getStatus()).isEqualTo(SubmissionStatus.APPROVED);
+    assertThat(submission.getApprovedBy()).isEqualTo(approverId);
+    assertThat(submission.getApprovedAt()).isNotNull();
+}
+
+// 점수 거절 테스트
+@Test
+void ScoreSubmission_거절_성공() {
+    ScoreSubmission submission = DomainScoreSubmissionFactory.buildValidSubmission();
+    Long approverId = 999L;
+    String reason = "증빙서류 부족";
+
+    submission.reject(approverId, reason);
+
+    assertThat(submission.getStatus()).isEqualTo(SubmissionStatus.REJECTED);
+    assertThat(submission.getApprovedBy()).isEqualTo(approverId);
+    assertThat(submission.getRejectionReason()).isEqualTo(reason);
+}
+```
+
+### 시간 기반 로직 테스트 패턴
+
+```java
+// 고정 시간 기반 테스트 (권장)
+@Test
+void 시간_기반_로직_테스트() {
+    LocalDateTime fixedTime = LocalDateTime.of(2024, 1, 15, 14, 0);
+    InterviewSlot slot = new InterviewSlot(
+            interview, fixedTime, fixedTime.plusHours(1), 5
+    );
+
+    // 시간 기반 검증
+    assertThat(slot.getStartTime()).isEqualTo(fixedTime);
+    assertThat(slot.getDuration()).isEqualTo(Duration.ofHours(1));
+}
+
+// 만료 시간 테스트
+@Test
+void ScoreSubmission_만료_확인() {
+    ScoreSubmission submission = DomainScoreSubmissionFactory.buildValidSubmission();
+    LocalDateTime pastTime = LocalDateTime.of(2024, 1, 1, 0, 0);
+
+    ReflectionTestUtils.setField(submission, "expiresAt", pastTime);
+
+    assertThat(submission.isExpired()).isTrue();
+}
+
+// 시간 범위 검증 테스트
+@Test
+void Interview_기간_내_슬롯_검증() {
+    LocalDate interviewStart = LocalDate.of(2024, 1, 15);
+    LocalDate interviewEnd = LocalDate.of(2024, 1, 22);
+    Interview interview = DomainInterviewFactory.buildInterviewWithDates(interviewStart, interviewEnd);
+
+    LocalDateTime slotTime = LocalDateTime.of(2024, 1, 16, 14, 0);
+    InterviewSlot slot = new InterviewSlot(interview, slotTime, slotTime.plusHours(1), 5);
+
+    assertThat(slot.getStartTime().toLocalDate()).isBetween(interviewStart, interviewEnd);
 }
 ```
 
@@ -90,18 +272,28 @@ void {Domain}_연관관계_설정_성공() {
 
 ```java
 // 도메인별 권한 테스트
-@Test @WithMockUser(roles = "USER")
-void {Domain}_생성_권한_있음() throws Exception {
+@Test
+@WithMockUser(roles = "USER")
+void {
+    Domain
+}
+
+_생성_권한_있음() throws Exception {
     mockMvc.perform(post("/api/{domains}")
-            .content(objectMapper.writeValueAsString(request)))
+                    .content(objectMapper.writeValueAsString(request)))
             .andExpected(status().isCreated());
 }
 
 // 랩실 권한 테스트
-@Test @WithMockUser(roles = "LAB_MANAGER")
-void {Domain}_관리_권한_있음() throws Exception {
+@Test
+@WithMockUser(roles = "LAB_MANAGER")
+void {
+    Domain
+}
+
+_관리_권한_있음() throws Exception {
     mockMvc.perform(post("/api/labs/{labId}/{domains}", 1L)
-            .content(objectMapper.writeValueAsString(request)))
+                    .content(objectMapper.writeValueAsString(request)))
             .andExpected(status().isCreated());
 }
 ```
@@ -111,26 +303,86 @@ void {Domain}_관리_권한_있음() throws Exception {
 ```java
 // 입력값 검증 테스트
 @Test
-void {필드}_누락시_{PREFIX}_001_반환() {
-    {Domain}Exception exception = assertThrows({Domain}Exception.class,
-        () -> service.create{Domain}(invalidRequest));
-    assertThat(exception.getErrorCode()).isEqualTo({Domain}ErrorCode.{FIELD}_REQUIRED);
+void {
+    필드
+}
+
+_누락시_ {
+    PREFIX
+}
+
+_001_반환() {
+    {
+        Domain
+    } Exception exception = assertThrows({Domain}Exception.class,
+            () -> service.create {
+        Domain
+    } (invalidRequest));
+    assertThat(exception.getErrorCode()).isEqualTo({Domain}ErrorCode. {
+        FIELD
+    } _REQUIRED);
 }
 
 // 상태 변경 불가 테스트
 @Test
-void 잘못된_상태에서_변경시_{PREFIX}_422_반환() {
-    {Domain}Exception exception = assertThrows({Domain}Exception.class,
-        () -> entity.changeStatus());
+void 잘못된_상태에서_변경시_{PREFIX}
+
+_422_반환() {
+    {
+        Domain
+    } Exception exception = assertThrows({Domain}Exception.class,
+            () -> entity.changeStatus());
     assertThat(exception.getErrorCode()).isEqualTo({Domain}ErrorCode.CANNOT_CHANGE_STATUS);
 }
 
 // 조회 실패 테스트
 @Test
-void 존재하지않는_{Domain}_조회시_{PREFIX}_404_반환() {
-    {Domain}Exception exception = assertThrows({Domain}Exception.class,
-        () -> service.find{Domain}ById(999L));
-    assertThat(exception.getErrorCode()).isEqualTo({Domain}ErrorCode.{DOMAIN}_NOT_FOUND);
+void 존재하지않는_{Domain}
+
+_조회시_ {
+    PREFIX
+}
+
+_404_반환() {
+    {
+        Domain
+    } Exception exception = assertThrows({Domain}Exception.class,
+            () -> service.find {
+        Domain
+    } ById(999L));
+    assertThat(exception.getErrorCode()).isEqualTo({Domain}ErrorCode. {
+        DOMAIN
+    } _NOT_FOUND);
+}
+
+// Interview ErrorCode 테스트
+@Test
+void 중복된_활성화_면접_생성시_INT_012_반환() {
+    InterviewValidationException exception = assertThrows(InterviewValidationException.class,
+            () -> service.createInterview(labId, startDate, endDate, duration, maxApplicants));
+    assertThat(exception.getErrorCode()).isEqualTo(InterviewErrorCode.DUPLICATE_INTERVIEW);
+}
+
+@Test
+void 시간_충돌_슬롯_생성시_INT_015_반환() {
+    InterviewValidationException exception = assertThrows(InterviewValidationException.class,
+            () -> service.createInterviewSlot(interviewId, startTime, endTime, maxApplicants));
+    assertThat(exception.getErrorCode()).isEqualTo(InterviewErrorCode.SLOT_TIME_CONFLICT);
+}
+
+// Ranking ErrorCode 테스트
+@Test
+void 존재하지않는_점수신청_조회시_RANKING_404_반환() {
+    RankingValidationException exception = assertThrows(RankingValidationException.class,
+            () -> service.findSubmissionById(999L));
+    assertThat(exception.getErrorCode()).isEqualTo(RankingErrorCode.SUBMISSION_NOT_FOUND);
+}
+
+@Test
+void 중복된_성과_신청시_RANKING_009_반환() {
+    RankingValidationException exception = assertThrows(RankingValidationException.class,
+            () -> service.submitScore(userId, labId, category, description, achievementDate, proofUrl, reason, relatedLink, visibility));
+    assertThat(exception.getErrorCode()).isEqualTo(RankingErrorCode.DUPLICATE_ACHIEVEMENT);
 }
 ```
 
@@ -138,9 +390,21 @@ void 존재하지않는_{Domain}_조회시_{PREFIX}_404_반환() {
 
 ```java
 // Repository Mock
-when(repository.save(any({Entity}.class))).thenReturn(savedEntity);
-when(repository.findById(1L)).thenReturn(Optional.of(entity));
-verify(repository).save(any({Entity}.class));
+when(repository.save(any( {
+    Entity
+}.class))).
+
+thenReturn(savedEntity);
+
+when(repository.findById(1L)).
+
+thenReturn(Optional.of(entity));
+
+verify(repository).
+
+save(any( {
+    Entity
+}.class));
 
 // Security Mock
 @WithMockUser(roles = "ADMIN") // 실제 권한 설정
@@ -162,12 +426,18 @@ public static Entity createEntity() {
 }
 
 // ✅ DTO Null 안전성: 연관 객체 검증
-.relation(entity.getRelation() != null ? 
-    RelationDto.from(entity.getRelation()) : null)
+.
+
+relation(entity.getRelation() !=null?
+        RelationDto.
+
+from(entity.getRelation()):null)
 
 // ✅ 테스트 격리: 필요시에만 상태 설정
-if (테스트_검증_필요시) {
-    ReflectionTestUtils.setField(entity, "field", value);
+        if(테스트_검증_필요시){
+        ReflectionTestUtils.
+
+setField(entity, "field",value);
 }
 ```
 

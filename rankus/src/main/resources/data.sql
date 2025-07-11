@@ -27,12 +27,14 @@ VALUES (1, 1, 'https://example.com/lab1_img1.png', 'REPRESENTATIVE'),
        (3, 2, 'https://example.com/lab2_img1.png', 'REPRESENTATIVE');
 
 -- 4. interviews (면접 일정)
-INSERT INTO interviews (id, lab_id, start_date, end_date, duration_minutes, max_applicants_per_slot, status, created_at, updated_at)
+INSERT INTO interviews (id, lab_id, start_date, end_date, duration_minutes, max_applicants_per_slot, status, created_at,
+                        updated_at)
 VALUES (1, 1, '2025-07-15', '2025-07-16', 30, 2, 'ACTIVE', NOW(), NOW()),
        (2, 2, '2025-07-20', '2025-07-21', 45, 1, 'ACTIVE', NOW(), NOW());
 
 -- 5. interview_slots (면접 슬롯)
-INSERT INTO interview_slots (id, interview_id, start_time, end_time, max_applicants, current_applicants, status, created_at, updated_at)
+INSERT INTO interview_slots (id, interview_id, start_time, end_time, max_applicants, current_applicants, status,
+                             created_at, updated_at)
 VALUES (1, 1, '2025-07-15 09:00:00', '2025-07-15 09:30:00', 2, 1, 'AVAILABLE', NOW(), NOW()),
        (2, 1, '2025-07-15 10:00:00', '2025-07-15 10:30:00', 2, 0, 'AVAILABLE', NOW(), NOW()),
        (3, 1, '2025-07-15 14:00:00', '2025-07-15 14:30:00', 2, 2, 'FULL', NOW(), NOW()),
