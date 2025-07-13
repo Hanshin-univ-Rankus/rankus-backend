@@ -21,7 +21,7 @@ public final class DomainLabCreationRequestFactory {
         return new LabCreationRequest(
                 "TestLab",
                 LabCategory.AI,
-                "Test lab",
+                "Test lab description",
                 requester
         );
     }
@@ -36,7 +36,7 @@ public final class DomainLabCreationRequestFactory {
         return new LabCreationRequest(
                 "TestLab",
                 LabCategory.AI,
-                "Test lab",
+                "Test lab description",
                 requester
         );
     }
@@ -63,28 +63,28 @@ public final class DomainLabCreationRequestFactory {
         return buildRejectedRequest(rejector, "Test reason");
     }
 
-    public static LabCreationRequest buildRequestWithCustomData(String labName, LabCategory category, String description, User requester) {
-        return new LabCreationRequest(labName, category, description, requester);
+    public static LabCreationRequest buildRequestWithCustomData(String requestedLabName, LabCategory requestedCategory, String requestedDescription, User requester) {
+        return new LabCreationRequest(requestedLabName, requestedCategory, requestedDescription, requester);
     }
 
     public static LabCreationRequest buildRequestWithCategory(LabCategory category) {
         User requester = DomainUserFactory.buildStudentUser();
-        return new LabCreationRequest("TestLab", category, "Test desc", requester);
+        return new LabCreationRequest("TestLab", category, "Test description", requester);
     }
 
     public static LabCreationRequest buildAiLabRequest() {
         User requester = DomainUserFactory.buildStudentUser();
-        return new LabCreationRequest("AI Lab", LabCategory.AI, "AI research", requester);
+        return new LabCreationRequest("AI Lab", LabCategory.AI, "AI research description", requester);
     }
 
     public static LabCreationRequest buildDbLabRequest() {
         User requester = DomainUserFactory.buildStudentUser();
-        return new LabCreationRequest("DB Lab", LabCategory.DB, "DB research", requester);
+        return new LabCreationRequest("DB Lab", LabCategory.DB, "DB research description", requester);
     }
 
     public static LabCreationRequest buildSecurityLabRequest() {
         User requester = DomainUserFactory.buildStudentUser();
-        return new LabCreationRequest("Sec Lab", LabCategory.SECURITY, "Sec research", requester);
+        return new LabCreationRequest("Sec Lab", LabCategory.SECURITY, "Security research description", requester);
     }
 
     // 검증 실패 케이스용 빌더들

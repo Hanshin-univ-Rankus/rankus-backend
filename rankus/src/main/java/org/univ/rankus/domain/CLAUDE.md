@@ -39,13 +39,15 @@ ScoreSubmission (Root) → ScoreCategory (Enum) → SubmissionStatus (Enum) → 
 
 ## 🗄️ 엔티티 매트릭스
 
-| 엔티티                 | 핵심 비즈니스 메서드                                                                  | 상태 전이                       |
-|---------------------|------------------------------------------------------------------------------|-----------------------------|
-| **User**            | `checkPassword()`, `assignLab()`, `canManage()`                              | Role 승급                     |
-| **Lab**             | `autoAssignProfessor()`, `updateRanking()`                                   | -                           |
-| **LabApplication**  | `approve()`, `reject()`, `isOwnedBy()`                                       | PENDING → APPROVED/REJECTED |
-| **LabNotice**       | `pin()`, `unpin()`, `isOwnedBy()`                                            | isPinned 토글                 |
-| **ScoreSubmission** | `approve()`, `reject()`, `correctStatus()`, `canBeApproved()`, `isOwnedBy()` | PENDING → APPROVED/REJECTED |
+| 엔티티                   | 핵심 비즈니스 메서드                                                                  | 상태 전이                        |
+|-----------------------|------------------------------------------------------------------------------|------------------------------|
+| **User**              | `checkPassword()`, `assignLab()`, `canManage()`                              | Role 승급                      |
+| **Lab**               | `autoAssignProfessor()`, `updateRanking()`                                   | -                            |
+| **LabApplication**    | `approve()`, `reject()`, `isOwnedBy()`                                       | PENDING → APPROVED/REJECTED  |
+| **LabNotice**         | `pin()`, `unpin()`, `isOwnedBy()`                                            | isPinned 토글                  |
+| **ScoreSubmission**   | `approve()`, `reject()`, `correctStatus()`, `canBeApproved()`, `isOwnedBy()` | PENDING → APPROVED/REJECTED  |
+| **AttendanceSession** | `generateQRToken()`, `checkAttendance()`, `endSession()`, `isOwnedBy()`      | ACTIVE → COMPLETED/CANCELLED |
+| **AttendanceRecord**  | `markAsAbsent()`, `markAsLate()`, `markAsPresent()`, `isOwnedBy()`           | 출석 상태 변경                     |
 
 ## 💎 Value Object 및 Enum
 
@@ -77,6 +79,8 @@ VisibilityLevel:PUBLIC,LAB_ONLY,PRIVATE
 ScoreCategory:
 
 RESEARCH_SCI_PAPER(100),CONTEST_EXTERNAL_WINNER(50),...
+SessionStatus:ACTIVE →COMPLETED/CANCELLED
+AttendanceStatus:PRESENT,ABSENT,LATE
 ```
 
 ## 🛡️ 도메인 불변 조건
@@ -86,6 +90,8 @@ RESEARCH_SCI_PAPER(100),CONTEST_EXTERNAL_WINNER(50),...
 3. **LabApplication**: 면접시간 미래, PENDING에서만 상태변경
 4. **LabNotice**: 제목/내용 필수, 작성자/랩실 유효성
 5. **ScoreSubmission**: 취득일자 미래 불가, 6개월 만료, 본인 승인 불가, 정정 1회 제한
+6. **AttendanceSession**: 제목 필수, QR 유효시간 1-10분, 활성 상태에서만 QR 생성/출석 체크
+7. **AttendanceRecord**: 세션당 사용자 중복 출석 금지, 수동 수정 시 사유 필수
 
 ---
 
@@ -94,4 +100,4 @@ RESEARCH_SCI_PAPER(100),CONTEST_EXTERNAL_WINNER(50),...
 - **Ranking Domain**: `/domain/model/ranking/CLAUDE.md`
 - **상세 컨벤션**: 각 도메인별 CONVENTIONS.md 참조
 
-**업데이트**: 2025-01-09 | **구현 완료**: Ranking 도메인 포함
+**업데이트**: 2025-01-11 | **구현 완료**: Ranking, Attendance 도메인 포함

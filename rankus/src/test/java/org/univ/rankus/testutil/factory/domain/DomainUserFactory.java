@@ -8,7 +8,6 @@ import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.testutil.mock.TestPasswordEncoder;
 
-import java.util.UUID;
 
 /**
  * DomainUserFactory - 순수 도메인 단위 테스트 전용 팩토리
@@ -20,19 +19,21 @@ public final class DomainUserFactory {
     private DomainUserFactory() {
     }
 
+    private static long nameCounter = 1L;
+    
     public static User buildValidUser() {
-        String uid = UUID.randomUUID().toString().substring(0, 8);
+        String suffix = String.valueOf(nameCounter++);
         return new User(
-                "User-" + uid,
-                uid + "@example.com",
+                "TestUser" + suffix,
+                "testuser" + suffix + "@example.com",
                 Password.fromRaw("Password!23", ENCODER)
         );
     }
 
     public static User buildValidUserWithId(Long id) {
-        User u = buildValidUser();
-        ReflectionTestUtils.setField(u, "id", id);
-        return u;
+        User user = buildValidUser();
+        ReflectionTestUtils.setField(user, "id", id);
+        return user;
     }
 
     public static User buildInvalidUser_Name() {
@@ -123,7 +124,9 @@ public final class DomainUserFactory {
         return user;
     }
 
+    private static long sequentialIdCounter = 1000L;
+    
     private static Long generateUserId() {
-        return (long) (Math.random() * 1000000) + 1;
+        return sequentialIdCounter++;
     }
 }

@@ -12,6 +12,7 @@
 | **Notice**         | **`LNT`**     | **001~007** | **LNT_001**     |
 | **Interview**      | **`INT`**     | **001~034** | **INT_001**     |
 | **Ranking**        | **`RANKING`** | **001~023** | **RANKING_001** |
+| **Attendance**     | **`ATT`**     | **001~022** | **ATT_001**     |
 
 ## 🎯 ErrorCode 템플릿
 
@@ -117,6 +118,33 @@ CORRECTION_LIMIT_EXCEEDED("RANKING_019",CONFLICT, "정정 가능 횟수를 초�
 FILE_SIZE_EXCEEDED("RANKING_021",UNPROCESSABLE_ENTITY, "파일 크기는 10MB 이하여야 합니다"),
 
 UNSUPPORTED_FILE_TYPE("RANKING_022",UNPROCESSABLE_ENTITY, "지원하지 않는 파일 형식입니다")
+```
+
+## 📝 Attendance ErrorCode 예시
+
+```java
+// ATT_001~010: 입력값 검증
+TITLE_REQUIRED("ATT_001",BAD_REQUEST, "출석 세션 제목은 필수입니다"),
+
+QR_VALIDITY_INVALID("ATT_004",BAD_REQUEST, "QR 코드 유효시간은 1~10분 사이여야 합니다"),
+
+SESSION_NOT_ACTIVE("ATT_006",BAD_REQUEST, "활성화된 출석 세션이 아닙니다"),
+
+ALREADY_CHECKED_IN("ATT_007",BAD_REQUEST, "이미 출석 체크되었습니다"),
+
+QR_TOKEN_EXPIRED("ATT_008",BAD_REQUEST, "QR 코드가 만료되었습니다"),
+
+// ATT_403: 권한 오류
+INSUFFICIENT_PERMISSION_FOR_ATTENDANCE("ATT_403",FORBIDDEN, "출석 관리 권한이 없습니다"),
+
+// ATT_404: 조회 실패
+SESSION_NOT_FOUND("ATT_404",NOT_FOUND, "출석 세션을 찾을 수 없습니다"),
+
+// ATT_409: 중복 오류
+DUPLICATE_SESSION("ATT_409",CONFLICT, "이미 진행 중인 출석 세션이 있습니다"),
+
+// ATT_422: 비즈니스 규칙 위반
+CANNOT_END_INACTIVE_SESSION("ATT_422",UNPROCESSABLE_ENTITY, "비활성화된 세션은 종료할 수 없습니다")
 ```
 
 ## ✅ 체크리스트

@@ -217,4 +217,51 @@ void 관계_객체_테스트() {
 - **AI 최적화**: 50줄 이하, 테이블 중심, 코드 템플릿 포함
 - **즉시 업데이트**: 개발 완료 즉시 문서 업데이트
 
-**업데이트**: 2025-07-06 | **65줄** | 테스트 품질 체크리스트 추가
+## 🚨 테스트 실패 방지 가이드 (즉시 참조)
+
+> ⚡ **신규 추가**: Controller 테스트 실패를 방지하는 핵심 가이드
+
+### 📋 필수 참조 순서 (테스트 작성 시)
+
+1. **AI 실수 방지**: @core/ai-test-prevention-guide.md ⭐ **핵심**
+2. **빠른 체크리스트**: @core/controller-test-checklist.md ⭐ **3초 검증**
+3. **상세 트러블슈팅**: @core/controller-test-troubleshooting.md ⭐ **실패 시**
+4. **도메인 상태 검증**: @core/domain-state-validation.md ⭐ **상태 전이**
+
+### 🎯 TOP 3 실패 방지 팁 (AI 필독)
+
+1. **@RequestBody 체크**: `grep "@RequestBody" Controller.java` (1초)
+2. **상태 전이 확인**: `DomainFactory.buildAbsentRecordWithId()` 사용
+3. **Spring Boot 3.x**: `@MockitoBean` 사용 (NOT @MockBean)
+
+### ⚡ 즉시 적용 패턴
+
+```java
+// ✅ 실패 없는 Controller 테스트 템플릿
+@WebMvcTest(AttendanceRecordController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class AttendanceRecordControllerTest {
+
+    @MockitoBean
+    private AttendanceRecordCommandUseCase commandUseCase;
+
+    @Test
+    void markAsPresent_Success() throws Exception {
+        // given - 올바른 상태 전이
+        AttendanceRecord record = DomainAttendanceFactory.buildAbsentRecordWithId(1L);
+        AttendanceStatusUpdateRequestDto request = new AttendanceStatusUpdateRequestDto(
+                AttendanceStatus.PRESENT, "테스트"
+        );
+
+        // when & then - 필수 헤더와 본문
+        mockMvc.perform(put("/api/attendance/records/{id}/present", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+}
+```
+
+**업데이트**: 2025-07-13 | **85줄** | 테스트 실패 방지 가이드 추가

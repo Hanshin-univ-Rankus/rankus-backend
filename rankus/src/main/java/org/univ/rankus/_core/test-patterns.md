@@ -27,25 +27,92 @@ Test {
 }
 ```
 
-## 🎭 Controller Test 템플릿
+## 🎭 Controller Test 템플릿 (Spring Boot 3.x 호환)
 
 ```java
-@WebMvcTest({Controller}.class) class {Controller}
+@WebMvcTest({Controller}.class)
+@AutoConfigureMockMvc(addFilters = false)  // 보안 필터 비활성화
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT) class {Controller}
 
 Test {
-    @Autowired private MockMvc mockMvc;
-    @MockBean private {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockitoBean  // ⚠️ NOT @MockBean (deprecated)
+    private {
         UseCase
     } useCase;
+
+    @MockitoBean
+    private {
+        PermissionHandler
+    } permissionHandler;
+
+    @AfterEach
+    void clearSecurity () {
+        SecurityContextHolder.clearContext();  // 테스트 격리
+    }
+
+    private void setupSecurityContext (Long userId){
+        CustomUserDetails principal = mock(CustomUserDetails.class);
+        given(principal.getUserId()).willReturn(userId);
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(principal, null);
+        authentication.setAuthenticated(true);  // 필수!
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
     
-    @Test @WithMockUser(roles = "USER")
+    @Test
+    @DisplayName("POST /api/{endpoint} > {기능} 성공 → 201 Created")
     void{
-        엔드포인트
-    } _호출_테스트() throws Exception {
+        메서드명
+    } _Success() throws Exception {
+        // given
+        setupSecurityContext(USER_ID);
+        {
+            RequestDto
+        } request = new {
+            RequestDto
+        } (validData);
+        {
+            Domain
+        } entity = {DomainFactory}.build {
+            ValidEntity
+        } ();
+
+        given(useCase. {
+            method
+        } (any())).willReturn(entity);
+        given(permissionHandler.hasPermission(any(), any(), eq("ACTION"))).willReturn(true);
+
+        // when & then
+        mockMvc.perform(post("/api/{endpoint}")
+                        .contentType(MediaType.APPLICATION_JSON)  // 필수 헤더
+                        .content(objectMapper.writeValueAsString(request)))  // JSON 직렬화
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value(201));
+    }
+
+    @Test
+    @DisplayName("인증 없는 요청 시 500 Internal Server Error (필터 비활성화)")
+    void unauthenticatedRequest_InternalServerError () throws Exception {
+        // given
+        {
+            RequestDto
+        } request = new {
+            RequestDto
+        } (validData);
+
+        // when & then - 필터가 비활성화되어 userDetails가 null이 되어 500 발생
         mockMvc.perform(post("/api/{endpoint}")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500));
     }
 }
 ```
@@ -83,6 +150,7 @@ _반환() {
 // LabNotice: LNT_001~007(입력값), LNT_403(권한), LNT_404(미존재)
 // Interview: INT_001~034(입력값/상태), INT_028~029(권한), INT_030~032(미존재)
 // LabCreationRequest: LCR_006(중복), LCR_007(상태변경불가), LCR_009(미존재)
+// Attendance: ATT_001~010(입력값), ATT_403(권한), ATT_404(미존재), ATT_409(중복), ATT_422(상태변경불가)
 ```
 
 ## 📝 다양한 도메인 테스트 예시
@@ -383,6 +451,41 @@ void 중복된_성과_신청시_RANKING_009_반환() {
     RankingValidationException exception = assertThrows(RankingValidationException.class,
             () -> service.submitScore(userId, labId, category, description, achievementDate, proofUrl, reason, relatedLink, visibility));
     assertThat(exception.getErrorCode()).isEqualTo(RankingErrorCode.DUPLICATE_ACHIEVEMENT);
+}
+
+// Attendance ErrorCode 테스트
+@Test
+void 제목_누락시_ATT_001_반환() {
+    AttendanceValidationException exception = assertThrows(AttendanceValidationException.class,
+            () -> AttendanceSession.create(1L, 1L, null, 5));
+    assertThat(exception.getErrorCode()).isEqualTo(AttendanceErrorCode.TITLE_REQUIRED);
+}
+
+@Test
+void QR_유효시간_범위_초과시_ATT_004_반환() {
+    AttendanceValidationException exception = assertThrows(AttendanceValidationException.class,
+            () -> AttendanceSession.create(1L, 1L, "테스트", 11));
+    assertThat(exception.getErrorCode()).isEqualTo(AttendanceErrorCode.QR_VALIDITY_INVALID);
+}
+
+@Test
+void 중복_출석_체크시_ATT_007_반환() {
+    AttendanceSession session = AttendanceSession.create(1L, 1L, "테스트", 5);
+    session.checkAttendance(2L, LocalDateTime.now());
+
+    AttendanceValidationException exception = assertThrows(AttendanceValidationException.class,
+            () -> session.checkAttendance(2L, LocalDateTime.now()));
+    assertThat(exception.getErrorCode()).isEqualTo(AttendanceErrorCode.ALREADY_CHECKED_IN);
+}
+
+@Test
+void 비활성_세션_QR_생성시_ATT_006_반환() {
+    AttendanceSession session = AttendanceSession.create(1L, 1L, "테스트", 5);
+    session.endSession();
+
+    AttendanceValidationException exception = assertThrows(AttendanceValidationException.class,
+            () -> session.generateQRToken());
+    assertThat(exception.getErrorCode()).isEqualTo(AttendanceErrorCode.SESSION_NOT_ACTIVE);
 }
 ```
 
