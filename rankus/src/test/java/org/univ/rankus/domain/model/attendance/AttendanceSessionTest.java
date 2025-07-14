@@ -12,7 +12,7 @@ import org.univ.rankus.testutil.factory.domain.DomainAttendanceFactory;
 
 import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 import static org.assertj.core.data.Percentage.withPercentage;
 import static org.junit.jupiter.api.Assertions.assertThrows;

@@ -2,6 +2,7 @@ package org.univ.rankus.adapter.in.web.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.univ.rankus.domain.model.user.EnrollmentStatus;
 import org.univ.rankus.domain.model.user.User;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,10 @@ public class UserResponseDto {
     private final Long id;
     private final String name;
     private final String email;
+    private final String studentNumber;
+    private final String phoneNumber;
+    private final Integer grade;
+    private final EnrollmentStatus enrollmentStatus;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
@@ -22,6 +27,10 @@ public class UserResponseDto {
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
+                .studentNumber(user.getStudentNumber())
+                .phoneNumber(user.getPhoneNumber())
+                .grade(user.getGrade())
+                .enrollmentStatus(user.getEnrollmentStatus())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();

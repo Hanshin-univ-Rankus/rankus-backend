@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -40,6 +41,7 @@ public class LabNoticeController {
     private final LabNoticeQueryUseCase labNoticeQueryUseCase;
     private final LabNoticeCommandUseCase labNoticeCommandUseCase;
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 공지사항 목록 조회", description = "특정 랩실의 공지사항을 페이징하여 조회합니다. 고정 공지 → 최신순으로 정렬됩니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -63,6 +65,7 @@ public class LabNoticeController {
         return ResponseEntity.ok(ApiResponse.success(pageResponse, "공지사항 목록 조회 성공"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 공지사항 전체 목록 조회", description = "특정 랩실의 모든 공지사항을 조회합니다.")
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_NOTICES')")
@@ -75,6 +78,7 @@ public class LabNoticeController {
         return ResponseEntity.ok(ApiResponse.success(responseList, "전체 공지사항 조회 성공"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "특정 타입 공지사항 조회", description = "특정 랩실의 특정 타입(일반/긴급) 공지사항을 조회합니다.")
     @GetMapping("/type/{type}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_NOTICES')")
@@ -89,6 +93,7 @@ public class LabNoticeController {
         return ResponseEntity.ok(ApiResponse.success(responseList, message));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "고정 공지사항 조회", description = "특정 랩실의 고정된 공지사항만 조회합니다.")
     @GetMapping("/pinned")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_NOTICES')")
@@ -101,6 +106,7 @@ public class LabNoticeController {
         return ResponseEntity.ok(ApiResponse.success(responseList, "고정 공지사항 조회 성공"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "공지사항 상세 조회", description = "특정 공지사항의 상세 정보를 조회합니다.")
     @GetMapping("/{noticeId}")
     @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #noticeId, 'LabNotice', 'VIEW')")
@@ -114,6 +120,7 @@ public class LabNoticeController {
         return ResponseEntity.ok(ApiResponse.success(responseDto, "공지사항 상세 조회 성공"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "공지사항 생성", description = "새로운 공지사항을 생성합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -147,6 +154,7 @@ public class LabNoticeController {
                 .body(ApiResponse.created(responseDto, "공지사항이 성공적으로 생성되었습니다"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "공지사항 수정", description = "기존 공지사항을 수정합니다.")
     @PutMapping("/{noticeId}")
     @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #noticeId, 'LabNotice', 'UPDATE')")
@@ -168,6 +176,7 @@ public class LabNoticeController {
         return ResponseEntity.ok(ApiResponse.success(responseDto, "공지사항이 성공적으로 수정되었습니다"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "공지사항 고정 토글", description = "공지사항의 고정 상태를 토글합니다.")
     @PatchMapping("/{noticeId}/pin")
     @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #noticeId, 'LabNotice', 'UPDATE')")
@@ -183,6 +192,7 @@ public class LabNoticeController {
         return ResponseEntity.ok(ApiResponse.success(responseDto, message));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "공지사항 삭제", description = "공지사항을 삭제합니다.")
     @DeleteMapping("/{noticeId}")
     @PreAuthorize("@unifiedPermissionEvaluator.hasPermission(authentication, #noticeId, 'LabNotice', 'DELETE')")

@@ -41,19 +41,19 @@ public class LabCreationRequestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "201", description = "랩실 생성 신청 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, LabCreationRequestResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400", description = "입력 검증 실패",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "409", description = "중복 신청",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             )
     })
@@ -81,7 +81,7 @@ public class LabCreationRequestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "목록 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, LabCreationRequestResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             )
     })
@@ -102,7 +102,7 @@ public class LabCreationRequestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, LabCreationRequestResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -151,7 +151,7 @@ public class LabCreationRequestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "목록 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, LabCreationRequestResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -173,7 +173,7 @@ public class LabCreationRequestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "목록 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, LabCreationRequestResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(

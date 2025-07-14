@@ -1,13 +1,11 @@
 package org.univ.rankus.adapter.in.web.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.univ.rankus.domain.model.user.EnrollmentStatus;
 import org.univ.rankus.domain.model.user.Role;
 
 /**
@@ -34,4 +32,20 @@ public class UserCreateRequestDto {
 
     @NotNull(message = "역할은 필수입니다.")
     private Role role;
+
+    @NotBlank(message = "학번은 필수입니다.")
+    @Pattern(regexp = "^[0-9]{8,20}$", message = "학번은 8-20자리 숫자여야 합니다.")
+    private String studentNumber;
+
+    @NotBlank(message = "전화번호는 필수입니다.")
+    @Pattern(regexp = "^[0-9-]{10,15}$", message = "전화번호 형식이 올바르지 않습니다.")
+    private String phoneNumber;
+
+    @NotNull(message = "학년은 필수입니다.")
+    @Min(value = 1, message = "학년은 1 이상이어야 합니다.")
+    @Max(value = 8, message = "학년은 8 이하여야 합니다.")
+    private Integer grade;
+
+    @NotNull(message = "재학상태는 필수입니다.")
+    private EnrollmentStatus enrollmentStatus;
 }

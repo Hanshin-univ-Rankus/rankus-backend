@@ -46,7 +46,7 @@ public class AuthController {
                     description = "회원가입 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, UserResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -54,7 +54,7 @@ public class AuthController {
                     description = "입력값 검증 실패",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -62,7 +62,7 @@ public class AuthController {
                     description = "이메일 중복 등 회원가입 실패",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             )
     })
@@ -90,7 +90,7 @@ public class AuthController {
                     description = "로그인 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, AuthResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -98,7 +98,7 @@ public class AuthController {
                     description = "입력값 검증 실패",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -106,7 +106,7 @@ public class AuthController {
                     description = "인증 실패(잘못된 이메일/비밀번호)",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -114,7 +114,7 @@ public class AuthController {
                     description = "사용자 정보 없음",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             )
     })

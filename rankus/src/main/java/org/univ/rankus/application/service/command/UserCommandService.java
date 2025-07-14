@@ -37,14 +37,23 @@ public class UserCommandService implements UserCommandUseCase {
             throw new UserValidationException(UserErrorCode.EMAIL_DUPLICATED);
         }
 
-        // 2. 도메인 객체 생성
+        // 2. 학번 중복 검증
+        if (userRepositoryPort.existsByStudentNumber(request.getStudentNumber())) {
+            throw new UserValidationException(UserErrorCode.STUDENT_NUMBER_DUPLICATED);
+        }
+
+        // 3. 도메인 객체 생성
         User user = new User(
                 request.getName(),
                 request.getEmail(),
-                Password.fromRaw(request.getPassword(), passwordEncoder)
+                Password.fromRaw(request.getPassword(), passwordEncoder),
+                request.getStudentNumber(),
+                request.getPhoneNumber(),
+                request.getGrade(),
+                request.getEnrollmentStatus()
         );
 
-        // 3. 저장
+        // 4. 저장
         return userRepositoryPort.save(user);
     }
 
@@ -62,7 +71,14 @@ public class UserCommandService implements UserCommandUseCase {
             }
         }
 
-        // 3. 도메인 메서드로 정보 변경
+        // 3. 학번 변경시 중복 검증 (현재 사용자 제외)
+        if (request.getStudentNumber() != null && !request.getStudentNumber().equals(user.getStudentNumber())) {
+            if (userRepositoryPort.existsByStudentNumber(request.getStudentNumber())) {
+                throw new UserValidationException(UserErrorCode.STUDENT_NUMBER_DUPLICATED);
+            }
+        }
+
+        // 4. 도메인 메서드로 정보 변경
         if (request.getName() != null) {
             user.changeName(request.getName());
         }
@@ -72,8 +88,20 @@ public class UserCommandService implements UserCommandUseCase {
         if (request.getRole() != null) {
             user.changeRole(request.getRole());
         }
+        if (request.getStudentNumber() != null) {
+            user.changeStudentNumber(request.getStudentNumber());
+        }
+        if (request.getPhoneNumber() != null) {
+            user.changePhoneNumber(request.getPhoneNumber());
+        }
+        if (request.getGrade() != null) {
+            user.changeGrade(request.getGrade());
+        }
+        if (request.getEnrollmentStatus() != null) {
+            user.changeEnrollmentStatus(request.getEnrollmentStatus());
+        }
 
-        // 4. 저장
+        // 5. 저장
         return userRepositoryPort.save(user);
     }
 

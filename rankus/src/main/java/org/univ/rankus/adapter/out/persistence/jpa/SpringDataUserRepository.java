@@ -23,4 +23,9 @@ public interface SpringDataUserRepository extends JpaRepository<User, Long> {
      * 이메일 중복 체크
      */
     boolean existsByEmail(String email);
+
+    /**
+     * 학번 중복 체크
+     */
+    boolean existsByStudentNumber(String studentNumber);
 }

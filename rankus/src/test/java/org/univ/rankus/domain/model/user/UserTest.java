@@ -32,7 +32,7 @@ class UserTest {
             // when & then
             UserValidationException ex = assertThrows(
                     UserValidationException.class,
-                    () -> new User(name, email, pwd)
+                    () -> new User(name, email, pwd, "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED)
             );
 
             assertEquals(UserErrorCode.PASSWORD_REQUIRED, ex.getErrorCode());
@@ -49,7 +49,7 @@ class UserTest {
             // when & then
             UserValidationException ex = assertThrows(
                     UserValidationException.class,
-                    () -> new User(name, "a@b.com", pwd)
+                    () -> new User(name, "a@b.com", pwd, "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED)
             );
             assertEquals(UserErrorCode.NAME_REQUIRED, ex.getErrorCode());
         }
@@ -64,7 +64,7 @@ class UserTest {
             // when & then
             UserValidationException ex = assertThrows(
                     UserValidationException.class,
-                    () -> new User(longName, "a@b.com", pwd)
+                    () -> new User(longName, "a@b.com", pwd, "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED)
             );
             assertEquals(UserErrorCode.NAME_TOO_LONG, ex.getErrorCode());
         }
@@ -80,7 +80,7 @@ class UserTest {
             // when & then
             UserValidationException ex = assertThrows(
                     UserValidationException.class,
-                    () -> new User("홍길동", email, pwd)
+                    () -> new User("홍길동", email, pwd, "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED)
             );
             assertEquals(UserErrorCode.EMAIL_REQUIRED, ex.getErrorCode());
         }
@@ -105,12 +105,16 @@ class UserTest {
             Password pwd = Password.fromRaw("Password!23", new TestPasswordEncoder());
 
             // when
-            User user = new User(name, email, pwd);
+            User user = new User(name, email, pwd, "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED);
 
             // then
             assertNull(user.getId(), "생성 전에는 ID가 null이어야 한다");
             assertEquals("홍길동", user.getName());
             assertEquals("test@univ.ac.kr", user.getEmail());
+            assertEquals("20201001", user.getStudentNumber());
+            assertEquals("010-1234-5678", user.getPhoneNumber());
+            assertEquals(3, user.getGrade());
+            assertEquals(EnrollmentStatus.ENROLLED, user.getEnrollmentStatus());
             assertEquals(Role.STUDENT, user.getRole());
             assertTrue(user.checkPassword("Password!23", new TestPasswordEncoder()));
         }

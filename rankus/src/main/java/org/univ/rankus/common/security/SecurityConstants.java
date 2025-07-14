@@ -12,6 +12,8 @@ public final class SecurityConstants {
             "/api/auth/**",
             "/api/labs/**", // GET /api/labs 만 허용하려면, POST/PUT 엔드포인트는 별도 인증 필요
             "/swagger-ui/**",
-            "/v3/api-docs/**"
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/api-docs/**"
     };
 }

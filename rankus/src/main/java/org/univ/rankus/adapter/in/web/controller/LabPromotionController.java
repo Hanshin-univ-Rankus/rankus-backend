@@ -45,7 +45,7 @@ public class LabPromotionController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "랩실 목록 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, List.class, LabResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             )
     })
@@ -73,7 +73,7 @@ public class LabPromotionController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "랩실 정보 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, LabResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(

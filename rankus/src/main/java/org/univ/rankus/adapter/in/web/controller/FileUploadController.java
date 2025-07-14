@@ -2,6 +2,7 @@ package org.univ.rankus.adapter.in.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,7 @@ public class FileUploadController {
     /**
      * 증빙서류 파일 업로드
      */
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "증빙서류 파일 업로드", description = "점수 신청용 증빙서류 파일을 업로드합니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "파일 업로드 성공"),
@@ -89,6 +91,7 @@ public class FileUploadController {
     /**
      * 프로필 이미지 파일 업로드
      */
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "프로필 이미지 파일 업로드", description = "사용자 프로필 이미지 파일을 업로드합니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "파일 업로드 성공"),
@@ -131,6 +134,7 @@ public class FileUploadController {
     /**
      * 파일 다운로드
      */
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "파일 다운로드", description = "업로드된 파일을 다운로드합니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "파일 다운로드 성공"),
@@ -196,6 +200,7 @@ public class FileUploadController {
     /**
      * 파일 삭제
      */
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "파일 삭제", description = "업로드된 파일을 삭제합니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "파일 삭제 성공"),
@@ -240,6 +245,7 @@ public class FileUploadController {
     /**
      * 파일 정보 조회
      */
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "파일 정보 조회", description = "업로드된 파일의 정보를 조회합니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "파일 정보 조회 성공"),

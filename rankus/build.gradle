@@ -48,6 +48,14 @@ dependencies {
     // SpringDoc OpenAPI
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 
+    // QR Code Generation
+    implementation 'com.google.zxing:core:3.5.3'
+    implementation 'com.google.zxing:javase:3.5.3'
+
+    // Excel Export
+    implementation 'org.apache.poi:poi:5.2.4'
+    implementation 'org.apache.poi:poi-ooxml:5.2.4'
+
 }
 
 
@@ -179,3 +187,6 @@ test {
 check {
     dependsOn jacocoTestCoverageVerification
 }
+
+// Static Analysis Configuration (temporarily disabled for Java 21 compatibility)
+// TODO: Re-enable with updated versions once compatibility issues are resolved

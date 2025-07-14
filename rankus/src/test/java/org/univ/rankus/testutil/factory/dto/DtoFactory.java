@@ -8,6 +8,7 @@ import org.univ.rankus.domain.model.lab.core.LabCategory;
 import org.univ.rankus.domain.model.lab.creation.LabCreationStatus;
 import org.univ.rankus.domain.model.lab.notice.NoticeType;
 import org.univ.rankus.domain.model.user.Role;
+import org.univ.rankus.domain.model.user.EnrollmentStatus;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +26,10 @@ public final class DtoFactory {
                 .name("테스트사용자")
                 .email("test@example.com")
                 .password("Password!123")
+                .studentNumber("20201001")
+                .phoneNumber("010-1234-5678")
+                .grade(3)
+                .enrollmentStatus(EnrollmentStatus.ENROLLED)
                 .build();
     }
 
@@ -33,6 +38,10 @@ public final class DtoFactory {
                 .name(name)
                 .email(email)
                 .password(password)
+                .studentNumber("20201001")
+                .phoneNumber("010-1234-5678")
+                .grade(3)
+                .enrollmentStatus(EnrollmentStatus.ENROLLED)
                 .build();
     }
 
@@ -77,6 +86,10 @@ public final class DtoFactory {
                 .id(1L)
                 .name("테스트사용자")
                 .email("test@example.com")
+                .studentNumber("20201001")
+                .phoneNumber("010-1234-5678")
+                .grade(3)
+                .enrollmentStatus(EnrollmentStatus.ENROLLED)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -87,6 +100,10 @@ public final class DtoFactory {
                 .id(id)
                 .name(name)
                 .email(email)
+                .studentNumber("20201001")
+                .phoneNumber("010-1234-5678")
+                .grade(3)
+                .enrollmentStatus(EnrollmentStatus.ENROLLED)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();

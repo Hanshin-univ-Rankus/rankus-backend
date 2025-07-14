@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -44,6 +45,7 @@ public class ScoreSubmissionController {
     private final ScoreSubmissionQueryUseCase scoreSubmissionQueryUseCase;
     private final FileUploadUseCase fileUploadUseCase;
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "점수 신청", description = "새로운 점수 신청을 생성합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -84,6 +86,7 @@ public class ScoreSubmissionController {
                 .body(ApiResponse.created(ScoreSubmissionResponseDto.from(submission)));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "점수 신청 상세 조회", description = "특정 점수 신청의 상세 정보를 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -107,6 +110,7 @@ public class ScoreSubmissionController {
         return ResponseEntity.ok(ApiResponse.success(ScoreSubmissionResponseDto.from(submission)));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "내 점수 신청 목록 조회", description = "현재 사용자의 점수 신청 목록을 페이징하여 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -127,6 +131,7 @@ public class ScoreSubmissionController {
         return ResponseEntity.ok(ApiResponse.success(PageResponse.of(submissions, ScoreSubmissionResponseDto::from)));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 점수 신청 목록 조회", description = "특정 랩실의 점수 신청 목록을 페이징하여 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -149,6 +154,7 @@ public class ScoreSubmissionController {
         return ResponseEntity.ok(ApiResponse.success(PageResponse.of(submissions, ScoreSubmissionResponseDto::from)));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "승인 대기 점수 신청 목록 조회", description = "승인자가 처리할 수 있는 PENDING 상태의 점수 신청 목록을 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -169,6 +175,7 @@ public class ScoreSubmissionController {
         return ResponseEntity.ok(ApiResponse.success(PageResponse.of(submissions, ScoreSubmissionResponseDto::from)));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "점수 신청 승인", description = "특정 점수 신청을 승인합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -198,6 +205,7 @@ public class ScoreSubmissionController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "점수 신청 거부", description = "특정 점수 신청을 거부합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -229,6 +237,7 @@ public class ScoreSubmissionController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "점수 신청 상태 정정", description = "점수 신청의 상태를 정정합니다 (승인 ↔ 거부).")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -258,6 +267,7 @@ public class ScoreSubmissionController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "점수 신청 삭제", description = "본인이 신청한 점수 신청을 삭제합니다. (PENDING 상태만 가능)")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -287,6 +297,7 @@ public class ScoreSubmissionController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "중복 검사", description = "점수 신청 시 중복 여부를 검사합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -308,6 +319,7 @@ public class ScoreSubmissionController {
         return ResponseEntity.ok(ApiResponse.success(DuplicateCheckResponseDto.from(result)));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "사용자 총 점수 조회", description = "현재 사용자의 총 승인된 점수를 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -326,6 +338,7 @@ public class ScoreSubmissionController {
         return ResponseEntity.ok(ApiResponse.success(totalScore));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 내 사용자 점수 조회", description = "특정 랩실에서 현재 사용자의 승인된 점수를 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -345,6 +358,7 @@ public class ScoreSubmissionController {
         return ResponseEntity.ok(ApiResponse.success(labScore));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "증빙서류 파일 업로드", description = "점수 신청용 증빙서류 파일을 업로드합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -388,6 +402,7 @@ public class ScoreSubmissionController {
         }
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "증빙서류 파일과 점수 신청 동시 처리", description = "파일을 업로드하고 점수 신청을 동시에 처리합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(

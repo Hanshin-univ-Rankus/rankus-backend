@@ -42,18 +42,36 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "lab_id")
     private Lab lab; // 소속 랩실(선택)
 
+    @Column(nullable = false, length = 20, unique = true)
+    private String studentNumber; // 학번
+
+    @Column(nullable = false, length = 15)
+    private String phoneNumber; // 전화번호
+
+    @Column(nullable = false)
+    private Integer grade; // 학년 (1-8)
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private EnrollmentStatus enrollmentStatus; // 휴학/재학 상태
+
     /**
-     * 생성자: 필수 필드(name, email, Password 객체) 검증 후 세팅
+     * 생성자: 필수 필드들 검증 후 세팅
      * - Role은 기본값으로 STUDENT 설정
      * Service 계층에서 Password.fromRaw(...)을 사용해 Password 객체를 생성한 후 넘겨주어야 한다.
      */
-    public User(String name, String email, Password password) {
+    public User(String name, String email, Password password, String studentNumber,
+                String phoneNumber, Integer grade, EnrollmentStatus enrollmentStatus) {
         if (password == null) {
             throw new UserValidationException(UserErrorCode.PASSWORD_REQUIRED);
         }
         this.name = validateName(name);
         this.email = validateEmail(email);
         this.password = password;
+        this.studentNumber = validateStudentNumber(studentNumber);
+        this.phoneNumber = validatePhoneNumber(phoneNumber);
+        this.grade = validateGrade(grade);
+        this.enrollmentStatus = validateEnrollmentStatus(enrollmentStatus);
         this.role = Role.STUDENT;  // 기본값 설정
     }
 
@@ -152,6 +170,42 @@ public class User extends BaseTimeEntity {
     }
 
     /**
+     * 학번 변경
+     *
+     * @param newStudentNumber 새 학번
+     */
+    public void changeStudentNumber(String newStudentNumber) {
+        this.studentNumber = validateStudentNumber(newStudentNumber);
+    }
+
+    /**
+     * 전화번호 변경
+     *
+     * @param newPhoneNumber 새 전화번호
+     */
+    public void changePhoneNumber(String newPhoneNumber) {
+        this.phoneNumber = validatePhoneNumber(newPhoneNumber);
+    }
+
+    /**
+     * 학년 변경
+     *
+     * @param newGrade 새 학년
+     */
+    public void changeGrade(Integer newGrade) {
+        this.grade = validateGrade(newGrade);
+    }
+
+    /**
+     * 재학상태 변경
+     *
+     * @param newEnrollmentStatus 새 재학상태
+     */
+    public void changeEnrollmentStatus(EnrollmentStatus newEnrollmentStatus) {
+        this.enrollmentStatus = validateEnrollmentStatus(newEnrollmentStatus);
+    }
+
+    /**
      * 특정 랩실의 지원서 관리 권한을 확인
      * ADMIN은 모든 랩실의 지원서 관리 가능
      * LAB_LEADER, PROFESSOR 역할이 해당 랩실에 소속된 경우 권한 부여
@@ -235,5 +289,58 @@ public class User extends BaseTimeEntity {
      */
     public Long getUserId() {
         return this.id;
+    }
+
+    /**
+     * 학번 유효성 검증
+     */
+    private String validateStudentNumber(String studentNumber) {
+        if (!StringUtils.hasText(studentNumber)) {
+            throw new UserValidationException(UserErrorCode.STUDENT_NUMBER_REQUIRED);
+        }
+        String trimmed = studentNumber.trim();
+        // 학번 형식 검증: 숫자만 허용, 8-20자리
+        if (!trimmed.matches("^[0-9]{8,20}$")) {
+            throw new UserValidationException(UserErrorCode.STUDENT_NUMBER_INVALID);
+        }
+        return trimmed;
+    }
+
+    /**
+     * 전화번호 유효성 검증
+     */
+    private String validatePhoneNumber(String phoneNumber) {
+        if (!StringUtils.hasText(phoneNumber)) {
+            throw new UserValidationException(UserErrorCode.PHONE_NUMBER_REQUIRED);
+        }
+        String trimmed = phoneNumber.trim();
+        // 전화번호 형식 검증: 숫자, 하이픈 허용
+        if (!trimmed.matches("^[0-9-]{10,15}$")) {
+            throw new UserValidationException(UserErrorCode.PHONE_NUMBER_INVALID);
+        }
+        return trimmed;
+    }
+
+    /**
+     * 학년 유효성 검증
+     */
+    private Integer validateGrade(Integer grade) {
+        if (grade == null) {
+            throw new UserValidationException(UserErrorCode.GRADE_REQUIRED);
+        }
+        if (grade < 1 || grade > 8) {
+            throw new UserValidationException(UserErrorCode.GRADE_INVALID);
+        }
+        return grade;
+    }
+
+    /**
+     * 재학상태 유효성 검증
+     */
+    private EnrollmentStatus validateEnrollmentStatus(EnrollmentStatus enrollmentStatus) {
+        if (enrollmentStatus == null) {
+            throw new UserValidationException(UserErrorCode.ENROLLMENT_STATUS_REQUIRED);
+        }
+        return enrollmentStatus;
     }
 }

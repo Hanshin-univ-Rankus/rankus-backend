@@ -50,14 +50,14 @@ public class LabImageController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "이미지 등록 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, LabImageResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 검증 실패",
-                    content = @Content(schema = @Schema(allOf = {ApiResponse.class}))
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음",
-                    content = @Content(schema = @Schema(allOf = {ApiResponse.class}))
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
     public ResponseEntity<ApiResponse<LabImageResponseDto>> addImage(
@@ -101,11 +101,11 @@ public class LabImageController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "이미지 목록 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, List.class, LabImageResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 검증 실패",
-                    content = @Content(schema = @Schema(allOf = {ApiResponse.class}))
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
     public ResponseEntity<ApiResponse<List<LabImageResponseDto>>> listImages(
@@ -136,11 +136,11 @@ public class LabImageController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "이미지 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, LabImageResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "입력값 검증 실패",
-                    content = @Content(schema = @Schema(allOf = {ApiResponse.class}))
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
     public ResponseEntity<ApiResponse<LabImageResponseDto>> getImage(

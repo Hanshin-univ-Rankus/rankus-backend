@@ -137,16 +137,25 @@ class AuthServiceTest {
                     .name(name)
                     .email(email)
                     .password(AuthMockUtil.RAW_PASSWORD)
+                    .studentNumber("20201001")
+                    .phoneNumber("010-1234-5678")
+                    .grade(3)
+                    .enrollmentStatus(org.univ.rankus.domain.model.user.EnrollmentStatus.ENROLLED)
                     .build();
             User saved = authService.signUp(request);
 
             // then: 반환된 User 필드 검증 및 포트 호출 검증
             assertThat(saved.getName()).isEqualTo(name);
             assertThat(saved.getEmail()).isEqualTo(email);
+            assertThat(saved.getStudentNumber()).isEqualTo("20201001");
+            assertThat(saved.getPhoneNumber()).isEqualTo("010-1234-5678");
+            assertThat(saved.getGrade()).isEqualTo(3);
+            assertThat(saved.getEnrollmentStatus()).isEqualTo(org.univ.rankus.domain.model.user.EnrollmentStatus.ENROLLED);
             // Password VO에서 해시 값을 꺼내 비교는 별도 Password 테스트에서 확인
             assertThat(saved.getPassword()).isNotNull();
 
             verify(userRepo).existsByEmail(email);
+            verify(userRepo).existsByStudentNumber("20201001");
             verify(passwordEncoder).encode(AuthMockUtil.RAW_PASSWORD);
             verify(userRepo).save(any(User.class));
         }

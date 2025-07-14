@@ -6,6 +6,7 @@ import org.univ.rankus.domain.model.user.Password;
 import org.univ.rankus.domain.model.user.PasswordEncoder;
 import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
+import org.univ.rankus.domain.model.user.EnrollmentStatus;
 import org.univ.rankus.testutil.mock.TestPasswordEncoder;
 
 
@@ -26,7 +27,11 @@ public final class DomainUserFactory {
         return new User(
                 "TestUser" + suffix,
                 "testuser" + suffix + "@example.com",
-                Password.fromRaw("Password!23", ENCODER)
+                Password.fromRaw("Password!23", ENCODER),
+                "2020100" + suffix,
+                "010-1234-567" + suffix,
+                3,
+                EnrollmentStatus.ENROLLED
         );
     }
 
@@ -37,11 +42,13 @@ public final class DomainUserFactory {
     }
 
     public static User buildInvalidUser_Name() {
-        return new User("", "user@example.com", Password.fromRaw("Password!23", ENCODER));
+        return new User("", "user@example.com", Password.fromRaw("Password!23", ENCODER),
+                "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED);
     }
 
     public static User buildInvalidUser_Email() {
-        return new User("NoEmailUser", "invalid-email", Password.fromRaw("Password!23", ENCODER));
+        return new User("NoEmailUser", "invalid-email", Password.fromRaw("Password!23", ENCODER),
+                "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED);
     }
 
     public static User buildValidUserWithRole(Role role) {
@@ -81,7 +88,9 @@ public final class DomainUserFactory {
     }
 
     public static User buildCustomUser(String name, String email, String rawPassword) {
-        return new User(name, email, Password.fromRaw(rawPassword, ENCODER));
+        String suffix = String.valueOf(nameCounter++);
+        return new User(name, email, Password.fromRaw(rawPassword, ENCODER),
+                "2020100" + suffix, "010-1234-567" + suffix, 3, EnrollmentStatus.ENROLLED);
     }
 
     public static User buildUserWithLab(Lab lab) {

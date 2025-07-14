@@ -51,11 +51,19 @@ public class AuthService implements AuthUseCase {
         if (userRepo.existsByEmail(request.getEmail())) {
             throw new UserValidationException(UserErrorCode.EMAIL_DUPLICATED);
         }
-        // 2) 엔티티 생성·저장 (Password 검증 & 암호화 포함)
+        // 2) 학번 중복 검증 → 중복 시 409
+        if (userRepo.existsByStudentNumber(request.getStudentNumber())) {
+            throw new UserValidationException(UserErrorCode.STUDENT_NUMBER_DUPLICATED);
+        }
+        // 3) 엔티티 생성·저장 (Password 검증 & 암호화 포함)
         User newUser = new User(
                 request.getName(),
                 request.getEmail(),
-                Password.fromRaw(request.getPassword(), passwordEncoder)
+                Password.fromRaw(request.getPassword(), passwordEncoder),
+                request.getStudentNumber(),
+                request.getPhoneNumber(),
+                request.getGrade(),
+                request.getEnrollmentStatus()
         );
         return userRepo.save(newUser);
     }

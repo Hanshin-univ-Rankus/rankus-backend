@@ -51,7 +51,7 @@ public class InterviewController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "201", description = "면접 생성 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(allOf = {ApiResponse.class, InterviewResponseDto.class})
+                            schema = @Schema(implementation = ApiResponse.class)
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(

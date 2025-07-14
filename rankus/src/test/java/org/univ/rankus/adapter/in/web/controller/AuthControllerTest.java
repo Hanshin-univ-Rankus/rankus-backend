@@ -101,7 +101,7 @@ class AuthControllerTest {
                     "name", "",
                     "email", "bad-email",
                     "password", "123"
-                    // role 필드를 빠뜨려서 null로 만듦
+                    // 새로 추가된 필드들(studentNumber, phoneNumber, grade, enrollmentStatus)을 빠뜨려서 null로 만듦
             );
             String json = objectMapper.writeValueAsString(req);
 
@@ -111,7 +111,7 @@ class AuthControllerTest {
                     .andExpect(status().isBadRequest())
                     // 검증 오류 메시지가 JSON 배열로 반환됨
                     .andExpect(jsonPath("$.errors").isArray())
-                    .andExpect(jsonPath("$.errors.length()").value(3)); // name, email, password, role 총 4개 에러
+                    .andExpect(jsonPath("$.errors.length()").value(7)); // name, email, password, studentNumber, phoneNumber, grade, enrollmentStatus 총 7개 에러
         }
     }
 

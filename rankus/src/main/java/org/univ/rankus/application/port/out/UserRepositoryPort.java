@@ -43,6 +43,14 @@ public interface UserRepositoryPort {
     boolean existsByEmail(String email);
 
     /**
+     * 학번 중복 여부를 확인합니다.
+     *
+     * @param studentNumber 체크할 학번
+     * @return 이미 존재하면 true
+     */
+    boolean existsByStudentNumber(String studentNumber);
+
+    /**
      * ID로 User를 삭제합니다.
      *
      * @param id 삭제할 User ID

@@ -33,6 +33,22 @@ spring:
 server:
   port: 8080
 
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    display-request-duration: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+    default-models-expand-depth: 1
+    default-model-expand-depth: 1
+    try-it-out-enabled: true
+  packages-to-scan: org.univ.rankus.adapter.in.web.controller
+  paths-to-match: /api/**
+
 security:
   jwt:
     secret: yDeGly34tDXIxkjo6MQKgBNCI+2iMFLdT0i8zD2JZuE=

@@ -12,7 +12,7 @@ import org.univ.rankus.testutil.factory.domain.DomainAttendanceFactory;
 
 import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("QRToken 도메인 단위 테스트")

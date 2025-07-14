@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class RankingController {
 
     private final RankingQueryUseCase rankingQueryUseCase;
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "전체 랩실 랭킹 조회", description = "모든 랩실의 랭킹을 페이징하여 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -50,6 +52,7 @@ public class RankingController {
         return ResponseEntity.ok(ApiResponse.success(PageResponse.of(rankings, RankingResponseDto::from)));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "특정 랩실 랭킹 조회", description = "특정 랩실의 상세 랭킹 정보를 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -73,6 +76,7 @@ public class RankingController {
         return ResponseEntity.ok(ApiResponse.success(RankingResponseDto.from(ranking)));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 상위 기여자 조회", description = "특정 랩실의 상위 기여자 목록을 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -101,6 +105,7 @@ public class RankingController {
         return ResponseEntity.ok(ApiResponse.success(responseDtos));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "내 랩실 랭킹 조회", description = "현재 사용자가 속한 랩실들의 랭킹 정보를 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -123,6 +128,7 @@ public class RankingController {
         return ResponseEntity.ok(ApiResponse.success(responseDtos));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 총 점수 조회", description = "특정 랩실의 총 점수를 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -146,6 +152,7 @@ public class RankingController {
         return ResponseEntity.ok(ApiResponse.success(totalScore));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 내 사용자 기여도 조회", description = "특정 랩실에서 사용자의 기여도를 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -170,6 +177,7 @@ public class RankingController {
         return ResponseEntity.ok(ApiResponse.success(contribution));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "점수 범위별 랩실 수 조회", description = "특정 점수 범위에 속하는 랩실의 수를 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(

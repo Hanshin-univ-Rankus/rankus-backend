@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -33,6 +34,7 @@ public class AttendanceRecordController {
     private final AttendanceRecordCommandUseCase attendanceRecordCommandUseCase;
     private final AttendanceRecordQueryUseCase attendanceRecordQueryUseCase;
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "출석 기록 조회", description = "특정 출석 기록을 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -58,6 +60,7 @@ public class AttendanceRecordController {
         return ResponseEntity.ok(ApiResponse.success(AttendanceRecordResponseDto.from(record), "출석 기록 조회 성공"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "세션 출석 기록 목록 조회", description = "특정 세션의 모든 출석 기록을 조회합니다.")
     @GetMapping("/sessions/{sessionId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
@@ -74,6 +77,7 @@ public class AttendanceRecordController {
         return ResponseEntity.ok(ApiResponse.success(responseList, "세션 출석 기록 목록 조회 성공"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "특정 사용자의 세션 출석 기록 조회", description = "특정 세션에서 특정 사용자의 출석 기록을 조회합니다.")
     @GetMapping("/sessions/{sessionId}/users/{userId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
@@ -95,6 +99,7 @@ public class AttendanceRecordController {
         return ResponseEntity.ok(ApiResponse.success(AttendanceRecordResponseDto.from(record), "출석 기록 조회 성공"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "사용자 출석 기록 목록 조회", description = "특정 사용자의 모든 출석 기록을 페이징하여 조회합니다.")
     @GetMapping("/users/{userId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or #userId == authentication.principal.userId")
@@ -114,6 +119,7 @@ public class AttendanceRecordController {
         return ResponseEntity.ok(ApiResponse.success(responseList, "사용자 출석 기록 목록 조회 성공"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 출석 기록 목록 조회", description = "특정 랩실의 모든 출석 기록을 페이징하여 조회합니다.")
     @GetMapping("/labs/{labId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
@@ -134,6 +140,7 @@ public class AttendanceRecordController {
         return ResponseEntity.ok(ApiResponse.success(responseList, "랩실 출석 기록 목록 조회 성공"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "내 출석 기록 목록 조회", description = "현재 사용자의 출석 기록을 페이징하여 조회합니다.")
     @GetMapping("/my-records")
     @PreAuthorize("isAuthenticated()")
@@ -152,6 +159,7 @@ public class AttendanceRecordController {
         return ResponseEntity.ok(ApiResponse.success(responseList, "내 출석 기록 조회 성공"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "출석 상태를 결석으로 변경", description = "출석 기록의 상태를 결석으로 변경합니다.")
     @PutMapping("/{recordId}/absent")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
@@ -168,6 +176,7 @@ public class AttendanceRecordController {
         return ResponseEntity.ok(ApiResponse.success(AttendanceRecordResponseDto.from(record), "결석 처리가 완료되었습니다"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "출석 상태를 지각으로 변경", description = "출석 기록의 상태를 지각으로 변경합니다.")
     @PutMapping("/{recordId}/late")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
@@ -184,6 +193,7 @@ public class AttendanceRecordController {
         return ResponseEntity.ok(ApiResponse.success(AttendanceRecordResponseDto.from(record), "지각 처리가 완료되었습니다"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "출석 상태를 출석으로 변경", description = "출석 기록의 상태를 출석으로 변경합니다.")
     @PutMapping("/{recordId}/present")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
@@ -200,6 +210,7 @@ public class AttendanceRecordController {
         return ResponseEntity.ok(ApiResponse.success(AttendanceRecordResponseDto.from(record), "출석 처리가 완료되었습니다"));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "출석 상태 직접 변경", description = "출석 기록의 상태를 직접 변경합니다.")
     @PutMapping("/{recordId}/status")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
