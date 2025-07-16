@@ -44,7 +44,7 @@ class AttendanceRecordCommandServiceTest {
 
     @Mock
     private UserRepositoryPort userRepository;
-    
+
     @Mock
     private LabRepositoryPort labRepository;
 
@@ -57,7 +57,7 @@ class AttendanceRecordCommandServiceTest {
     private void givenCompleteAttendanceChain(Long recordId, Long managerId) {
         givenCompleteAttendanceChain(recordId, managerId, AttendanceStatus.PRESENT);
     }
-    
+
     /**
      * 특정 초기 상태로 완전한 의존성 체인을 설정하는 헬퍼 메서드
      */
@@ -65,15 +65,15 @@ class AttendanceRecordCommandServiceTest {
         // 1. Lab 설정 (먼저 생성, ID 필수)
         Lab lab = DomainLabFactory.buildValidLabWithId(1L);
         when(labRepository.findById(any(Long.class))).thenReturn(Optional.of(lab));
-        
+
         // 2. 해당 Lab에 할당된 User 설정 (권한 확보)
         User user = DomainUserFactory.buildLabManagerWithLab(lab);
         when(userRepository.findById(managerId)).thenReturn(Optional.of(user));
-        
+
         // 3. AttendanceSession 설정 (동일한 lab 사용)
         AttendanceSession session = DomainAttendanceFactory.buildSessionWithLab(lab);
         when(attendanceSessionRepository.findById(any(Long.class))).thenReturn(Optional.of(session));
-        
+
         // 4. AttendanceRecord 설정 (session 사용, 초기 상태 조정)
         AttendanceRecord record = DomainAttendanceFactory.buildRecordWithSession(session);
         // 초기 상태가 PRESENT가 아닌 경우 상태 조정
@@ -97,7 +97,7 @@ class AttendanceRecordCommandServiceTest {
             Long recordId = 1L;
             Long managerId = 2L;
             String reason = "연락 없이 불참";
-            
+
             givenCompleteAttendanceChain(recordId, managerId);
 
             // when
@@ -141,7 +141,7 @@ class AttendanceRecordCommandServiceTest {
             Long recordId = 1L;
             Long managerId = 2L;
             String reason = "교통 체증으로 지각";
-            
+
             givenCompleteAttendanceChain(recordId, managerId);
 
             // when
@@ -181,7 +181,7 @@ class AttendanceRecordCommandServiceTest {
             Long recordId = 1L;
             Long managerId = 2L;
             String reason = "출석 인정";
-            
+
             // ABSENT 상태에서 시작해야 PRESENT로 변경 가능
             givenCompleteAttendanceChain(recordId, managerId, AttendanceStatus.ABSENT);
 
@@ -223,7 +223,7 @@ class AttendanceRecordCommandServiceTest {
             AttendanceStatus newStatus = AttendanceStatus.LATE;
             Long managerId = 2L;
             String reason = "상태 변경";
-            
+
             givenCompleteAttendanceChain(recordId, managerId);
 
             // when

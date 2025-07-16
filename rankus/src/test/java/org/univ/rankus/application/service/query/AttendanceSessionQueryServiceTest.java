@@ -346,11 +346,11 @@ class AttendanceSessionQueryServiceTest {
             AttendanceSession session = givenExistingSession(sessionId);
             givenExistingUser(userId);
             givenExistingLab(session.getLabId()); // Lab 모킹 추가
-            
+
             // Mock 통계 데이터 - 실제 통계 리포지토리 응답을 시뮬레이션
-            AttendanceRecordRepositoryPort.AttendanceStatistics mockStatistics = 
+            AttendanceRecordRepositoryPort.AttendanceStatistics mockStatistics =
                     new AttendanceRecordRepositoryPort.AttendanceStatistics(10L, 8L, 1L, 1L);
-            
+
             when(attendanceRecordRepositoryPort.findStatisticsBySessionId(sessionId))
                     .thenReturn(mockStatistics);
 

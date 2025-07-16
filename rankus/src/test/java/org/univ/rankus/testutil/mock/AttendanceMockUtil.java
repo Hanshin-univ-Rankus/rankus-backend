@@ -37,19 +37,19 @@ public class AttendanceMockUtil {
 
     /**
      * AttendanceRecord 존재 상황을 모킹합니다.
-     * 
+     *
      * @param recordRepo AttendanceRecordRepositoryPort mock
-     * @param recordId 출석 기록 ID
+     * @param recordId   출석 기록 ID
      * @return 모킹된 AttendanceRecord
      */
     public static AttendanceRecord mockExistingRecord(AttendanceRecordRepositoryPort recordRepo, Long recordId) {
         // ID가 설정된 AttendanceRecord 사용
         AttendanceRecord record = DomainAttendanceFactory.buildValidRecordWithId(recordId);
         when(recordRepo.findById(recordId)).thenReturn(Optional.of(record));
-        
+
         // save 메서드도 함께 모킹 (상태 변경 시 필요)
         when(recordRepo.save(any(AttendanceRecord.class))).thenReturn(record);
-        
+
         return record;
     }
 
@@ -62,26 +62,26 @@ public class AttendanceMockUtil {
 
     /**
      * AttendanceSession 존재 상황을 모킹합니다.
-     * 
+     *
      * @param sessionRepo AttendanceSessionRepositoryPort mock
-     * @param sessionId 세션 ID
+     * @param sessionId   세션 ID
      * @return 모킹된 AttendanceSession
      */
     public static AttendanceSession mockExistingSession(AttendanceSessionRepositoryPort sessionRepo, Long sessionId) {
         AttendanceSession mockSession = DomainAttendanceFactory.buildValidSessionWithId(sessionId);
         when(sessionRepo.findById(sessionId)).thenReturn(Optional.of(mockSession));
-        
+
         // save 메서드도 함께 모킹
         when(sessionRepo.save(any(AttendanceSession.class))).thenReturn(mockSession);
-        
+
         return mockSession;
     }
 
     /**
      * User 존재 상황을 모킹합니다.
-     * 
-     * @param userRepo UserRepositoryPort mock  
-     * @param userId 사용자 ID
+     *
+     * @param userRepo UserRepositoryPort mock
+     * @param userId   사용자 ID
      * @return 모킹된 User
      */
     public static User mockExistingUser(UserRepositoryPort userRepo, Long userId) {
@@ -99,9 +99,9 @@ public class AttendanceMockUtil {
 
     /**
      * Lab 존재 상황을 모킹합니다.
-     * 
+     *
      * @param labRepo LabRepositoryPort mock
-     * @param labId 랩실 ID
+     * @param labId   랩실 ID
      * @return 모킹된 Lab
      */
     public static Lab mockExistingLab(LabRepositoryPort labRepo, Long labId) {
@@ -113,47 +113,47 @@ public class AttendanceMockUtil {
     /**
      * 출석 기록 관련 전체 의존성 체인을 한번에 모킹합니다.
      * AttendanceRecord → AttendanceSession → Lab, User 관계
-     * 
-     * @param recordRepo AttendanceRecordRepositoryPort mock
+     *
+     * @param recordRepo  AttendanceRecordRepositoryPort mock
      * @param sessionRepo AttendanceSessionRepositoryPort mock
-     * @param userRepo UserRepositoryPort mock
-     * @param labRepo LabRepositoryPort mock
+     * @param userRepo    UserRepositoryPort mock
+     * @param labRepo     LabRepositoryPort mock
      */
     public static MockChainResult mockFullAttendanceChain(
             AttendanceRecordRepositoryPort recordRepo,
-            AttendanceSessionRepositoryPort sessionRepo, 
+            AttendanceSessionRepositoryPort sessionRepo,
             UserRepositoryPort userRepo,
             LabRepositoryPort labRepo) {
-        
+
         return mockFullAttendanceChain(recordRepo, sessionRepo, userRepo, labRepo, AttendanceStatus.PRESENT);
     }
-    
+
     /**
      * 특정 초기 상태로 출석 기록 관련 전체 의존성 체인을 한번에 모킹합니다.
-     * 
-     * @param recordRepo AttendanceRecordRepositoryPort mock
-     * @param sessionRepo AttendanceSessionRepositoryPort mock
-     * @param userRepo UserRepositoryPort mock
-     * @param labRepo LabRepositoryPort mock
+     *
+     * @param recordRepo    AttendanceRecordRepositoryPort mock
+     * @param sessionRepo   AttendanceSessionRepositoryPort mock
+     * @param userRepo      UserRepositoryPort mock
+     * @param labRepo       LabRepositoryPort mock
      * @param initialStatus 출석 기록 초기 상태
      */
     public static MockChainResult mockFullAttendanceChain(
             AttendanceRecordRepositoryPort recordRepo,
-            AttendanceSessionRepositoryPort sessionRepo, 
+            AttendanceSessionRepositoryPort sessionRepo,
             UserRepositoryPort userRepo,
             LabRepositoryPort labRepo,
             AttendanceStatus initialStatus) {
-        
+
         // 1. Lab 생성 (ID 설정)
         Lab lab = DomainLabFactory.buildValidLabWithId(DEFAULT_LAB_ID);
-        
+
         // 2. 해당 Lab에 할당된 User 생성 (권한 확보)
         User user = DomainUserFactory.buildLabManagerWithLab(lab);
-        
+
         // 3. AttendanceSession 생성 (동일한 lab 사용, ID 설정)
         AttendanceSession session = DomainAttendanceFactory.buildSessionWithLab(lab);
         org.springframework.test.util.ReflectionTestUtils.setField(session, "sessionId", DEFAULT_SESSION_ID);
-        
+
         // 4. AttendanceRecord 생성 (session 사용, 초기 상태 조정)
         AttendanceRecord record = DomainAttendanceFactory.buildRecordWithSession(session);
         org.springframework.test.util.ReflectionTestUtils.setField(record, "recordId", DEFAULT_RECORD_ID);
@@ -163,18 +163,18 @@ public class AttendanceMockUtil {
             org.springframework.test.util.ReflectionTestUtils.setField(record, "status", initialStatus);
             org.springframework.test.util.ReflectionTestUtils.setField(record, "isManuallyAdjusted", false);
         }
-        
+
         // 5. Repository mock 설정
         when(recordRepo.findById(DEFAULT_RECORD_ID)).thenReturn(Optional.of(record));
         when(recordRepo.save(any(AttendanceRecord.class))).thenReturn(record);
-        
+
         when(sessionRepo.findById(anyLong())).thenReturn(Optional.of(session));
         when(sessionRepo.save(any(AttendanceSession.class))).thenReturn(session);
-        
+
         when(userRepo.findById(anyLong())).thenReturn(Optional.of(user));
-        
+
         when(labRepo.findById(anyLong())).thenReturn(Optional.of(lab));
-        
+
         return new MockChainResult(record, session, user, lab);
     }
 

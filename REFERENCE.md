@@ -158,22 +158,113 @@ ATT_007: "이미 출석 체크되었습니다"
 
 ## 📋 Factory 패턴
 
-### Domain Factory 예시
+### Domain Factory 필수 규칙
 
+#### 1. 실제 메서드 시그니처 확인
 ```java
-public class DomainAttendanceFactory {
-    public static AttendanceSession buildActiveSession() {
-        return AttendanceSession.create(1L, 1L, "테스트 세션", 5);
-    }
-    
-    public static AttendanceRecord buildAbsentRecordWithId(Long id) {
-        AttendanceRecord record = new AttendanceRecord(/* params */);
-        ReflectionTestUtils.setField(record, "id", id);
-        record.markAsAbsent("결석 처리");
-        return record;
-    }
-}
+// ❌ 추측으로 작성하지 말것
+DomainFactory.buildEntity(wrongParam1, wrongParam2);
+
+// ✅ 실제 Factory 클래스 확인 후 사용
+DomainAttendanceFactory.buildValidRecord();
+DomainAttendanceFactory.buildAbsentRecordWithId(1L);
 ```
+
+## 🚨 예외 처리 리팩터링 주의사항
+
+### 리팩터링 시 테스트 실패 방지
+
+#### 1. 예외 타입 변경 시 테스트도 함께 수정
+```java
+// ❌ 서비스만 변경하고 테스트 방치
+// Service: IllegalArgumentException → LabNotFoundException
+// Test: 여전히 IllegalArgumentException 기대
+
+// ✅ 서비스와 테스트 동시 변경
+assertThrows(LabNotFoundException.class, () -> service.method());
+```
+
+#### 2. Import 문 누락 방지
+```java
+// ✅ 새로운 예외 클래스 Import 반드시 추가
+import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
+import org.univ.rankus.domain.model.lab.exception.LabPermissionException;
+import org.univ.rankus.domain.model.lab.exception.LabValidationException;
+```
+
+#### 2. 출석 Factory 메서드 목록 (실제 구현)
+```java
+// AttendanceSession 생성 메서드
+buildValidSession()
+buildValidSessionWithId(Long sessionId)
+buildSessionWithLab(Lab lab)
+buildSessionWithTitle(String title)
+buildSessionWithValidityMinutes(Integer validityMinutes)
+
+// AttendanceRecord 생성 메서드
+buildValidRecord()
+buildValidRecordWithId(Long recordId)
+buildAbsentRecord()
+buildAbsentRecordWithId(Long recordId)
+buildLateRecord()
+buildLateRecordWithId(Long recordId)
+buildRecordWithUser(Long userId)
+buildRecordWithSession(AttendanceSession session)
+
+// QR 토큰 생성
+buildValidToken()
+buildExpiredToken()
+buildTokenWithLabId(Long labId)
+buildTokenWithSessionId(Long sessionId)
+```
+
+#### 3. ReflectionTestUtils 올바른 사용
+```java
+// ✅ ID 설정 시에만 사용
+AttendanceRecord record = buildValidRecord();
+ReflectionTestUtils.setField(record, "recordId", 1L);
+
+// ❌ 잘못된 필드명 사용 금지
+ReflectionTestUtils.setField(record, "id", 1L); // 실제 필드명 확인 필요
+```
+
+### Factory 메서드 타입 체크리스트
+
+| 메서드 | 파라미터 타입 | 반환 타입 |
+|--------|--------------|-----------|
+| `buildValidSession()` | `()` | `AttendanceSession` |
+| `buildValidSessionWithId()` | `(Long)` | `AttendanceSession` |
+| `buildSessionWithTitle()` | `(String)` | `AttendanceSession` |
+| `buildValidRecord()` | `()` | `AttendanceRecord` |
+| `buildAbsentRecordWithId()` | `(Long)` | `AttendanceRecord` |
+| `buildValidToken()` | `()` | `QRToken` |
+| `buildExpiredToken()` | `()` | `QRToken` |
+
+## 🎮 Command 패턴 주의사항
+
+### ❌ 잘못된 Command 사용
+```java
+// 인터페이스의 record는 단순 데이터 클래스
+BulkUpdateAttendanceCommand.Command command = 
+    new BulkUpdateAttendanceCommand.Command(labId, request); // 잘못된 파라미터
+
+service.bulkUpdateAttendance(command); // 잘못된 메서드 호출
+```
+
+### ✅ 올바른 Service 메서드 호출
+```java
+// 실제 구현된 인터페이스 메서드 직접 호출
+BulkAttendanceUpdateResponse response = service.bulkUpdateAttendance(
+    labId, request, managerId);
+
+// Command record는 필요시에만 사용 (실제 시그니처 확인)
+BulkUpdateAttendanceCommand.Command command = 
+    new BulkUpdateAttendanceCommand.Command(recordId, newStatus);
+```
+
+### Command vs Service 메서드 구분
+- **Command record**: 단순 데이터 전달용 (recordId, status 등)
+- **Service method**: 실제 비즈니스 로직 수행 (labId, request, managerId)
 
 ## 🔄 상태 전이 규칙
 

@@ -4,7 +4,8 @@ VALUES (1, 'AI랩', 'AI', '인공지능 랩', 1, null, NOW(), NOW()),
        (2, 'DB랩', 'DB', '데이터베이스 랩', 2, null, NOW(), NOW());
 
 -- 2. users
-INSERT INTO users (id, name, email, password_hash, role, lab_id, student_number, phone_number, grade, enrollment_status, created_at, updated_at)
+INSERT INTO users (id, name, email, password_hash, role, lab_id, student_number, phone_number, grade, enrollment_status,
+                   created_at, updated_at)
 VALUES (1, '학생1', 'user1@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'STUDENT', NULL,
         '20201001', '010-1234-5678', 3, 'ENROLLED', NOW(), NOW()),
        (2, '랩장1', 'leader1@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'LAB_LEADER',

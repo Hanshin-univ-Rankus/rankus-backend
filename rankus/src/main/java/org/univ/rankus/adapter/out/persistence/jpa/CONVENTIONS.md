@@ -153,24 +153,25 @@ Optional<User> findByIdReadOnly(@Param("id") Long id);
 ## 테스트 패턴
 
 ```java
+
 @DataJpaTest
 class SpringDataUserRepositoryTest {
-    
+
     @Autowired
     private SpringDataUserRepository userRepository;
-    
-    @Autowired 
+
+    @Autowired
     private TestEntityManager entityManager;
-    
+
     @Test
     void 이메일로_사용자_조회() {
         // given
         User user = createUser("test@example.com");
         entityManager.persistAndFlush(user);
-        
+
         // when
         Optional<User> found = userRepository.findByEmail("test@example.com");
-        
+
         // then
         assertThat(found).isPresent();
         assertThat(found.get().getEmail()).isEqualTo("test@example.com");

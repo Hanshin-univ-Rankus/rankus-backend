@@ -156,7 +156,7 @@ class QRTokenTest {
         void isValid_boundaryTest() {
             // given
             QRToken token = DomainAttendanceFactory.buildValidToken();
-            
+
             // when & then
             LocalDateTime exactExpiryTime = token.getExpiresAt();
             assertThat(token.isValid(exactExpiryTime)).isTrue();
@@ -203,10 +203,10 @@ class QRTokenTest {
         void getTimeInfo_success() {
             // given
             LocalDateTime beforeCreate = LocalDateTime.now().minusSeconds(1);
-            
+
             // when
             QRToken token = DomainAttendanceFactory.buildTokenWithValidityMinutes(5);
-            
+
             // then
             LocalDateTime afterCreate = LocalDateTime.now().plusSeconds(1);
             assertThat(token.getGeneratedAt()).isAfter(beforeCreate);

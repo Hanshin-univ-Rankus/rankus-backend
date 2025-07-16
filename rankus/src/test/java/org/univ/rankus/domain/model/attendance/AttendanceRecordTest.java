@@ -255,7 +255,7 @@ class AttendanceRecordTest {
         void isCheckedInLate_true() {
             // given
             AttendanceSession session = DomainAttendanceFactory.buildValidSession();
-            
+
             // 세션 시작 후 10분 뒤에 체크인
             LocalDateTime lateCheckedAt = session.getStartTime().plusMinutes(10);
             AttendanceRecord record = AttendanceRecord.create(session, 2L, lateCheckedAt);
@@ -269,7 +269,7 @@ class AttendanceRecordTest {
         void isCheckedInLate_false() {
             // given
             AttendanceSession session = DomainAttendanceFactory.buildValidSession();
-            
+
             // 세션 시작 후 3분 뒤에 체크인
             LocalDateTime normalCheckedAt = session.getStartTime().plusMinutes(3);
             AttendanceRecord record = AttendanceRecord.create(session, 2L, normalCheckedAt);

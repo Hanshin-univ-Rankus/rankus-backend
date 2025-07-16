@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * ZXingQRCodeGenerator 단위 테스트
- * 
+ * <p>
  * QR 코드 생성 기능의 정확성과 예외 처리를 검증합니다.
  */
 @ExtendWith(MockitoExtension.class)
@@ -49,7 +49,7 @@ class ZXingQRCodeGeneratorTest {
 
             // Then
             assertThat(imageBytes).isNotNull().isNotEmpty();
-            
+
             // 이미지가 유효한 PNG 형식인지 확인
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
             assertThat(image).isNotNull();
@@ -68,7 +68,7 @@ class ZXingQRCodeGeneratorTest {
 
             // Then
             assertThat(imageBytes).isNotNull().isNotEmpty();
-            
+
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
             assertThat(image).isNotNull();
             assertThat(image.getWidth()).isEqualTo(300);
@@ -86,7 +86,7 @@ class ZXingQRCodeGeneratorTest {
 
             // Then
             assertThat(imageBytes).isNotNull().isNotEmpty();
-            
+
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
             assertThat(image).isNotNull();
             assertThat(image.getWidth()).isEqualTo(600);
@@ -98,8 +98,8 @@ class ZXingQRCodeGeneratorTest {
         void generateQRCodeImage_NullQRToken_ThrowsException() {
             // When & Then
             assertThatThrownBy(() -> qrCodeGenerator.generateQRCodeImage((QRToken) null, 300, 300))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("QR 토큰이 null이거나 토큰 문자열이 없습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("QR 토큰이 null이거나 토큰 문자열이 없습니다");
         }
     }
 
@@ -120,7 +120,7 @@ class ZXingQRCodeGeneratorTest {
 
             // Then
             assertThat(imageBytes).isNotNull().isNotEmpty();
-            
+
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
             assertThat(image).isNotNull();
             assertThat(image.getWidth()).isEqualTo(width);
@@ -139,7 +139,7 @@ class ZXingQRCodeGeneratorTest {
 
             // Then
             assertThat(imageBytes).isNotNull().isNotEmpty();
-            
+
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
             assertThat(image).isNotNull();
             assertThat(image.getWidth()).isEqualTo(size);
@@ -158,7 +158,7 @@ class ZXingQRCodeGeneratorTest {
 
             // Then
             assertThat(imageBytes).isNotNull().isNotEmpty();
-            
+
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
             assertThat(image).isNotNull();
             assertThat(image.getWidth()).isEqualTo(size);
@@ -175,8 +175,8 @@ class ZXingQRCodeGeneratorTest {
         void generateQRCodeImage_NullTokenString_ThrowsException() {
             // When & Then
             assertThatThrownBy(() -> qrCodeGenerator.generateQRCodeImage((String) null, 300, 300))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("QR 토큰 문자열이 null이거나 비어있습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("QR 토큰 문자열이 null이거나 비어있습니다");
         }
 
         @Test
@@ -184,8 +184,8 @@ class ZXingQRCodeGeneratorTest {
         void generateQRCodeImage_EmptyTokenString_ThrowsException() {
             // When & Then
             assertThatThrownBy(() -> qrCodeGenerator.generateQRCodeImage("", 300, 300))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("QR 토큰 문자열이 null이거나 비어있습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("QR 토큰 문자열이 null이거나 비어있습니다");
         }
 
         @Test
@@ -193,8 +193,8 @@ class ZXingQRCodeGeneratorTest {
         void generateQRCodeImage_BlankTokenString_ThrowsException() {
             // When & Then
             assertThatThrownBy(() -> qrCodeGenerator.generateQRCodeImage("   ", 300, 300))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("QR 토큰 문자열이 null이거나 비어있습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("QR 토큰 문자열이 null이거나 비어있습니다");
         }
 
         @Test
@@ -205,12 +205,12 @@ class ZXingQRCodeGeneratorTest {
 
             // When & Then
             assertThatThrownBy(() -> qrCodeGenerator.generateQRCodeImage(tokenString, 50, 300))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("이미지 너비는 100-1000 픽셀 범위여야 합니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("이미지 너비는 100-1000 픽셀 범위여야 합니다");
 
             assertThatThrownBy(() -> qrCodeGenerator.generateQRCodeImage(tokenString, 300, 50))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("이미지 높이는 100-1000 픽셀 범위여야 합니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("이미지 높이는 100-1000 픽셀 범위여야 합니다");
         }
 
         @Test
@@ -221,12 +221,12 @@ class ZXingQRCodeGeneratorTest {
 
             // When & Then
             assertThatThrownBy(() -> qrCodeGenerator.generateQRCodeImage(tokenString, 1500, 300))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("이미지 너비는 100-1000 픽셀 범위여야 합니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("이미지 너비는 100-1000 픽셀 범위여야 합니다");
 
             assertThatThrownBy(() -> qrCodeGenerator.generateQRCodeImage(tokenString, 300, 1500))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("이미지 높이는 100-1000 픽셀 범위여야 합니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("이미지 높이는 100-1000 픽셀 범위여야 합니다");
         }
     }
 
@@ -245,7 +245,7 @@ class ZXingQRCodeGeneratorTest {
 
             // Then
             assertThat(imageBytes).isNotNull().isNotEmpty();
-            
+
             // PNG 매직 넘버 확인 (89 50 4E 47)
             assertThat(imageBytes[0] & 0xFF).isEqualTo(0x89);
             assertThat(imageBytes[1] & 0xFF).isEqualTo(0x50);

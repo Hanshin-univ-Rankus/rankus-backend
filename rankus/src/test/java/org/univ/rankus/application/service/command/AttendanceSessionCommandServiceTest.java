@@ -52,7 +52,7 @@ class AttendanceSessionCommandServiceTest {
 
     @Mock
     private UserRepositoryPort userRepositoryPort;
-    
+
     @Mock
     private AttendanceRecordRepositoryPort attendanceRecordRepositoryPort;
 
@@ -71,26 +71,26 @@ class AttendanceSessionCommandServiceTest {
                 userRepositoryPort,
                 labRepositoryPort
         );
-        
+
         // Mock 설정 - ID는 Mock에서 관리
         when(attendanceSessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(mockChain.session));
         when(userRepositoryPort.findById(userId)).thenReturn(Optional.of(mockChain.user));
     }
-    
+
     /**
      * Session 미존재 상황을 모킹
      */
     private void givenSessionNotFound(Long sessionId) {
         when(attendanceSessionRepositoryPort.findById(sessionId)).thenReturn(Optional.empty());
     }
-    
+
     /**
      * User 미존재 상황을 모킹
      */
     private void givenUserNotFound(Long userId) {
         when(userRepositoryPort.findById(userId)).thenReturn(Optional.empty());
     }
-    
+
     /**
      * Lab 미존재 상황을 모킹
      */
@@ -115,7 +115,7 @@ class AttendanceSessionCommandServiceTest {
             Long createdBy = 2L;
 
             givenCompleteSessionChain(1L, createdBy);
-            
+
             AttendanceSession expectedSession = DomainAttendanceFactory.buildValidSessionWithCreator(createdBy);
             when(attendanceSessionRepositoryPort.save(any(AttendanceSession.class)))
                     .thenReturn(expectedSession);
@@ -138,7 +138,7 @@ class AttendanceSessionCommandServiceTest {
             // given
             Long labId = 999L;
             Long createdBy = 1L;
-            
+
             // User는 존재하지만 Lab은 없는 상황
             User creator = DomainUserFactory.buildValidUserWithId(createdBy);
             when(userRepositoryPort.findById(createdBy)).thenReturn(Optional.of(creator));
@@ -163,7 +163,7 @@ class AttendanceSessionCommandServiceTest {
             // given
             Long labId = 1L;
             Long createdBy = 999L;
-            
+
             // Service에서 User를 먼저 찾으므로 User not found 예외 발생
             givenUserNotFound(createdBy);
 
@@ -195,7 +195,7 @@ class AttendanceSessionCommandServiceTest {
             // given
             Long sessionId = 1L;
             Long userId = 2L;
-            
+
             givenCompleteSessionChain(sessionId, userId);
 
             // when
@@ -239,7 +239,7 @@ class AttendanceSessionCommandServiceTest {
             // given
             Long sessionId = 1L;
             Long userId = 2L;
-            
+
             givenCompleteSessionChain(sessionId, userId);
 
             // when
@@ -284,7 +284,7 @@ class AttendanceSessionCommandServiceTest {
             Long sessionId = 1L;
             String newTitle = "수정된 출석";
             Long userId = 2L;
-            
+
             givenCompleteSessionChain(sessionId, userId);
 
             // when
@@ -329,7 +329,7 @@ class AttendanceSessionCommandServiceTest {
             Long sessionId = 1L;
             Integer newValidityMinutes = 10;
             Long userId = 2L;
-            
+
             givenCompleteSessionChain(sessionId, userId);
 
             // when
@@ -373,13 +373,13 @@ class AttendanceSessionCommandServiceTest {
             // given
             Long sessionId = 1L;
             Long userId = 2L;
-            
+
             // ID가 설정된 AttendanceSession 생성
             AttendanceSession session = DomainAttendanceFactory.buildValidSessionWithId(sessionId);
             Lab lab = DomainLabFactory.buildValidLabWithId(session.getLabId());
             User user = DomainUserFactory.buildLabManagerWithLab(lab);
             org.springframework.test.util.ReflectionTestUtils.setField(user, "id", userId);
-            
+
             when(attendanceSessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
             when(userRepositoryPort.findById(userId)).thenReturn(Optional.of(user));
             when(labRepositoryPort.findById(session.getLabId())).thenReturn(Optional.of(lab));
@@ -391,7 +391,7 @@ class AttendanceSessionCommandServiceTest {
             assertThat(result).isNotNull();
             assertThat(result.getToken()).isNotBlank();
             assertThat(result.getSessionId()).isEqualTo(sessionId);
-            
+
             verify(attendanceSessionRepositoryPort).findById(sessionId);
             verify(userRepositoryPort).findById(userId);
         }
@@ -430,24 +430,24 @@ class AttendanceSessionCommandServiceTest {
             long oneMinuteAgo = LocalDateTime.now().minusMinutes(1).toEpochSecond(java.time.ZoneOffset.UTC);
             String qrToken = "1-1-" + oneMinuteAgo;
             Long userId = 2L;
-            
+
             // QR 토큰에서 세션 ID 추출 (두 번째 부분)
             Long sessionId = Long.parseLong(qrToken.split("-")[1]);
-            
+
             // Lab과 User를 먼저 생성하고 관계 설정
             Lab lab = DomainLabFactory.buildValidLabWithId(1L);
             when(labRepositoryPort.findById(any(Long.class))).thenReturn(Optional.of(lab));
-            
+
             // LAB_MEMBER User 생성 및 랩실 할당 (해당 랩실 출석 체크 권한 확보)
             User user = DomainUserFactory.buildLabMemberWithLab(lab);
             org.springframework.test.util.ReflectionTestUtils.setField(user, "id", userId);
             when(userRepositoryPort.findById(userId)).thenReturn(Optional.of(user));
-            
+
             // AttendanceSession 설정
             AttendanceSession session = DomainAttendanceFactory.buildSessionWithLab(lab);
             org.springframework.test.util.ReflectionTestUtils.setField(session, "sessionId", sessionId);
             when(attendanceSessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
-            
+
             // AttendanceRecord 관련 Mock 설정
             when(attendanceRecordRepositoryPort.existsBySessionIdAndUserId(sessionId, userId)).thenReturn(false);
             when(attendanceRecordRepositoryPort.save(any(AttendanceRecord.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -458,7 +458,7 @@ class AttendanceSessionCommandServiceTest {
             // then
             assertThat(result).isNotNull();
             assertThat(result.getUserId()).isEqualTo(userId);
-            
+
             verify(attendanceSessionRepositoryPort).findById(sessionId);
             verify(userRepositoryPort).findById(userId);
         }
@@ -469,7 +469,7 @@ class AttendanceSessionCommandServiceTest {
             // given
             String invalidToken = "invalid-token";
             Long userId = 2L;
-            
+
             // 잘못된 토큰은 QRToken.fromString()에서 예외 발생하므로 Mock 설정 불필요
 
             // when & then
@@ -492,7 +492,7 @@ class AttendanceSessionCommandServiceTest {
             long oneMinuteAgo = LocalDateTime.now().minusMinutes(1).toEpochSecond(java.time.ZoneOffset.UTC);
             String qrToken = "999-999-" + oneMinuteAgo;
             Long userId = 2L;
-            
+
             // 세션이 없으므로 세션 조회에서 예외 발생, 사용자 조회는 도달하지 않음
             givenSessionNotFound(999L);
 
@@ -517,13 +517,13 @@ class AttendanceSessionCommandServiceTest {
             String qrToken = "1-1-" + oneMinuteAgo;
             Long userId = 999L;
             Long sessionId = 1L;
-            
+
             // 세션은 존재하지만 사용자는 없는 상황
             Lab lab = DomainLabFactory.buildValidLabWithId(1L);
             AttendanceSession session = DomainAttendanceFactory.buildSessionWithLab(lab);
             org.springframework.test.util.ReflectionTestUtils.setField(session, "sessionId", sessionId);
             when(attendanceSessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
-            
+
             givenUserNotFound(userId);
 
             // when & then

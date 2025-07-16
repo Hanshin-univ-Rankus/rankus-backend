@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.univ.rankus.adapter.out.persistence.jpa.SpringDataUserRepository;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.User;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -46,5 +48,15 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public void deleteById(Long id) {
         springDataUserRepository.deleteById(id);
+    }
+
+    @Override
+    public List<User> findByLab(Lab lab) {
+        return springDataUserRepository.findByLab(lab);
+    }
+
+    @Override
+    public Optional<User> findByLabAndStudentNumber(Lab lab, String studentNumber) {
+        return springDataUserRepository.findByLabAndStudentNumber(lab, studentNumber);
     }
 }

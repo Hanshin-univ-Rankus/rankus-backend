@@ -7,8 +7,8 @@ import org.univ.rankus.domain.model.lab.core.ImageType;
 import org.univ.rankus.domain.model.lab.core.LabCategory;
 import org.univ.rankus.domain.model.lab.creation.LabCreationStatus;
 import org.univ.rankus.domain.model.lab.notice.NoticeType;
-import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.EnrollmentStatus;
+import org.univ.rankus.domain.model.user.Role;
 
 import java.time.LocalDateTime;
 

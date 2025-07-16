@@ -2,11 +2,7 @@ package org.univ.rankus.testutil.factory.domain;
 
 import org.springframework.test.util.ReflectionTestUtils;
 import org.univ.rankus.domain.model.lab.core.Lab;
-import org.univ.rankus.domain.model.user.Password;
-import org.univ.rankus.domain.model.user.PasswordEncoder;
-import org.univ.rankus.domain.model.user.Role;
-import org.univ.rankus.domain.model.user.User;
-import org.univ.rankus.domain.model.user.EnrollmentStatus;
+import org.univ.rankus.domain.model.user.*;
 import org.univ.rankus.testutil.mock.TestPasswordEncoder;
 
 
@@ -21,7 +17,7 @@ public final class DomainUserFactory {
     }
 
     private static long nameCounter = 1L;
-    
+
     public static User buildValidUser() {
         String suffix = String.valueOf(nameCounter++);
         return new User(
@@ -134,7 +130,7 @@ public final class DomainUserFactory {
     }
 
     private static long sequentialIdCounter = 1000L;
-    
+
     private static Long generateUserId() {
         return sequentialIdCounter++;
     }

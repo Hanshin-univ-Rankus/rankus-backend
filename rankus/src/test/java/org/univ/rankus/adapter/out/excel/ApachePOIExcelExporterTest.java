@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.univ.rankus.domain.model.attendance.AttendanceRecord;
 import org.univ.rankus.domain.model.attendance.AttendanceSession;
-import org.univ.rankus.domain.model.attendance.AttendanceStatus;
 import org.univ.rankus.testutil.factory.domain.DomainAttendanceFactory;
 
 import java.io.ByteArrayInputStream;
@@ -27,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * ApachePOIExcelExporter 단위 테스트
- * 
+ * <p>
  * Excel 파일 생성 기능의 정확성과 예외 처리를 검증합니다.
  */
 @ExtendWith(MockitoExtension.class)
@@ -54,17 +53,17 @@ class ApachePOIExcelExporterTest {
             // Set ID using reflection to maintain different title
             ReflectionTestUtils.setField(session2, "sessionId", 2L);
             List<AttendanceSession> sessions = Arrays.asList(session1, session2);
-            
+
             AttendanceRecord record1 = DomainAttendanceFactory.buildRecordWithSessionAndUser(session1, 1L);
             AttendanceRecord record2 = DomainAttendanceFactory.buildRecordWithSessionAndUser(session1, 2L);
             AttendanceRecord record3 = DomainAttendanceFactory.buildRecordWithSessionAndUser(session2, 1L);
-            
+
             // 상태 변경
             record2.markAsAbsent(1L, "테스트 결석");
             record3.markAsLate(1L, "테스트 지각");
-            
+
             List<AttendanceRecord> records = Arrays.asList(record1, record2, record3);
-            
+
             String fileName = "attendance_report";
 
             // When
@@ -72,16 +71,16 @@ class ApachePOIExcelExporterTest {
 
             // Then
             assertThat(excelBytes).isNotNull().isNotEmpty();
-            
+
             // Excel 파일이 유효한지 확인
             try (Workbook workbook = new XSSFWorkbook(new ByteArrayInputStream(excelBytes))) {
                 assertThat(workbook.getNumberOfSheets()).isGreaterThanOrEqualTo(2); // 세션 시트들 + 요약 시트
-                
+
                 // 첫 번째 세션 시트 확인
                 Sheet firstSheet = workbook.getSheetAt(0);
                 assertThat(firstSheet).isNotNull();
                 assertThat(firstSheet.getLastRowNum()).isGreaterThan(0);
-                
+
                 // 요약 시트 확인
                 Sheet summarySheet = workbook.getSheet("전체 요약");
                 assertThat(summarySheet).isNotNull();
@@ -101,10 +100,10 @@ class ApachePOIExcelExporterTest {
 
             // Then
             assertThat(excelBytes).isNotNull().isNotEmpty();
-            
+
             try (Workbook workbook = new XSSFWorkbook(new ByteArrayInputStream(excelBytes))) {
                 assertThat(workbook.getNumberOfSheets()).isEqualTo(1); // 요약 시트만
-                
+
                 Sheet summarySheet = workbook.getSheet("전체 요약");
                 assertThat(summarySheet).isNotNull();
             }
@@ -119,8 +118,8 @@ class ApachePOIExcelExporterTest {
 
             // When & Then
             assertThatThrownBy(() -> excelExporter.exportAttendanceToExcel(null, records, fileName))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("세션 목록이 null입니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("세션 목록이 null입니다");
         }
 
         @Test
@@ -132,8 +131,8 @@ class ApachePOIExcelExporterTest {
 
             // When & Then
             assertThatThrownBy(() -> excelExporter.exportAttendanceToExcel(sessions, null, fileName))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("출석 기록 목록이 null입니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("출석 기록 목록이 null입니다");
         }
 
         @Test
@@ -145,8 +144,8 @@ class ApachePOIExcelExporterTest {
 
             // When & Then
             assertThatThrownBy(() -> excelExporter.exportAttendanceToExcel(sessions, records, null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("파일명이 null이거나 비어있습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("파일명이 null이거나 비어있습니다");
         }
 
         @Test
@@ -158,8 +157,8 @@ class ApachePOIExcelExporterTest {
 
             // When & Then
             assertThatThrownBy(() -> excelExporter.exportAttendanceToExcel(sessions, records, ""))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("파일명이 null이거나 비어있습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("파일명이 null이거나 비어있습니다");
         }
     }
 
@@ -174,7 +173,7 @@ class ApachePOIExcelExporterTest {
             Long labId = 1L;
             LocalDate fromDate = LocalDate.of(2024, 1, 1);
             LocalDate toDate = LocalDate.of(2024, 1, 31);
-            
+
             AttendanceSession session = DomainAttendanceFactory.buildValidSessionWithId(1L);
             AttendanceRecord record1 = DomainAttendanceFactory.buildRecordWithSessionAndUser(session, 1L);
             AttendanceRecord record2 = DomainAttendanceFactory.buildRecordWithSessionAndUser(session, 2L);
@@ -186,10 +185,10 @@ class ApachePOIExcelExporterTest {
 
             // Then
             assertThat(excelBytes).isNotNull().isNotEmpty();
-            
+
             try (Workbook workbook = new XSSFWorkbook(new ByteArrayInputStream(excelBytes))) {
                 assertThat(workbook.getNumberOfSheets()).isEqualTo(1);
-                
+
                 Sheet sheet = workbook.getSheet("출석 통계");
                 assertThat(sheet).isNotNull();
                 assertThat(sheet.getLastRowNum()).isGreaterThan(0);
@@ -206,12 +205,12 @@ class ApachePOIExcelExporterTest {
 
             // When & Then
             assertThatThrownBy(() -> excelExporter.exportLabAttendanceStatistics(0L, fromDate, toDate, records))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("랩 ID가 유효하지 않습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("랩 ID가 유효하지 않습니다");
 
             assertThatThrownBy(() -> excelExporter.exportLabAttendanceStatistics(null, fromDate, toDate, records))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("랩 ID가 유효하지 않습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("랩 ID가 유효하지 않습니다");
         }
 
         @Test
@@ -225,8 +224,8 @@ class ApachePOIExcelExporterTest {
 
             // When & Then
             assertThatThrownBy(() -> excelExporter.exportLabAttendanceStatistics(labId, fromDate, toDate, records))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("시작 날짜가 종료 날짜보다 늦습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("시작 날짜가 종료 날짜보다 늦습니다");
         }
     }
 
@@ -240,7 +239,7 @@ class ApachePOIExcelExporterTest {
             // Given
             Long userId = 1L;
             String userName = "김철수";
-            
+
             AttendanceSession session = DomainAttendanceFactory.buildValidSessionWithId(1L);
             AttendanceRecord record1 = DomainAttendanceFactory.buildRecordWithSessionAndUser(session, userId);
             AttendanceRecord record2 = DomainAttendanceFactory.buildRecordWithSessionAndUser(session, userId);
@@ -252,10 +251,10 @@ class ApachePOIExcelExporterTest {
 
             // Then
             assertThat(excelBytes).isNotNull().isNotEmpty();
-            
+
             try (Workbook workbook = new XSSFWorkbook(new ByteArrayInputStream(excelBytes))) {
                 assertThat(workbook.getNumberOfSheets()).isEqualTo(1);
-                
+
                 Sheet sheet = workbook.getSheet("출석 기록");
                 assertThat(sheet).isNotNull();
                 assertThat(sheet.getLastRowNum()).isGreaterThan(0);
@@ -270,16 +269,16 @@ class ApachePOIExcelExporterTest {
 
             // When & Then
             assertThatThrownBy(() -> excelExporter.exportUserAttendanceHistory(null, "김철수", records))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("사용자 ID가 유효하지 않습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("사용자 ID가 유효하지 않습니다");
 
             assertThatThrownBy(() -> excelExporter.exportUserAttendanceHistory(1L, null, records))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("사용자 이름이 null이거나 비어있습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("사용자 이름이 null이거나 비어있습니다");
 
             assertThatThrownBy(() -> excelExporter.exportUserAttendanceHistory(1L, "", records))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("사용자 이름이 null이거나 비어있습니다");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("사용자 이름이 null이거나 비어있습니다");
         }
     }
 
@@ -302,16 +301,16 @@ class ApachePOIExcelExporterTest {
 
             // When
             byte[] excelBytes = excelExporter.generateAttendanceCertificate(
-                userId, userName, labName, fromDate, toDate, 
-                attendanceRate, totalSessions, attendedSessions
+                    userId, userName, labName, fromDate, toDate,
+                    attendanceRate, totalSessions, attendedSessions
             );
 
             // Then
             assertThat(excelBytes).isNotNull().isNotEmpty();
-            
+
             try (Workbook workbook = new XSSFWorkbook(new ByteArrayInputStream(excelBytes))) {
                 assertThat(workbook.getNumberOfSheets()).isEqualTo(1);
-                
+
                 Sheet sheet = workbook.getSheet("출석 증명서");
                 assertThat(sheet).isNotNull();
                 assertThat(sheet.getLastRowNum()).isGreaterThan(0);
@@ -332,16 +331,16 @@ class ApachePOIExcelExporterTest {
 
             // When & Then
             assertThatThrownBy(() -> excelExporter.generateAttendanceCertificate(
-                userId, userName, labName, fromDate, toDate, 
-                -10.0, totalSessions, attendedSessions))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("출석률은 0-100% 범위여야 합니다");
+                    userId, userName, labName, fromDate, toDate,
+                    -10.0, totalSessions, attendedSessions))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("출석률은 0-100% 범위여야 합니다");
 
             assertThatThrownBy(() -> excelExporter.generateAttendanceCertificate(
-                userId, userName, labName, fromDate, toDate, 
-                150.0, totalSessions, attendedSessions))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("출석률은 0-100% 범위여야 합니다");
+                    userId, userName, labName, fromDate, toDate,
+                    150.0, totalSessions, attendedSessions))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("출석률은 0-100% 범위여야 합니다");
         }
 
         @Test
@@ -357,16 +356,16 @@ class ApachePOIExcelExporterTest {
 
             // When & Then
             assertThatThrownBy(() -> excelExporter.generateAttendanceCertificate(
-                userId, userName, labName, fromDate, toDate, 
-                attendanceRate, -1, 5))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("세션 수는 0 이상이어야 합니다");
+                    userId, userName, labName, fromDate, toDate,
+                    attendanceRate, -1, 5))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("세션 수는 0 이상이어야 합니다");
 
             assertThatThrownBy(() -> excelExporter.generateAttendanceCertificate(
-                userId, userName, labName, fromDate, toDate, 
-                attendanceRate, 10, 15)) // 출석 세션이 총 세션보다 많음
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("출석 세션 수가 총 세션 수보다 클 수 없습니다");
+                    userId, userName, labName, fromDate, toDate,
+                    attendanceRate, 10, 15)) // 출석 세션이 총 세션보다 많음
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("출석 세션 수가 총 세션 수보다 클 수 없습니다");
         }
     }
 
@@ -387,7 +386,7 @@ class ApachePOIExcelExporterTest {
 
             // Then
             assertThat(excelBytes).isNotNull().isNotEmpty();
-            
+
             // XLSX 매직 넘버 확인 (PK\003\004)
             assertThat(excelBytes[0] & 0xFF).isEqualTo(0x50); // P
             assertThat(excelBytes[1] & 0xFF).isEqualTo(0x4B); // K

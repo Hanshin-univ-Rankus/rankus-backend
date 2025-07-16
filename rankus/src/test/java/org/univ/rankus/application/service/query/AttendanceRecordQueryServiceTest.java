@@ -17,7 +17,6 @@ import org.univ.rankus.domain.model.attendance.AttendanceRecord;
 import org.univ.rankus.domain.model.attendance.AttendanceSession;
 import org.univ.rankus.domain.model.attendance.exception.AttendanceErrorCode;
 import org.univ.rankus.domain.model.attendance.exception.AttendanceNotFoundException;
-import org.univ.rankus.domain.model.attendance.exception.AttendanceValidationException;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
@@ -258,7 +257,7 @@ class AttendanceRecordQueryServiceTest {
 
             AttendanceRecord record = DomainAttendanceFactory.buildValidRecord();
             AttendanceSession session = givenExistingSession(sessionId);
-            
+
             givenExistingUser(requesterId);
             givenExistingUser(targetUserId); // 대상 사용자 모킹 추가
             givenExistingLab(session.getLabId()); // Lab 모킹 추가

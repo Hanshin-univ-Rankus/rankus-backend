@@ -61,15 +61,19 @@ boolean existsById(Long id);
 ```java
 // UserRepositoryPort
 Optional<User> findByEmail(String email);
+
 boolean existsByEmail(String email);
+
 List<User> findByLabId(Long labId);
 
 // LabRepositoryPort  
 List<Lab> findByCategory(LabCategory category);
+
 List<Lab> findByRankingGreaterThan(Integer ranking);
 
 // LabApplicationRepositoryPort
 List<LabApplication> findByLabIdAndStatus(Long labId, ApplicationStatus status);
+
 boolean existsByLabIdAndUserId(Long labId, Long userId);
 ```
 

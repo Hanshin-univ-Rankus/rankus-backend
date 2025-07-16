@@ -11,6 +11,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -19,21 +20,22 @@ import org.univ.rankus.adapter.in.web.dto.request.AttendanceStatusUpdateRequestD
 import org.univ.rankus.adapter.in.web.dto.response.AttendanceRecordResponseDto;
 import org.univ.rankus.application.port.in.AttendanceRecordCommandUseCase;
 import org.univ.rankus.application.port.in.AttendanceRecordQueryUseCase;
+import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.common.security.permission.AttendanceRecordPermissionHandler;
 import org.univ.rankus.common.security.permission.AttendanceSessionPermissionHandler;
 import org.univ.rankus.common.security.permission.UnifiedPermissionEvaluator;
-import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.attendance.AttendanceRecord;
 import org.univ.rankus.domain.model.attendance.AttendanceStatus;
 import org.univ.rankus.domain.model.attendance.exception.AttendanceNotFoundException;
 import org.univ.rankus.testutil.factory.domain.DomainAttendanceFactory;
-import org.springframework.http.MediaType;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AttendanceRecordController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -88,7 +90,7 @@ class AttendanceRecordControllerTest {
         AttendanceRecord record = DomainAttendanceFactory.buildAbsentRecordWithId(RECORD_ID);
         record.markAsPresent(USER_ID, "테스트 수동 출석 처리");
         AttendanceRecordResponseDto response = AttendanceRecordResponseDto.from(record);
-        
+
         AttendanceStatusUpdateRequestDto request = new AttendanceStatusUpdateRequestDto(AttendanceStatus.PRESENT, "테스트 출석 처리");
 
         given(commandUseCase.markAsPresent(eq(RECORD_ID), eq(USER_ID), eq("테스트 출석 처리"))).willReturn(record);
@@ -110,7 +112,7 @@ class AttendanceRecordControllerTest {
         AttendanceRecord record = DomainAttendanceFactory.buildValidRecordWithId(RECORD_ID);
         record.markAsLate(USER_ID, "테스트 수동 지각 처리");
         AttendanceRecordResponseDto response = AttendanceRecordResponseDto.from(record);
-        
+
         AttendanceStatusUpdateRequestDto request = new AttendanceStatusUpdateRequestDto(AttendanceStatus.LATE, "테스트 지각 처리");
 
         given(commandUseCase.markAsLate(eq(RECORD_ID), eq(USER_ID), eq("테스트 지각 처리"))).willReturn(record);
@@ -132,7 +134,7 @@ class AttendanceRecordControllerTest {
         AttendanceRecord record = DomainAttendanceFactory.buildValidRecordWithId(RECORD_ID);
         record.markAsAbsent(USER_ID, "테스트 수동 결석 처리");
         AttendanceRecordResponseDto response = AttendanceRecordResponseDto.from(record);
-        
+
         AttendanceStatusUpdateRequestDto request = new AttendanceStatusUpdateRequestDto(AttendanceStatus.ABSENT, "테스트 결석 처리");
 
         given(commandUseCase.markAsAbsent(eq(RECORD_ID), eq(USER_ID), eq("테스트 결석 처리"))).willReturn(record);
@@ -152,7 +154,7 @@ class AttendanceRecordControllerTest {
         // given
         setupSecurityContext(USER_ID);
         AttendanceStatusUpdateRequestDto request = new AttendanceStatusUpdateRequestDto(AttendanceStatus.PRESENT, "테스트 출석 처리");
-        
+
         given(commandUseCase.markAsPresent(eq(999L), eq(USER_ID), eq("테스트 출석 처리")))
                 .willThrow(new AttendanceNotFoundException(999L));
 
@@ -169,7 +171,7 @@ class AttendanceRecordControllerTest {
     void unauthenticatedRequest_InternalServerError() throws Exception {
         // given
         AttendanceStatusUpdateRequestDto request = new AttendanceStatusUpdateRequestDto(AttendanceStatus.PRESENT, "테스트 출석 처리");
-        
+
         // when & then - 필터가 비활성화되어 userDetails가 null이 되어 500 발생
         mockMvc.perform(put("/api/attendance/records/{recordId}/present", RECORD_ID)
                         .contentType(MediaType.APPLICATION_JSON)

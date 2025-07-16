@@ -19,9 +19,24 @@ public enum LabErrorCode implements ErrorCode {
     LAB_PROFESSOR_NAME_TOO_LONG("LAB_005", HttpStatus.BAD_REQUEST, "랩실 교수 이름이 너무 깁니다. 최대 10자까지 가능합니다."),
 
     // ------------------------------------------------------------------------
+    // 403 Forbidden: 권한 오류
+    // ------------------------------------------------------------------------
+    LAB_MEMBER_VIEW_PERMISSION_DENIED("LAB_007", HttpStatus.FORBIDDEN, "랩실 멤버 조회 권한이 없습니다."),
+    LAB_MEMBER_MANAGE_PERMISSION_DENIED("LAB_008", HttpStatus.FORBIDDEN, "랩실 멤버 관리 권한이 없습니다."),
+    LAB_LEADERSHIP_TRANSFER_PERMISSION_DENIED("LAB_010", HttpStatus.FORBIDDEN, "랩실 리더십 위임 권한이 없습니다."),
+    LAB_ATTENDANCE_MANAGE_PERMISSION_DENIED("LAB_012", HttpStatus.FORBIDDEN, "출석 일괄 수정 권한이 없습니다."),
+    LAB_STATISTICS_VIEW_PERMISSION_DENIED("LAB_013", HttpStatus.FORBIDDEN, "랩실 통계 조회 권한이 없습니다."),
+
+    // ------------------------------------------------------------------------
     // 404 Not Found: 조회 실패
     // ------------------------------------------------------------------------
-    LAB_NOT_FOUND("LAB_006", HttpStatus.NOT_FOUND, "해당 랩실을 찾을 수 없습니다.");
+    LAB_NOT_FOUND("LAB_006", HttpStatus.NOT_FOUND, "해당 랩실을 찾을 수 없습니다."),
+
+    // ------------------------------------------------------------------------
+    // 409 Conflict: 상태 오류
+    // ------------------------------------------------------------------------
+    LAB_MEMBER_NOT_FOUND("LAB_009", HttpStatus.BAD_REQUEST, "해당 멤버는 이 랩실에 속하지 않습니다."),
+    LAB_ROLE_CHANGE_NOT_ALLOWED("LAB_011", HttpStatus.CONFLICT, "현재 역할에서는 해당 역할로 변경할 수 없습니다.");
 
     private final String code;
     private final HttpStatus status;

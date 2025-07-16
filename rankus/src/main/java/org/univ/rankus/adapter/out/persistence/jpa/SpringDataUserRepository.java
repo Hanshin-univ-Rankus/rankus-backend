@@ -2,8 +2,10 @@ package org.univ.rankus.adapter.out.persistence.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.User;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -28,4 +30,14 @@ public interface SpringDataUserRepository extends JpaRepository<User, Long> {
      * 학번 중복 체크
      */
     boolean existsByStudentNumber(String studentNumber);
+
+    /**
+     * 특정 랩실의 모든 멤버를 조회
+     */
+    List<User> findByLab(Lab lab);
+
+    /**
+     * 특정 랩실의 멤버를 학번으로 조회
+     */
+    Optional<User> findByLabAndStudentNumber(Lab lab, String studentNumber);
 }

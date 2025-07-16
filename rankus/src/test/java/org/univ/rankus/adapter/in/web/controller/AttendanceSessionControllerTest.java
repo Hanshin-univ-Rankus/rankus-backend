@@ -20,31 +20,30 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.univ.rankus.application.port.in.AttendanceSessionCommandUseCase;
 import org.univ.rankus.application.port.in.AttendanceSessionQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
-import org.univ.rankus.domain.model.attendance.AttendanceRecord;
-import org.univ.rankus.domain.model.attendance.AttendanceSession;
-import org.univ.rankus.domain.model.attendance.AttendanceStatus;
-import org.univ.rankus.domain.model.attendance.QRToken;
-import org.univ.rankus.domain.model.attendance.SessionStatus;
-import org.univ.rankus.domain.model.attendance.exception.AttendanceErrorCode;
-import org.univ.rankus.domain.model.attendance.exception.AttendanceNotFoundException;
-import org.univ.rankus.domain.model.attendance.exception.AttendanceValidationException;
 import org.univ.rankus.common.security.permission.AttendanceRecordPermissionHandler;
 import org.univ.rankus.common.security.permission.AttendanceSessionPermissionHandler;
 import org.univ.rankus.common.security.permission.UnifiedPermissionEvaluator;
+import org.univ.rankus.domain.model.attendance.AttendanceRecord;
+import org.univ.rankus.domain.model.attendance.AttendanceSession;
+import org.univ.rankus.domain.model.attendance.QRToken;
+import org.univ.rankus.domain.model.attendance.exception.AttendanceErrorCode;
+import org.univ.rankus.domain.model.attendance.exception.AttendanceNotFoundException;
+import org.univ.rankus.domain.model.attendance.exception.AttendanceValidationException;
 import org.univ.rankus.testutil.factory.domain.DomainAttendanceFactory;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AttendanceSessionController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -466,7 +465,7 @@ class AttendanceSessionControllerTest {
             // given
             setupSecurityContext(USER_ID);
 
-            AttendanceSession.AttendanceStatistics mockStats = 
+            AttendanceSession.AttendanceStatistics mockStats =
                     AttendanceSession.AttendanceStatistics.from(10L, 8L, 1L, 1L);
             given(queryUseCase.getSessionStatistics(eq(SESSION_ID), eq(USER_ID)))
                     .willReturn(mockStats);

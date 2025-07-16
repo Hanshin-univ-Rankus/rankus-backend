@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 
 import java.util.Collection;
@@ -12,12 +13,18 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
     @Getter
     private final Long userId;
+    @Getter
+    private final Role role;
+    @Getter
+    private final Long labId;
     private final String username;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(User user) {
         this.userId = user.getId();
+        this.role = user.getRole();
+        this.labId = user.getLab() != null ? user.getLab().getId() : null;
         this.username = user.getEmail();
         this.password = user.getPassword().getHashed();
         this.authorities = List.of(

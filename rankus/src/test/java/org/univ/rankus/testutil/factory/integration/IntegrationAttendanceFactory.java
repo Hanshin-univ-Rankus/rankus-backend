@@ -5,9 +5,7 @@ import org.univ.rankus.application.port.out.AttendanceRecordRepositoryPort;
 import org.univ.rankus.application.port.out.AttendanceSessionRepositoryPort;
 import org.univ.rankus.domain.model.attendance.AttendanceRecord;
 import org.univ.rankus.domain.model.attendance.AttendanceSession;
-import org.univ.rankus.domain.model.attendance.AttendanceStatus;
 import org.univ.rankus.domain.model.lab.core.Lab;
-import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.testutil.factory.domain.DomainAttendanceFactory;
 
 import java.time.LocalDateTime;
@@ -131,30 +129,30 @@ public final class IntegrationAttendanceFactory {
     }
 
     // 복합 객체 생성 헬퍼 메서드들
-    public static SessionWithRecords persistSessionWithRecords(AttendanceSessionRepositoryPort sessionRepo, 
+    public static SessionWithRecords persistSessionWithRecords(AttendanceSessionRepositoryPort sessionRepo,
                                                                AttendanceRecordRepositoryPort recordRepo,
                                                                Lab lab, int recordCount) {
         AttendanceSession session = persistSessionWithLab(sessionRepo, lab);
-        
+
         AttendanceRecord[] records = new AttendanceRecord[recordCount];
         for (int i = 0; i < recordCount; i++) {
             Long userId = 100L + i; // 테스트용 사용자 ID
             records[i] = persistRecordWithSessionAndUser(recordRepo, session, userId);
         }
-        
+
         return new SessionWithRecords(session, records);
     }
 
     public static SessionWithRecords persistSessionWithRecords(TestEntityManager em,
                                                                Lab lab, int recordCount) {
         AttendanceSession session = persistSessionWithLab(em, lab);
-        
+
         AttendanceRecord[] records = new AttendanceRecord[recordCount];
         for (int i = 0; i < recordCount; i++) {
             Long userId = 100L + i; // 테스트용 사용자 ID
             records[i] = persistRecordWithSessionAndUser(em, session, userId);
         }
-        
+
         return new SessionWithRecords(session, records);
     }
 

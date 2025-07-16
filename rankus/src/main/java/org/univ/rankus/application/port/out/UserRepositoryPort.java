@@ -1,7 +1,9 @@
 package org.univ.rankus.application.port.out;
 
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.User;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -56,4 +58,21 @@ public interface UserRepositoryPort {
      * @param id 삭제할 User ID
      */
     void deleteById(Long id);
+
+    /**
+     * 특정 랩실의 모든 멤버를 조회합니다.
+     *
+     * @param lab 조회할 랩실
+     * @return 해당 랩실에 속한 모든 사용자 목록
+     */
+    List<User> findByLab(Lab lab);
+
+    /**
+     * 특정 랩실의 멤버를 학번으로 조회합니다.
+     *
+     * @param lab           조회할 랩실
+     * @param studentNumber 조회할 학번
+     * @return Optional.of(User) or Optional.empty()
+     */
+    Optional<User> findByLabAndStudentNumber(Lab lab, String studentNumber);
 }
