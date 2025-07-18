@@ -3,6 +3,7 @@ package org.univ.rankus.application.service.command;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.univ.rankus.application.port.in.command.CalendarEventCommandUseCase;
 import org.univ.rankus.application.port.in.command.InterviewCommandUseCase;
 import org.univ.rankus.application.port.out.InterviewRepositoryPort;
 import org.univ.rankus.application.port.out.InterviewSlotRepositoryPort;
@@ -19,6 +20,7 @@ import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +37,7 @@ public class InterviewCommandService implements InterviewCommandUseCase {
     private final InterviewRepositoryPort interviewRepositoryPort;
     private final InterviewSlotRepositoryPort slotRepositoryPort;
     private final LabRepositoryPort labRepositoryPort;
+    private final CalendarEventCommandUseCase calendarEventCommandUseCase;
 
     @Override
     public Interview createInterview(Long labId, LocalDate startDate, LocalDate endDate,
@@ -51,8 +54,26 @@ public class InterviewCommandService implements InterviewCommandUseCase {
 
         // 면접 생성
         Interview interview = new Interview(lab, startDate, endDate, durationMinutes, maxApplicantsPerSlot);
+        Interview savedInterview = interviewRepositoryPort.save(interview);
 
-        return interviewRepositoryPort.save(interview);
+        // 캘린더 이벤트 자동 생성 (면접 기간 동안)
+        try {
+            calendarEventCommandUseCase.createInterviewEvent(
+                    labId,
+                    "면접 기간", // 제목
+                    "면접 기간: " + startDate + " ~ " + endDate, // 설명
+                    startDate,
+                    LocalTime.of(9, 0), // 기본 시작 시간 9:00
+                    LocalTime.of(18, 0), // 기본 종료 시간 18:00
+                    savedInterview.getId()
+            );
+        } catch (Exception e) {
+            // 캘린더 이벤트 생성 실패 시 로깅만 하고 면접 생성은 계속 진행
+            // 실제 운영에서는 로깅 프레임워크 사용
+            System.err.println("Failed to create calendar event for interview: " + savedInterview.getId());
+        }
+
+        return savedInterview;
     }
 
     @Override
@@ -181,6 +202,14 @@ public class InterviewCommandService implements InterviewCommandUseCase {
         // 모든 슬롯 삭제 후 면접 삭제
         slotRepositoryPort.deleteByInterviewId(interviewId);
         interviewRepositoryPort.delete(interview);
+
+        // 캘린더 이벤트 자동 삭제
+        try {
+            calendarEventCommandUseCase.deleteEventsByInterviewId(interviewId);
+        } catch (Exception e) {
+            // 캘린더 이벤트 삭제 실패 시 로깅만 하고 면접 삭제는 계속 진행
+            System.err.println("Failed to delete calendar event for interview: " + interviewId);
+        }
     }
 
     @Override
@@ -199,7 +228,24 @@ public class InterviewCommandService implements InterviewCommandUseCase {
 
         // 기존 면접 삭제 후 새 면접 저장
         interviewRepositoryPort.delete(interview);
-        return interviewRepositoryPort.save(updatedInterview);
+        Interview savedInterview = interviewRepositoryPort.save(updatedInterview);
+
+        // 캘린더 이벤트 자동 업데이트
+        try {
+            calendarEventCommandUseCase.updateEventByInterviewId(
+                    interview.getId(),
+                    "면접 기간", // 제목
+                    "면접 기간: " + startDate + " ~ " + endDate, // 설명
+                    startDate,
+                    LocalTime.of(9, 0), // 기본 시작 시간 9:00
+                    LocalTime.of(18, 0) // 기본 종료 시간 18:00
+            );
+        } catch (Exception e) {
+            // 캘린더 이벤트 업데이트 실패 시 로깅만 하고 면접 업데이트는 계속 진행
+            System.err.println("Failed to update calendar event for interview: " + interview.getId());
+        }
+
+        return savedInterview;
     }
 
     /**

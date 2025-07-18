@@ -33,6 +33,7 @@ HTTP Response ← DTO ← Entity ← Domain ← Repository
 | LabNotice         | isPinned 토글                  | `pin()`, `unpin()`              |
 | ScoreSubmission   | PENDING → APPROVED/REJECTED  | `approve()`, `reject()`         |
 | AttendanceSession | ACTIVE → COMPLETED/CANCELLED | `generateQRToken()`, `endSession()` |
+| CalendarEvent     | SCHEDULE ↔ INTERVIEW         | `updateSchedule()`, `updateInterview()` |
 
 ### 중요 Enum 정의
 
@@ -43,6 +44,7 @@ SubmissionStatus: PENDING → APPROVED/REJECTED
 SessionStatus: ACTIVE → COMPLETED/CANCELLED
 AttendanceStatus: PRESENT, ABSENT, LATE
 ScoreCategory: RESEARCH_SCI_PAPER(100), CONTEST_EXTERNAL_WINNER(50), ...
+EventType: SCHEDULE (날짜만), INTERVIEW (날짜+시간)
 ```
 
 ## 🔐 보안 및 권한

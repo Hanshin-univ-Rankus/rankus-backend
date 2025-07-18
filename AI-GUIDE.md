@@ -28,12 +28,12 @@ Controller → {Domain}CommandUseCase → {Domain}CommandService → {Domain}Rep
 
 | 타입         | 패턴                                | 예시                          |
 |------------|-----------------------------------|------------------------------|
-| Entity     | `{Domain}`                        | `User`, `Lab`, `AttendanceSession` |
-| Service    | `{Domain}{Command\|Query}Service` | `UserCommandService`, `RankingQueryService` |
-| Controller | `{Domain}Controller`              | `LabNoticeController`, `RankingController` |
-| UseCase    | `{Domain}{Command\|Query}UseCase` | `InterviewCommandUseCase` |
-| DTO        | `{Domain}{Action}RequestDto`      | `UserCreateRequestDto` |
-| ErrorCode  | `{Domain}ErrorCode`               | `RankingErrorCode` |
+| Entity     | `{Domain}`                        | `User`, `Lab`, `AttendanceSession`, `CalendarEvent` |
+| Service    | `{Domain}{Command\|Query}Service` | `UserCommandService`, `RankingQueryService`, `CalendarEventCommandService` |
+| Controller | `{Domain}Controller`              | `LabNoticeController`, `RankingController`, `CalendarScheduleController` |
+| UseCase    | `{Domain}{Command\|Query}UseCase` | `InterviewCommandUseCase`, `CalendarEventQueryUseCase` |
+| DTO        | `{Domain}{Action}RequestDto`      | `UserCreateRequestDto`, `CalendarEventCreateRequestDto` |
+| ErrorCode  | `{Domain}ErrorCode`               | `RankingErrorCode`, `CalendarEventErrorCode` |
 
 ## 🔧 즉시 사용 코드
 
@@ -84,6 +84,7 @@ public class {Domain}Controller {
 | 랩실 권한   | `@PreAuthorize("@labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'ACTION')")` |
 | 랩실 멤버 권한 | `@PreAuthorize("@labMemberPermissionEvaluator.hasLabPermission(authentication, #labId, 'MANAGE')")`           |
 | 벌크 업데이트 | `@PreAuthorize("@labMemberPermissionEvaluator.hasLabPermission(authentication, #request.labId, 'MANAGE')")`   |
+| 캘린더 권한 | `@PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_CALENDAR')")` |
 
 ## 📝 ErrorCode 템플릿
 
@@ -93,6 +94,7 @@ public class {Domain}Controller {
 | `LAB`        | Lab           | 001~015 |
 | `RANKING`    | Ranking       | 001~023 |
 | `ATT`        | Attendance    | 001~022 |
+| `CALENDAR_EVENT` | CalendarEvent | 001~016 |
 
 ```java
 public enum {Domain}ErrorCode implements ErrorCode {

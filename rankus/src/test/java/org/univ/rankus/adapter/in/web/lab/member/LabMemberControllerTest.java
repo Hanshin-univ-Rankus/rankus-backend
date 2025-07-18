@@ -14,10 +14,9 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.univ.rankus.adapter.in.web.lab.member.dto.LabMemberDetailResponse;
-import org.univ.rankus.adapter.in.web.lab.member.dto.LabMemberResponse;
 import org.univ.rankus.application.port.in.lab.member.GetLabMembersQuery;
-import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.common.security.LabMemberPermissionEvaluator;
+import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.common.security.permission.UnifiedPermissionEvaluator;
 import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
@@ -87,8 +86,8 @@ class LabMemberControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/members", LAB_ID)
-                    .with(SecurityMockMvcRequestPostProcessors.authentication(
-                            new TestingAuthenticationToken(principal, null, "ROLE_ADMIN"))))
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                    new TestingAuthenticationToken(principal, null, "ROLE_ADMIN"))))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.status").value(200))
                     .andExpect(jsonPath("$.message").value("랩실 멤버 목록을 성공적으로 조회했습니다."))
@@ -118,8 +117,8 @@ class LabMemberControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/members", LAB_ID)
-                    .with(SecurityMockMvcRequestPostProcessors.authentication(
-                            new TestingAuthenticationToken(principal, null, "ROLE_LAB_MEMBER"))))
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                    new TestingAuthenticationToken(principal, null, "ROLE_LAB_MEMBER"))))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.status").value(200))
                     .andExpect(jsonPath("$.message").value("랩실 멤버 목록을 성공적으로 조회했습니다."))
@@ -144,8 +143,8 @@ class LabMemberControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/members", LAB_ID)
-                    .with(SecurityMockMvcRequestPostProcessors.authentication(
-                            new TestingAuthenticationToken(principal, null, "ROLE_ADMIN"))))
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                    new TestingAuthenticationToken(principal, null, "ROLE_ADMIN"))))
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.code").value("LAB_006"));
         }
@@ -163,8 +162,8 @@ class LabMemberControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/members", LAB_ID)
-                    .with(SecurityMockMvcRequestPostProcessors.authentication(
-                            new TestingAuthenticationToken(principal, null, "ROLE_STUDENT"))))
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                    new TestingAuthenticationToken(principal, null, "ROLE_STUDENT"))))
                     .andExpect(status().isForbidden())
                     .andExpect(jsonPath("$.code").value("LAB_007"));
         }
@@ -189,8 +188,8 @@ class LabMemberControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/members/{memberId}", LAB_ID, MEMBER_ID)
-                    .with(SecurityMockMvcRequestPostProcessors.authentication(
-                            new TestingAuthenticationToken(principal, null, "ROLE_PROFESSOR"))))
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                    new TestingAuthenticationToken(principal, null, "ROLE_PROFESSOR"))))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.status").value(200))
                     .andExpect(jsonPath("$.message").value("랩실 멤버 정보를 성공적으로 조회했습니다."))
@@ -215,8 +214,8 @@ class LabMemberControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/members/{memberId}", LAB_ID, MEMBER_ID)
-                    .with(SecurityMockMvcRequestPostProcessors.authentication(
-                            new TestingAuthenticationToken(principal, null, "ROLE_LAB_LEADER"))))
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                    new TestingAuthenticationToken(principal, null, "ROLE_LAB_LEADER"))))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.status").value(200))
                     .andExpect(jsonPath("$.message").value("랩실 멤버 정보를 성공적으로 조회했습니다."))
@@ -240,8 +239,8 @@ class LabMemberControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/members/{memberId}", LAB_ID, MEMBER_ID)
-                    .with(SecurityMockMvcRequestPostProcessors.authentication(
-                            new TestingAuthenticationToken(principal, null, "ROLE_LAB_MEMBER"))))
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                    new TestingAuthenticationToken(principal, null, "ROLE_LAB_MEMBER"))))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.status").value(200))
                     .andExpect(jsonPath("$.message").value("랩실 멤버 정보를 성공적으로 조회했습니다."))
@@ -264,8 +263,8 @@ class LabMemberControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/members/{memberId}", LAB_ID, MEMBER_ID)
-                    .with(SecurityMockMvcRequestPostProcessors.authentication(
-                            new TestingAuthenticationToken(principal, null, "ROLE_ADMIN"))))
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                    new TestingAuthenticationToken(principal, null, "ROLE_ADMIN"))))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value("LAB_009"));
         }
@@ -293,8 +292,8 @@ class LabMemberControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/members/{memberId}/detail", LAB_ID, MEMBER_ID)
-                    .with(SecurityMockMvcRequestPostProcessors.authentication(
-                            new TestingAuthenticationToken(principal, null, "ROLE_ADMIN"))))
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                    new TestingAuthenticationToken(principal, null, "ROLE_ADMIN"))))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.status").value(200))
                     .andExpect(jsonPath("$.message").value("랩실 멤버 상세 정보를 성공적으로 조회했습니다."))
@@ -322,8 +321,8 @@ class LabMemberControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/members/{memberId}/detail", LAB_ID, MEMBER_ID)
-                    .with(SecurityMockMvcRequestPostProcessors.authentication(
-                            new TestingAuthenticationToken(principal, null, "ROLE_LAB_MEMBER"))))
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                    new TestingAuthenticationToken(principal, null, "ROLE_LAB_MEMBER"))))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.status").value(200))
                     .andExpect(jsonPath("$.message").value("랩실 멤버 상세 정보를 성공적으로 조회했습니다."))
@@ -346,8 +345,8 @@ class LabMemberControllerTest {
 
             // when & then
             mockMvc.perform(get("/api/labs/{labId}/members/{memberId}/detail", LAB_ID, MEMBER_ID)
-                    .with(SecurityMockMvcRequestPostProcessors.authentication(
-                            new TestingAuthenticationToken(principal, null, "ROLE_STUDENT"))))
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                    new TestingAuthenticationToken(principal, null, "ROLE_STUDENT"))))
                     .andExpect(status().isForbidden())
                     .andExpect(jsonPath("$.code").value("LAB_007"));
         }

@@ -16,7 +16,7 @@ import org.univ.rankus.config.DomainConfig;
 @DataJpaTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(DomainConfig.class)
+@Import({DomainConfig.class, org.univ.rankus.adapter.out.persistence.impl.CalendarEventRepositoryAdapter.class})
 public abstract class BaseRepositoryTest {
 
     @Autowired

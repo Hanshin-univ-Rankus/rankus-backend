@@ -84,38 +84,38 @@ jacocoTestReport {
         xml.outputLocation = layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml')
         csv.outputLocation = layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.csv')
     }
-    
+
     executionData fileTree(layout.buildDirectory.dir('jacoco')).include("**/*.exec")
-    
+
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, exclude: [
-                // Configuration classes
-                '**/*Config.class',
-                '**/*Configuration.class',
-                
-                // Application entry point
-                '**/RankusApplication.class',
-                
-                // DTOs
-                '**/dto/**/*.class',
-                '**/request/*.class',
-                '**/response/*.class',
-                
-                // Exception classes
-                '**/exception/**/*.class',
-                '**/*Exception.class',
-                '**/*ErrorCode.class',
-                
-                // Security configurations
-                '**/security/**/*Config.class',
-                
-                // Entity classes (JPA entities are typically data holders)
-                '**/*Entity.class',
-                
-                // Constants and enums (minimal business logic)
-                '**/*Constants.class',
-                '**/enums/*.class'
+                    // Configuration classes
+                    '**/*Config.class',
+                    '**/*Configuration.class',
+
+                    // Application entry point
+                    '**/RankusApplication.class',
+
+                    // DTOs
+                    '**/dto/**/*.class',
+                    '**/request/*.class',
+                    '**/response/*.class',
+
+                    // Exception classes
+                    '**/exception/**/*.class',
+                    '**/*Exception.class',
+                    '**/*ErrorCode.class',
+
+                    // Security configurations
+                    '**/security/**/*Config.class',
+
+                    // Entity classes (JPA entities are typically data holders)
+                    '**/*Entity.class',
+
+                    // Constants and enums (minimal business logic)
+                    '**/*Constants.class',
+                    '**/enums/*.class'
             ])
         }))
     }
@@ -141,7 +141,7 @@ jacocoTestCoverageVerification {
                 minimum = 0.80
             }
         }
-        
+
         // Domain model specific rules (higher coverage requirement)
         rule {
             element = 'CLASS'
@@ -153,7 +153,7 @@ jacocoTestCoverageVerification {
                 minimum = 0.95
             }
         }
-        
+
         // Application service rules
         rule {
             element = 'CLASS'
@@ -164,7 +164,7 @@ jacocoTestCoverageVerification {
                 minimum = 0.90
             }
         }
-        
+
         // Adapter layer rules
         rule {
             element = 'CLASS'

@@ -1,7 +1,6 @@
 package org.univ.rankus.adapter.in.web.lab.attendance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.univ.rankus.adapter.in.web.lab.attendance.dto.BulkAttendanceUpdateRequest;
@@ -18,8 +16,8 @@ import org.univ.rankus.adapter.in.web.lab.attendance.dto.BulkAttendanceUpdateRes
 import org.univ.rankus.adapter.in.web.lab.attendance.dto.LabAttendanceManagementResponse;
 import org.univ.rankus.application.port.in.command.BulkUpdateAttendanceCommand;
 import org.univ.rankus.application.port.in.query.GetLabAttendanceManagementQuery;
-import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.common.security.LabMemberPermissionEvaluator;
+import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.common.security.permission.UnifiedPermissionEvaluator;
 import org.univ.rankus.domain.model.attendance.AttendanceStatus;
 import org.univ.rankus.domain.model.attendance.SessionStatus;
@@ -378,29 +376,29 @@ class LabAttendanceManagementControllerTest {
 
 
     private LabAttendanceManagementResponse createMockAttendanceManagementResponse() {
-        LabAttendanceManagementResponse.AttendanceSessionSummary session1 = 
+        LabAttendanceManagementResponse.AttendanceSessionSummary session1 =
                 new LabAttendanceManagementResponse.AttendanceSessionSummary(
-                        1L, "AI 세미나", LocalDateTime.now().minusDays(1), 
+                        1L, "AI 세미나", LocalDateTime.now().minusDays(1),
                         LocalDateTime.now().minusDays(1).plusHours(2),
-                        SessionStatus.COMPLETED, 10, 8, 1, 1, 80.0, 
+                        SessionStatus.COMPLETED, 10, 8, 1, 1, 80.0,
                         LocalDateTime.now().minusDays(1), "관리자"
                 );
 
-        LabAttendanceManagementResponse.AttendanceSessionSummary session2 = 
+        LabAttendanceManagementResponse.AttendanceSessionSummary session2 =
                 new LabAttendanceManagementResponse.AttendanceSessionSummary(
-                        2L, "DB 스터디", LocalDateTime.now().minusDays(2), 
+                        2L, "DB 스터디", LocalDateTime.now().minusDays(2),
                         LocalDateTime.now().minusDays(2).plusHours(1),
-                        SessionStatus.COMPLETED, 12, 11, 0, 1, 91.7, 
+                        SessionStatus.COMPLETED, 12, 11, 0, 1, 91.7,
                         LocalDateTime.now().minusDays(2), "관리자"
                 );
 
-        LabAttendanceManagementResponse.AttendanceOverallStats overallStats = 
+        LabAttendanceManagementResponse.AttendanceOverallStats overallStats =
                 new LabAttendanceManagementResponse.AttendanceOverallStats(
                         2, 22, 19, 1, 2, 85.0, 15, LocalDateTime.now().minusDays(1)
                 );
 
         return new LabAttendanceManagementResponse(
-                Arrays.asList(session1, session2), 
+                Arrays.asList(session1, session2),
                 overallStats
         );
     }

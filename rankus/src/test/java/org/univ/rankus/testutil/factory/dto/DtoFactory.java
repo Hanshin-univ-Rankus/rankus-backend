@@ -305,6 +305,74 @@ public final class DtoFactory {
         throw new UnsupportedOperationException("LabImageRequestDto는 builder 패턴을 지원하지 않습니다");
     }
 
+    // Calendar Event Request DTOs
+    public static CalendarEventCreateRequestDto buildCalendarEventCreateRequest() {
+        return CalendarEventCreateRequestDto.builder()
+                .title("테스트 일정")
+                .description("테스트 일정 설명")
+                .eventDate(java.time.LocalDate.now().plusDays(1))
+                .build();
+    }
+
+    public static CalendarEventCreateRequestDto buildCalendarEventCreateRequest(String title, String description, java.time.LocalDate eventDate) {
+        return CalendarEventCreateRequestDto.builder()
+                .title(title)
+                .description(description)
+                .eventDate(eventDate)
+                .build();
+    }
+
+    public static CalendarEventUpdateRequestDto buildCalendarEventUpdateRequest() {
+        return CalendarEventUpdateRequestDto.builder()
+                .title("수정된 일정")
+                .description("수정된 일정 설명")
+                .eventDate(java.time.LocalDate.now().plusDays(2))
+                .build();
+    }
+
+    public static CalendarEventUpdateRequestDto buildCalendarEventUpdateRequest(String title, String description, java.time.LocalDate eventDate) {
+        return CalendarEventUpdateRequestDto.builder()
+                .title(title)
+                .description(description)
+                .eventDate(eventDate)
+                .build();
+    }
+
+    // Calendar Event Response DTOs
+    public static CalendarEventResponseDto buildCalendarEventResponseDto() {
+        return CalendarEventResponseDto.builder()
+                .id(1L)
+                .labId(1L)
+                .labName("AI 연구실")
+                .type("SCHEDULE")
+                .title("테스트 일정")
+                .description("테스트 일정 설명")
+                .eventDate(java.time.LocalDate.now().plusDays(1))
+                .startTime(null)
+                .endTime(null)
+                .interviewId(null)
+                .createdAt(java.time.LocalDateTime.now())
+                .updatedAt(java.time.LocalDateTime.now())
+                .build();
+    }
+
+    public static CalendarEventResponseDto buildCalendarEventResponseDto(Long id, String title, String type) {
+        return CalendarEventResponseDto.builder()
+                .id(id)
+                .labId(1L)
+                .labName("AI 연구실")
+                .type(type)
+                .title(title)
+                .description("테스트 일정 설명")
+                .eventDate(java.time.LocalDate.now().plusDays(1))
+                .startTime("INTERVIEW".equals(type) ? java.time.LocalTime.of(9, 0) : null)
+                .endTime("INTERVIEW".equals(type) ? java.time.LocalTime.of(10, 0) : null)
+                .interviewId("INTERVIEW".equals(type) ? 100L : null)
+                .createdAt(java.time.LocalDateTime.now())
+                .updatedAt(java.time.LocalDateTime.now())
+                .build();
+    }
+
     // Lab Image Response DTOs
     public static LabImageResponseDto buildLabImageResponseDto() {
         return LabImageResponseDto.builder()

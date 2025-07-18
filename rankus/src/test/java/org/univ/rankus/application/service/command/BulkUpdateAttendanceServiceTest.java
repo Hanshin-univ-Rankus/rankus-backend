@@ -9,14 +9,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.univ.rankus.adapter.in.web.lab.attendance.dto.BulkAttendanceUpdateRequest;
 import org.univ.rankus.adapter.in.web.lab.attendance.dto.BulkAttendanceUpdateResponse;
 import org.univ.rankus.application.port.in.AttendanceRecordCommandUseCase;
-import org.univ.rankus.application.port.out.AttendanceRepositoryPort;
 import org.univ.rankus.application.port.out.AttendanceRecordRepositoryPort;
+import org.univ.rankus.application.port.out.AttendanceRepositoryPort;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
 import org.univ.rankus.domain.model.attendance.AttendanceRecord;
 import org.univ.rankus.domain.model.attendance.AttendanceStatus;
 import org.univ.rankus.domain.model.lab.core.Lab;
-import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
 import org.univ.rankus.domain.model.lab.exception.LabPermissionException;
 import org.univ.rankus.domain.model.user.User;
@@ -25,16 +24,13 @@ import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
 import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BulkUpdateAttendanceService 테스트")
@@ -45,7 +41,7 @@ class BulkUpdateAttendanceServiceTest {
 
     @Mock
     private AttendanceRepositoryPort attendanceRepositoryPort;
-    
+
     @Mock
     private AttendanceRecordRepositoryPort attendanceRecordRepositoryPort;
 
@@ -70,7 +66,7 @@ class BulkUpdateAttendanceServiceTest {
         // given
         Lab lab = DomainLabFactory.buildValidLabWithId(LAB_ID);
         User manager = DomainUserFactory.buildAdminUser();
-        
+
         AttendanceRecord record1 = DomainAttendanceFactory.buildAbsentRecord();
         AttendanceRecord record2 = DomainAttendanceFactory.buildAbsentRecord();
         AttendanceRecord updatedRecord1 = DomainAttendanceFactory.buildValidRecord();
@@ -118,7 +114,7 @@ class BulkUpdateAttendanceServiceTest {
         // given
         Lab lab = DomainLabFactory.buildValidLabWithId(LAB_ID);
         User manager = DomainUserFactory.buildProfessorUser();
-        
+
         AttendanceRecord record1 = DomainAttendanceFactory.buildAbsentRecord();
         AttendanceRecord record2 = DomainAttendanceFactory.buildValidRecord(); // 이미 PRESENT 상태
         // record2를 PRESENT 상태로 설정하고 PRESENT로 변경을 시도하려고 함 (동일한 상태)
@@ -158,7 +154,7 @@ class BulkUpdateAttendanceServiceTest {
         // given
         Lab lab = DomainLabFactory.buildValidLabWithId(LAB_ID);
         User manager = DomainUserFactory.buildLabManagerWithLab(lab);
-        
+
         AttendanceRecord record1 = DomainAttendanceFactory.buildAbsentRecord();
         AttendanceRecord updatedRecord1 = DomainAttendanceFactory.buildValidRecord();
 
@@ -191,7 +187,7 @@ class BulkUpdateAttendanceServiceTest {
         // given
         Lab lab = DomainLabFactory.buildValidLabWithId(LAB_ID);
         User manager = DomainUserFactory.buildAdminUser();
-        
+
         AttendanceRecord record1 = DomainAttendanceFactory.buildAbsentRecord();
         AttendanceRecord record2 = DomainAttendanceFactory.buildAbsentRecord();
         AttendanceRecord updatedRecord1 = DomainAttendanceFactory.buildValidRecord();
@@ -284,7 +280,7 @@ class BulkUpdateAttendanceServiceTest {
         // given
         Lab lab = DomainLabFactory.buildValidLabWithId(LAB_ID);
         User manager = DomainUserFactory.buildAdminUser();
-        
+
         BulkAttendanceUpdateRequest request = createSingleUpdateRequest();
 
         given(labRepositoryPort.findById(LAB_ID)).willReturn(Optional.of(lab));

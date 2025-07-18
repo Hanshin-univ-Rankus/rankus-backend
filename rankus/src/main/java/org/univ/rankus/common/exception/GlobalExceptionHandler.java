@@ -9,8 +9,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -108,7 +110,56 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 4) 인증 실패(AuthenticationException) 시 처리 (401 Unauthorized)
+     * 4) 필수 요청 파라미터가 누락된 경우 발생 (400 Bad Request)
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    protected ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(
+            MissingServletRequestParameterException ex,
+            HttpServletRequest request
+    ) {
+        List<ErrorResponse.FieldError> fieldErrors = List.of(
+                new ErrorResponse.FieldError(ex.getParameterName(),
+                        ex.getParameterName() + " 파라미터가 필요합니다.")
+        );
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+                GlobalErrorCode.INVALID_INPUT,
+                request.getRequestURI(),
+                fieldErrors
+        );
+        return ResponseEntity
+                .status(GlobalErrorCode.INVALID_INPUT.getStatus())
+                .body(errorResponse);
+    }
+
+    /**
+     * 5) 메서드 파라미터 타입 불일치 발생 (400 Bad Request)
+     * 예: 날짜 형식이 잘못된 경우
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
+            MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request
+    ) {
+        String parameterName = ex.getName();
+        String message = parameterName + " 파라미터의 형식이 올바르지 않습니다.";
+
+        List<ErrorResponse.FieldError> fieldErrors = List.of(
+                new ErrorResponse.FieldError(parameterName, message)
+        );
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+                GlobalErrorCode.INVALID_INPUT,
+                request.getRequestURI(),
+                fieldErrors
+        );
+        return ResponseEntity
+                .status(GlobalErrorCode.INVALID_INPUT.getStatus())
+                .body(errorResponse);
+    }
+
+    /**
+     * 6) 인증 실패(AuthenticationException) 시 처리 (401 Unauthorized)
      */
     @ExceptionHandler(AuthenticationException.class)
     protected ResponseEntity<ErrorResponse> handleAuthenticationException(
@@ -127,7 +178,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 5) 권한 부족(AccessDeniedException) 시 처리 (403 Forbidden)
+     * 7) 권한 부족(AccessDeniedException) 시 처리 (403 Forbidden)
      */
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<ErrorResponse> handleAccessDeniedException(
@@ -146,7 +197,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 6) 지원하지 않는 미디어 타입(HttpMediaTypeNotSupportedException) 시 처리 (415 Unsupported Media Type)
+     * 8) 지원하지 않는 미디어 타입(HttpMediaTypeNotSupportedException) 시 처리 (415 Unsupported Media Type)
      */
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     protected ResponseEntity<ErrorResponse> handleMediaTypeNotSupported(
@@ -166,7 +217,7 @@ public class GlobalExceptionHandler {
 
 
     /**
-     * 7) 그 외 모든 예외 (예측하지 못한 서버 오류) 처리 (500 Internal Server Error)
+     * 9) 그 외 모든 예외 (예측하지 못한 서버 오류) 처리 (500 Internal Server Error)
      */
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleAllException(

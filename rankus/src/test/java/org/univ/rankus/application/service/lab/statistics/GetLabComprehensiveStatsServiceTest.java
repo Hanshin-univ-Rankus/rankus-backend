@@ -9,17 +9,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.univ.rankus.adapter.in.web.lab.statistics.dto.LabComprehensiveStatsResponse;
 import org.univ.rankus.application.port.out.*;
-import org.univ.rankus.application.port.out.AttendanceRecordRepositoryPort;
 import org.univ.rankus.domain.model.attendance.AttendanceRecord;
 import org.univ.rankus.domain.model.attendance.AttendanceSession;
-import org.univ.rankus.domain.model.attendance.AttendanceStatus;
 import org.univ.rankus.domain.model.lab.core.Lab;
-import org.univ.rankus.domain.model.lab.core.LabCategory;
-import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
 import org.univ.rankus.domain.model.lab.exception.LabPermissionException;
 import org.univ.rankus.domain.model.ranking.SubmissionStatus;
-import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.testutil.factory.domain.DomainAttendanceFactory;
 import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
@@ -32,7 +27,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -49,7 +43,7 @@ class GetLabComprehensiveStatsServiceTest {
     @Mock
     private AttendanceSessionRepositoryPort attendanceSessionRepositoryPort;
 
-    
+
     @Mock
     private AttendanceRecordRepositoryPort attendanceRecordRepositoryPort;
 
@@ -346,11 +340,11 @@ class GetLabComprehensiveStatsServiceTest {
         // 출석 세션 설정
         AttendanceSession session1 = DomainAttendanceFactory.buildValidSessionWithId(1L);
         AttendanceSession session2 = DomainAttendanceFactory.buildValidSessionWithId(2L);
-        
+
         // createdAt 필드 설정 (null 방지)
         ReflectionTestUtils.setField(session1, "createdAt", LocalDateTime.now().minusDays(1));
         ReflectionTestUtils.setField(session2, "createdAt", LocalDateTime.now().minusDays(2));
-        
+
         List<AttendanceSession> sessions = Arrays.asList(session1, session2);
 
         // 출석 기록 설정 - 실제 프로덕션 코드에서는 findByLabId를 사용
