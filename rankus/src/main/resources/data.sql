@@ -57,3 +57,41 @@ VALUES (1, 'AI랩 정기 미팅 안내', '매주 월요일 오후 2시에 정기
        (4, 'DB랩 세미나 일정', '이번 달 세미나는 매주 수요일 오후 3시에 진행됩니다.', 'NORMAL', false, 3, 2, NOW(), NOW()),
        (5, '[중요] 서버 점검 안내', '내일 오후 6시부터 자정까지 서버 점검이 있습니다. 작업 저장 후 로그아웃 바랍니다.', 'URGENT', true, 6, 2, NOW(), NOW()),
        (6, '데이터베이스 최적화 스터디', '매주 목요일 저녁 7시에 데이터베이스 최적화 스터디를 진행합니다.', 'NORMAL', false, 3, 2, NOW(), NOW());
+
+-- 8. attendance_sessions (출석 세션)
+INSERT INTO attendance_sessions (session_id, lab_id, created_by, title, start_time, end_time, qr_validity_minutes, status, created_at, updated_at)
+VALUES (1, 1, 2, 'AI랩 정기 미팅', '2025-07-18 14:00:00', '2025-07-18 16:00:00', 5, 'COMPLETED', NOW(), NOW()),
+       (2, 1, 2, '연구 진행 상황 점검', '2025-07-19 10:00:00', NULL, 3, 'ACTIVE', NOW(), NOW()),
+       (3, 2, 6, 'DB랩 세미나', '2025-07-17 15:00:00', '2025-07-17 17:00:00', 5, 'COMPLETED', NOW(), NOW()),
+       (4, 2, 3, '교수님과의 면담', '2025-07-18 13:00:00', NULL, 10, 'ACTIVE', NOW(), NOW()),
+       (5, 1, 2, '프로젝트 발표회', '2025-07-16 09:00:00', '2025-07-16 09:30:00', 5, 'CANCELLED', NOW(), NOW());
+
+-- 9. attendance_records (출석 기록)
+INSERT INTO attendance_records (record_id, session_id, user_id, checked_at, status, is_manually_adjusted, adjustment_reason, adjusted_by, adjusted_at, created_at, updated_at)
+VALUES (1, 1, 5, '2025-07-18 14:02:00', 'PRESENT', false, NULL, NULL, NULL, NOW(), NOW()),
+       (2, 1, 1, '2025-07-18 14:08:00', 'LATE', false, NULL, NULL, NULL, NOW(), NOW()),
+       (3, 3, 6, '2025-07-17 15:00:00', 'PRESENT', false, NULL, NULL, NULL, NOW(), NOW()),
+       (4, 3, 3, '2025-07-17 15:00:00', 'PRESENT', false, NULL, NULL, NULL, NOW(), NOW()),
+       (5, 1, 4, '2025-07-18 14:00:00', 'ABSENT', true, '사전 휴가 신청', 2, NOW(), NOW(), NOW());
+
+-- 10. score_submissions (점수 신청)
+INSERT INTO score_submissions (id, user_id, lab_id, category, achievement_description, achievement_date, proof_file_url, application_reason, related_link, status, visibility, approved_by, approved_at, submitted_at, expires_at, correction_used, correction_count, rejection_reason, created_at, updated_at)
+VALUES (1, 1, 1, 'ACADEMIC_ACHIEVEMENT', '인공지능 과목 A+ 성적 취득', '2025-06-15', 'https://example.com/proof1.pdf', '학업 성과를 인정받고 싶습니다', 'https://portal.example.com/grades', 'APPROVED', 'PUBLIC', 2, NOW(), DATE_SUB(NOW(), INTERVAL 1 MONTH), DATE_ADD(NOW(), INTERVAL 5 MONTH), false, 0, NULL, NOW(), NOW()),
+       (2, 5, 1, 'CONTEST_INTERNAL_WINNER', '2025 교내 AI 해커톤 대상', '2025-05-20', 'https://example.com/proof2.pdf', '대회 수상으로 랩실 기여', 'https://hackathon.example.com/results', 'APPROVED', 'LAB_ONLY', 2, NOW(), DATE_SUB(NOW(), INTERVAL 2 MONTH), DATE_ADD(NOW(), INTERVAL 4 MONTH), false, 0, NULL, NOW(), NOW()),
+       (3, 4, 2, 'CERTIFICATION_NATIONAL', '정보처리기사 자격증 취득', '2025-04-10', 'https://example.com/proof3.pdf', NULL, NULL, 'PENDING', 'PRIVATE', NULL, NULL, DATE_SUB(NOW(), INTERVAL 1 WEEK), DATE_ADD(NOW(), INTERVAL 5 MONTH), false, 0, NULL, NOW(), NOW()),
+       (4, 1, 1, 'RESEARCH_GENERAL_PAPER', '머신러닝 관련 논문 게재', '2025-03-15', 'https://example.com/proof4.pdf', '연구 성과 공유', 'https://journal.example.com/paper123', 'REJECTED', 'PUBLIC', 2, NOW(), DATE_SUB(NOW(), INTERVAL 3 MONTH), DATE_ADD(NOW(), INTERVAL 3 MONTH), false, 0, '증빙 자료 부족', NOW(), NOW());
+
+-- 11. calendar_events (캘린더 이벤트)
+INSERT INTO calendar_events (id, lab_id, type, title, description, event_date, start_time, end_time, interview_id, created_at, updated_at)
+VALUES (1, 1, 'SCHEDULE', 'AI랩 정기 미팅', '매주 월요일 정기 미팅입니다.', '2025-07-21', NULL, NULL, NULL, NOW(), NOW()),
+       (2, 1, 'SCHEDULE', '연구 성과 발표', '이번 달 연구 성과를 발표하는 시간입니다.', '2025-07-25', NULL, NULL, NULL, NOW(), NOW()),
+       (3, 2, 'SCHEDULE', 'DB랩 세미나', '데이터베이스 최적화 주제 세미나', '2025-07-24', NULL, NULL, NULL, NOW(), NOW()),
+       (4, 1, 'INTERVIEW', 'AI랩 면접', '2025년 하반기 AI랩 면접 일정', '2025-07-15', '09:00:00', '17:00:00', 1, NOW(), NOW()),
+       (5, 2, 'INTERVIEW', 'DB랩 면접', '2025년 하반기 DB랩 면접 일정', '2025-07-20', '13:00:00', '16:00:00', 2, NOW(), NOW());
+
+-- 12. lab_creation_requests (랩실 생성 신청)
+INSERT INTO lab_creation_requests (id, requested_lab_name, requested_category, requested_description, requester_id, status, processed_at, processed_by_id, rejection_reason, created_at, updated_at)
+VALUES (1, '로봇공학랩', 'ROBOTICS', '로봇공학 연구를 위한 랩실입니다.', 1, 'APPROVED', NOW(), 7, NULL, DATE_SUB(NOW(), INTERVAL 1 MONTH), NOW()),
+       (2, '블록체인랩', 'COMPUTER_SCIENCE', '블록체인 기술 연구 및 개발', 4, 'PENDING', NULL, NULL, NULL, DATE_SUB(NOW(), INTERVAL 2 WEEK), NOW()),
+       (3, '보안랩', 'SECURITY', '정보보안 및 사이버보안 연구', 5, 'REJECTED', NOW(), 3, '기존 보안 랩실이 이미 존재합니다.', DATE_SUB(NOW(), INTERVAL 3 WEEK), NOW()),
+       (4, '게임개발랩', 'GAME', '게임 개발 및 엔진 연구', 1, 'APPROVED', NOW(), 7, NULL, DATE_SUB(NOW(), INTERVAL 1 WEEK), NOW());
