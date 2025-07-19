@@ -95,3 +95,58 @@ VALUES (1, '로봇공학랩', 'ROBOTICS', '로봇공학 연구를 위한 랩실�
        (2, '블록체인랩', 'COMPUTER_SCIENCE', '블록체인 기술 연구 및 개발', 4, 'PENDING', NULL, NULL, NULL, DATE_SUB(NOW(), INTERVAL 2 WEEK), NOW()),
        (3, '보안랩', 'SECURITY', '정보보안 및 사이버보안 연구', 5, 'REJECTED', NOW(), 3, '기존 보안 랩실이 이미 존재합니다.', DATE_SUB(NOW(), INTERVAL 3 WEEK), NOW()),
        (4, '게임개발랩', 'GAME', '게임 개발 및 엔진 연구', 1, 'APPROVED', NOW(), 7, NULL, DATE_SUB(NOW(), INTERVAL 1 WEEK), NOW());
+
+-- 13. votes (투표)
+INSERT INTO votes (id, creator_id, lab_id, title, description, status, deadline, total_votes, created_at, updated_at)
+VALUES (1, 2, 1, '2025년 하반기 연구 주제 선정', 'AI랩의 하반기 연구 주제를 결정하는 투표입니다. 각자의 관심 분야와 연구 가능성을 고려하여 투표해주세요.', 'ACTIVE', '2025-08-01 23:59:59', 0, NOW(), NOW()),
+       (2, 3, 2, '신규 서버 장비 구매 우선순위', '랩실 확장을 위해 신규 서버 장비 구매가 결정되었습니다. 우선순위를 정하기 위한 투표입니다.', 'ACTIVE', '2025-07-25 18:00:00', 0, NOW(), NOW()),
+       (3, 2, 1, '정기 미팅 시간 조정', '랩원들의 스케줄 변경으로 인해 정기 미팅 시간을 조정하고자 합니다. 가장 적합한 시간대를 선택해주세요.', 'ACTIVE', '2025-07-22 12:00:00', 0, NOW(), NOW()),
+       (4, 2, 1, '여름휴가 기간 선택', 'AI랩 여름휴가 기간을 정하기 위한 투표였습니다.', 'CLOSED', '2025-07-10 23:59:59', 4, DATE_SUB(NOW(), INTERVAL 1 WEEK), NOW()),
+       (5, 6, 2, '연구실 청소 일정 결정', 'DB랩 정기 청소 일정을 정하기 위한 투표였습니다.', 'CLOSED', '2025-07-05 18:00:00', 3, DATE_SUB(NOW(), INTERVAL 2 WEEK), NOW()),
+       (6, 2, 1, '외부 세미나 참석 여부', '외부 AI 세미나 참석 여부를 묻는 투표였으나, 예산 문제로 취소되었습니다.', 'CANCELED', '2025-07-20 23:59:59', 0, DATE_SUB(NOW(), INTERVAL 3 DAY), NOW());
+
+-- 14. vote_options (투표 선택지)
+INSERT INTO vote_options (id, vote_id, option_text, option_order, vote_count, created_at, updated_at)
+VALUES 
+-- 투표 1: 2025년 하반기 연구 주제 선정 (ACTIVE)
+(1, 1, '자연어 처리 및 언어 모델 연구', 1, 0, NOW(), NOW()),
+(2, 1, '컴퓨터 비전 및 이미지 인식', 2, 0, NOW(), NOW()),
+(3, 1, '강화학습 및 게임 AI', 3, 0, NOW(), NOW()),
+(4, 1, '추천 시스템 및 데이터 마이닝', 4, 0, NOW(), NOW()),
+
+-- 투표 2: 신규 서버 장비 구매 우선순위 (ACTIVE)
+(5, 2, 'GPU 서버 (NVIDIA RTX 4090)', 1, 0, NOW(), NOW()),
+(6, 2, '고성능 워크스테이션', 2, 0, NOW(), NOW()),
+(7, 2, '스토리지 서버 확장', 3, 0, NOW(), NOW()),
+
+-- 투표 3: 정기 미팅 시간 조정 (ACTIVE)
+(8, 3, '월요일 오후 2시', 1, 0, NOW(), NOW()),
+(9, 3, '화요일 오후 3시', 2, 0, NOW(), NOW()),
+(10, 3, '수요일 오후 4시', 3, 0, NOW(), NOW()),
+
+-- 투표 4: 여름휴가 기간 선택 (CLOSED)
+(11, 4, '7월 마지막 주 (7/28-8/1)', 1, 2, DATE_SUB(NOW(), INTERVAL 1 WEEK), NOW()),
+(12, 4, '8월 첫째 주 (8/4-8/8)', 2, 2, DATE_SUB(NOW(), INTERVAL 1 WEEK), NOW()),
+
+-- 투표 5: 연구실 청소 일정 결정 (CLOSED)
+(13, 5, '매주 금요일 오후', 1, 1, DATE_SUB(NOW(), INTERVAL 2 WEEK), NOW()),
+(14, 5, '격주 토요일 오전', 2, 2, DATE_SUB(NOW(), INTERVAL 2 WEEK), NOW()),
+
+-- 투표 6: 외부 세미나 참석 여부 (CANCELED)
+(15, 6, '전체 참석', 1, 0, DATE_SUB(NOW(), INTERVAL 3 DAY), NOW()),
+(16, 6, '선별적 참석', 2, 0, DATE_SUB(NOW(), INTERVAL 3 DAY), NOW()),
+(17, 6, '불참', 3, 0, DATE_SUB(NOW(), INTERVAL 3 DAY), NOW());
+
+-- 15. vote_participations (투표 참여 기록)
+INSERT INTO vote_participations (id, vote_id, user_id, selected_option_id, created_at, updated_at)
+VALUES 
+-- 투표 4: 여름휴가 기간 선택 (CLOSED) - 4명 참여
+(1, 4, 2, 11, DATE_SUB(NOW(), INTERVAL 1 WEEK), NOW()),  -- 랩장1 → 7월 마지막 주
+(2, 4, 5, 11, DATE_SUB(NOW(), INTERVAL 1 WEEK), NOW()),  -- 학생3 → 7월 마지막 주
+(3, 4, 1, 12, DATE_SUB(NOW(), INTERVAL 6 DAY), NOW()),   -- 학생1 → 8월 첫째 주
+(4, 4, 4, 12, DATE_SUB(NOW(), INTERVAL 6 DAY), NOW()),   -- 학생2 → 8월 첫째 주
+
+-- 투표 5: 연구실 청소 일정 결정 (CLOSED) - 3명 참여
+(5, 5, 6, 14, DATE_SUB(NOW(), INTERVAL 2 WEEK), NOW()),  -- 랩장2 → 격주 토요일 오전
+(6, 5, 3, 14, DATE_SUB(NOW(), INTERVAL 13 DAY), NOW()),  -- 교수 → 격주 토요일 오전
+(7, 5, 1, 13, DATE_SUB(NOW(), INTERVAL 12 DAY), NOW()); -- 학생1 → 매주 금요일 오후
