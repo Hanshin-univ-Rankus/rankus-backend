@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserValidationException;
+import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
 import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
 import org.univ.rankus.testutil.mock.TestPasswordEncoder;
 
@@ -397,6 +398,249 @@ class UserTest {
                 return lab;
             } catch (Exception e) {
                 throw new RuntimeException("테스트용 Lab 객체 생성 실패", e);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("투표 권한 확인 메서드")
+    class VotePermissionTests {
+
+        @Nested
+        @DisplayName("투표 조회 권한(canViewVotes)")
+        class CanViewVotesTests {
+
+            @Test
+            @DisplayName("ADMIN은 모든 랩실의 투표 조회 권한이 있음")
+            void admin_canViewAllVotes() {
+                // given
+                User admin = DomainUserFactory.buildAdminUser();
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+
+                // when & then
+                assertTrue(admin.canViewVotes(lab));
+            }
+
+            @Test
+            @DisplayName("PROFESSOR는 모든 랩실의 투표 조회 권한이 있음")
+            void professor_canViewAllVotes() {
+                // given
+                User professor = DomainUserFactory.buildProfessorUser();
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+
+                // when & then
+                assertTrue(professor.canViewVotes(lab));
+            }
+
+            @Test
+            @DisplayName("LAB_MEMBER는 소속 랩실의 투표 조회 권한이 있음")
+            void labMember_canViewOwnLabVotes() {
+                // given
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+                User labMember = DomainUserFactory.buildLabMemberWithLab(lab);
+
+                // when & then
+                assertTrue(labMember.canViewVotes(lab));
+            }
+
+            @Test
+            @DisplayName("LAB_MANAGER는 소속 랩실의 투표 조회 권한이 있음")
+            void labManager_canViewOwnLabVotes() {
+                // given
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+                User labManager = DomainUserFactory.buildLabManagerWithLab(lab);
+
+                // when & then
+                assertTrue(labManager.canViewVotes(lab));
+            }
+
+            @Test
+            @DisplayName("LAB_LEADER는 소속 랩실의 투표 조회 권한이 있음")
+            void labLeader_canViewOwnLabVotes() {
+                // given
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+                User labLeader = DomainUserFactory.buildLabLeaderWithLab(lab);
+
+                // when & then
+                assertTrue(labLeader.canViewVotes(lab));
+            }
+
+            @Test
+            @DisplayName("다른 랩실 소속 사용자는 투표 조회 권한이 없음")
+            void differentLabMember_cannotViewVotes() {
+                // given
+                Lab lab1 = DomainLabFactory.buildValidLabWithId(1L);
+                Lab lab2 = DomainLabFactory.buildValidLabWithId(2L);
+                User labMember = DomainUserFactory.buildLabMemberWithLab(lab1);
+
+                // when & then
+                assertFalse(labMember.canViewVotes(lab2));
+            }
+
+            @Test
+            @DisplayName("랩실에 소속되지 않은 사용자는 투표 조회 권한이 없음")
+            void unassignedUser_cannotViewVotes() {
+                // given
+                User student = DomainUserFactory.buildStudentUser();
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+
+                // when & then
+                assertFalse(student.canViewVotes(lab));
+            }
+        }
+
+        @Nested
+        @DisplayName("투표 생성 권한(canCreateVotes)")
+        class CanCreateVotesTests {
+
+            @Test
+            @DisplayName("ADMIN은 모든 랩실의 투표 생성 권한이 있음")
+            void admin_canCreateAllVotes() {
+                // given
+                User admin = DomainUserFactory.buildAdminUser();
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+
+                // when & then
+                assertTrue(admin.canCreateVotes(lab));
+            }
+
+            @Test
+            @DisplayName("PROFESSOR는 모든 랩실의 투표 생성 권한이 있음")
+            void professor_canCreateAllVotes() {
+                // given
+                User professor = DomainUserFactory.buildProfessorUser();
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+
+                // when & then
+                assertTrue(professor.canCreateVotes(lab));
+            }
+
+            @Test
+            @DisplayName("LAB_MANAGER는 소속 랩실의 투표 생성 권한이 있음")
+            void labManager_canCreateOwnLabVotes() {
+                // given
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+                User labManager = DomainUserFactory.buildLabManagerWithLab(lab);
+
+                // when & then
+                assertTrue(labManager.canCreateVotes(lab));
+            }
+
+            @Test
+            @DisplayName("LAB_LEADER는 소속 랩실의 투표 생성 권한이 있음")
+            void labLeader_canCreateOwnLabVotes() {
+                // given
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+                User labLeader = DomainUserFactory.buildLabLeaderWithLab(lab);
+
+                // when & then
+                assertTrue(labLeader.canCreateVotes(lab));
+            }
+
+            @Test
+            @DisplayName("LAB_MEMBER는 투표 생성 권한이 없음")
+            void labMember_cannotCreateVotes() {
+                // given
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+                User labMember = DomainUserFactory.buildLabMemberWithLab(lab);
+
+                // when & then
+                assertFalse(labMember.canCreateVotes(lab));
+            }
+
+            @Test
+            @DisplayName("다른 랩실 소속 매니저는 투표 생성 권한이 없음")
+            void differentLabManager_cannotCreateVotes() {
+                // given
+                Lab lab1 = DomainLabFactory.buildValidLabWithId(1L);
+                Lab lab2 = DomainLabFactory.buildValidLabWithId(2L);
+                User labManager = DomainUserFactory.buildLabManagerWithLab(lab1);
+
+                // when & then
+                assertFalse(labManager.canCreateVotes(lab2));
+            }
+        }
+
+        @Nested
+        @DisplayName("투표 관리 권한(canManageVotes)")
+        class CanManageVotesTests {
+
+            @Test
+            @DisplayName("ADMIN은 모든 랩실의 투표 관리 권한이 있음")
+            void admin_canManageAllVotes() {
+                // given
+                User admin = DomainUserFactory.buildAdminUser();
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+
+                // when & then
+                assertTrue(admin.canManageVotes(lab));
+            }
+
+            @Test
+            @DisplayName("PROFESSOR는 모든 랩실의 투표 관리 권한이 있음")
+            void professor_canManageAllVotes() {
+                // given
+                User professor = DomainUserFactory.buildProfessorUser();
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+
+                // when & then
+                assertTrue(professor.canManageVotes(lab));
+            }
+
+            @Test
+            @DisplayName("LAB_MANAGER는 소속 랩실의 투표 관리 권한이 있음")
+            void labManager_canManageOwnLabVotes() {
+                // given
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+                User labManager = DomainUserFactory.buildLabManagerWithLab(lab);
+
+                // when & then
+                assertTrue(labManager.canManageVotes(lab));
+            }
+
+            @Test
+            @DisplayName("LAB_LEADER는 소속 랩실의 투표 관리 권한이 있음")
+            void labLeader_canManageOwnLabVotes() {
+                // given
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+                User labLeader = DomainUserFactory.buildLabLeaderWithLab(lab);
+
+                // when & then
+                assertTrue(labLeader.canManageVotes(lab));
+            }
+
+            @Test
+            @DisplayName("LAB_MEMBER는 투표 관리 권한이 없음")
+            void labMember_cannotManageVotes() {
+                // given
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+                User labMember = DomainUserFactory.buildLabMemberWithLab(lab);
+
+                // when & then
+                assertFalse(labMember.canManageVotes(lab));
+            }
+
+            @Test
+            @DisplayName("다른 랩실 소속 리더는 투표 관리 권한이 없음")
+            void differentLabLeader_cannotManageVotes() {
+                // given
+                Lab lab1 = DomainLabFactory.buildValidLabWithId(1L);
+                Lab lab2 = DomainLabFactory.buildValidLabWithId(2L);
+                User labLeader = DomainUserFactory.buildLabLeaderWithLab(lab1);
+
+                // when & then
+                assertFalse(labLeader.canManageVotes(lab2));
+            }
+
+            @Test
+            @DisplayName("랩실에 소속되지 않은 사용자는 투표 관리 권한이 없음")
+            void unassignedUser_cannotManageVotes() {
+                // given
+                User student = DomainUserFactory.buildStudentUser();
+                Lab lab = DomainLabFactory.buildValidLabWithId(1L);
+
+                // when & then
+                assertFalse(student.canManageVotes(lab));
             }
         }
     }

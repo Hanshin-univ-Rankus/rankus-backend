@@ -285,6 +285,51 @@ public class User extends BaseTimeEntity {
     }
 
     /**
+     * 특정 랩실의 투표 조회 권한을 확인
+     * 랩실 소속 멤버(LAB_MEMBER 이상) + 모든 PROFESSOR, ADMIN
+     */
+    public boolean canViewVotes(Lab lab) {
+        // ADMIN과 PROFESSOR는 모든 랩실의 투표 조회 가능
+        if (this.role == Role.ADMIN || this.role == Role.PROFESSOR) {
+            return true;
+        }
+
+        // 랩실 소속 멤버(LAB_MEMBER 이상)는 해당 랩실 투표 조회 가능
+        return this.lab != null && this.lab.equals(lab)
+                && (this.role == Role.LAB_MEMBER || this.role == Role.LAB_MANAGER || this.role == Role.LAB_LEADER);
+    }
+
+    /**
+     * 특정 랩실의 투표 생성 권한을 확인
+     * 랩 소속 LAB_MANAGER, LAB_LEADER + 모든 PROFESSOR, ADMIN
+     */
+    public boolean canCreateVotes(Lab lab) {
+        // ADMIN과 PROFESSOR는 모든 랩실의 투표 생성 가능
+        if (this.role == Role.ADMIN || this.role == Role.PROFESSOR) {
+            return true;
+        }
+
+        // 랩실 소속 LAB_MANAGER, LAB_LEADER는 해당 랩실 투표 생성 가능
+        return this.lab != null && this.lab.equals(lab)
+                && (this.role == Role.LAB_MANAGER || this.role == Role.LAB_LEADER);
+    }
+
+    /**
+     * 특정 랩실의 투표 관리(수정/삭제/결과조회) 권한을 확인
+     * 랩 소속 LAB_MANAGER, LAB_LEADER + 모든 PROFESSOR, ADMIN
+     */
+    public boolean canManageVotes(Lab lab) {
+        // ADMIN과 PROFESSOR는 모든 랩실의 투표 관리 가능
+        if (this.role == Role.ADMIN || this.role == Role.PROFESSOR) {
+            return true;
+        }
+
+        // 랩실 소속 LAB_MANAGER, LAB_LEADER는 해당 랩실 투표 관리 가능
+        return this.lab != null && this.lab.equals(lab)
+                && (this.role == Role.LAB_MANAGER || this.role == Role.LAB_LEADER);
+    }
+
+    /**
      * 사용자 ID 반환
      */
     public Long getUserId() {
