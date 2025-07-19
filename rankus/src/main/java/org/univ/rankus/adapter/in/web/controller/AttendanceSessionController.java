@@ -1,8 +1,11 @@
 package org.univ.rankus.adapter.in.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,21 +42,124 @@ public class AttendanceSessionController {
     private final AttendanceSessionQueryUseCase attendanceSessionQueryUseCase;
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "출석 세션 생성", description = "랩실의 출석 세션을 생성합니다.")
+    @Operation(
+            summary = "출석 세션 생성", 
+            description = """
+                    랩실의 새로운 출석 세션을 생성합니다.
+                    
+                    ## 기능 설명
+                    - QR 코드 기반 출석 체크 시스템
+                    - 세션별로 독립적인 출석 관리
+                    - 실시간 출석 현황 모니터링
+                    - 자동 QR 코드 유효시간 설정
+                    
+                    ## 권한 요구사항
+                    - 랩장, 매니저, 교수, 관리자만 세션 생성 가능
+                    - 해당 랩실의 출석 관리 권한 필요
+                    
+                    ## 사용 시나리오
+                    1. 세션 생성 (제목, QR 유효시간 설정)
+                    2. QR 코드 생성 및 표시
+                    3. 학생들의 QR 스캔을 통한 출석 체크
+                    4. 세션 종료 및 출석 결과 확인
+                    """
+    )
+    @RequestBody(
+            description = "출석 세션 생성 정보",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = AttendanceSessionCreateRequestDto.class),
+                    examples = @ExampleObject(
+                            name = "세션 생성 예시",
+                            summary = "일반적인 출석 세션 생성",
+                            value = """
+                                    {
+                                      "title": "2024-02-15 정기 미팅",
+                                      "qrValidityMinutes": 10
+                                    }
+                                    """
+                    )
+            )
+    )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "201", description = "출석 세션 생성 성공",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class))
+                    responseCode = "201", 
+                    description = "출석 세션 생성 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                                            {
+                                              "success": true,
+                                              "message": "출석 세션이 생성되었습니다",
+                                              "data": {
+                                                "id": 1,
+                                                "labId": 1,
+                                                "title": "2024-02-15 정기 미팅",
+                                                "status": "ACTIVE",
+                                                "qrValidityMinutes": 10,
+                                                "createdAt": "2024-02-15T14:00:00",
+                                                "createdBy": 1,
+                                                "attendanceCount": 0,
+                                                "totalMembers": 5
+                                              },
+                                              "timestamp": "2024-02-15T14:00:00"
+                                            }
+                                            """
+                            )
+                    )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "403", description = "출석 관리 권한 없음", content = @Content
+                    responseCode = "400", 
+                    description = "입력값 검증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "검증 실패",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "입력값 검증 실패",
+                                              "data": null,
+                                              "errors": [
+                                                "세션 제목은 필수입니다",
+                                                "QR 유효시간은 1분 이상이어야 합니다"
+                                              ],
+                                              "timestamp": "2024-02-15T14:00:00"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403", 
+                    description = "출석 관리 권한 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "권한 없음",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "출석 관리 권한이 없습니다",
+                                              "data": null,
+                                              "timestamp": "2024-02-15T14:00:00"
+                                            }
+                                            """
+                            )
+                    )
             )
     })
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
             "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_ATTENDANCE')")
     public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> createSession(
+            @Parameter(description = "출석 세션을 생성할 랩실의 ID", required = true, example = "1")
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @Valid @RequestBody AttendanceSessionCreateRequestDto request,
             @AuthenticationPrincipal CustomUserDetails userDetails

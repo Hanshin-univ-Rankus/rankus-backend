@@ -1,8 +1,11 @@
 package org.univ.rankus.adapter.in.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -122,10 +125,136 @@ public class VoteController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "투표 생성", description = "새로운 투표를 생성합니다.")
+    @Operation(
+            summary = "투표 생성", 
+            description = """
+                    랩실에 새로운 투표를 생성합니다.
+                    
+                    ## 기능 설명
+                    - 랩실 내 의사결정을 위한 투표 생성
+                    - 2개 이상 5개 이하의 선택지 제공
+                    - 투표 마감일 설정 가능
+                    - 투표 생성 후 자동으로 활성 상태로 변경
+                    
+                    ## 권한 요구사항
+                    - 랩장, 매니저, 교수, 관리자만 투표 생성 가능
+                    - 일반 멤버는 투표 참여만 가능
+                    
+                    ## 투표 규칙
+                    - 각 사용자는 투표당 1번만 참여 가능
+                    - 마감일 이후 자동으로 투표 종료
+                    - 생성자는 언제든 투표 종료/취소 가능
+                    """
+    )
+    @RequestBody(
+            description = "투표 생성 정보",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = VoteCreateRequestDto.class),
+                    examples = @ExampleObject(
+                            name = "투표 생성 예시",
+                            summary = "랩실 회식 장소 투표",
+                            value = """
+                                    {
+                                      "title": "다음 주 랩실 회식 장소 투표",
+                                      "description": "2024년 2월 랩실 회식 장소를 결정하기 위한 투표입니다. 많은 참여 부탁드립니다!",
+                                      "deadline": "2024-02-10T23:59:59",
+                                      "optionTexts": [
+                                        "한식당 (삼겹살)",
+                                        "중식당 (짜장면)",
+                                        "일식당 (초밥)",
+                                        "치킨집 (후라이드)"
+                                      ]
+                                    }
+                                    """
+                    )
+            )
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "201", 
+                    description = "투표 생성 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                                            {
+                                              "success": true,
+                                              "message": "투표 생성 성공",
+                                              "data": {
+                                                "id": 1,
+                                                "title": "다음 주 랩실 회식 장소 투표",
+                                                "description": "2024년 2월 랩실 회식 장소를 결정하기 위한 투표입니다.",
+                                                "creatorId": 1,
+                                                "labId": 1,
+                                                "deadline": "2024-02-10T23:59:59",
+                                                "status": "ACTIVE",
+                                                "options": [
+                                                  {"id": 1, "text": "한식당 (삼겹살)", "voteCount": 0},
+                                                  {"id": 2, "text": "중식당 (짜장면)", "voteCount": 0},
+                                                  {"id": 3, "text": "일식당 (초밥)", "voteCount": 0},
+                                                  {"id": 4, "text": "치킨집 (후라이드)", "voteCount": 0}
+                                                ],
+                                                "totalVotes": 0,
+                                                "createdAt": "2024-01-15T10:30:00"
+                                              },
+                                              "timestamp": "2024-01-15T10:30:00"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400", 
+                    description = "입력값 검증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "검증 실패",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "입력값 검증 실패",
+                                              "data": null,
+                                              "errors": [
+                                                "투표 제목은 필수입니다",
+                                                "투표 선택지는 2개 이상 5개 이하여야 합니다",
+                                                "투표 마감일은 현재 시간 이후여야 합니다"
+                                              ],
+                                              "timestamp": "2024-01-15T10:30:00"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403", 
+                    description = "투표 생성 권한 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "권한 없음",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "투표 생성 권한이 없습니다",
+                                              "data": null,
+                                              "timestamp": "2024-01-15T10:30:00"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'CREATE_VOTE')")
     public ResponseEntity<ApiResponse<VoteResponseDto>> createVote(
+            @Parameter(description = "투표를 생성할 랩실의 ID", required = true, example = "1")
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @Valid @RequestBody VoteCreateRequestDto requestDto,
             @AuthenticationPrincipal CustomUserDetails userDetails

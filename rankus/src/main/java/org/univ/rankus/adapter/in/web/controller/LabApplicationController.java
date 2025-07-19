@@ -1,8 +1,11 @@
 package org.univ.rankus.adapter.in.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,24 +41,126 @@ public class LabApplicationController {
     private final LabApplicationCommandUseCase commandUseCase;
     private final LabApplicationQueryUseCase queryUseCase;
 
-    @Operation(summary = "랩실 가입 신청 (레거시)", description = "로그인 사용자가 해당 랩실에 가입 신청을 합니다. (구형 시간 기반 - 호환성용)")
+    @Operation(
+            summary = "랩실 가입 신청 (레거시)", 
+            description = """
+                    로그인한 사용자가 특정 랩실에 가입 신청을 합니다. (구형 시간 기반 방식)
+                    
+                    ## 기능 설명
+                    - **레거시 API**: 면접 시스템 도입 전 호환성을 위해 유지
+                    - 직접 면접 시간을 지정하여 신청
+                    - 새로운 면접 시스템 사용 시 `/slot-based` 엔드포인트 권장
+                    
+                    ## 신청 절차
+                    1. 원하는 면접 시간 입력
+                    2. 랩실 지원 신청서 제출
+                    3. 랩장/매니저의 승인 대기
+                    4. 승인 시 랩실 멤버로 등록
+                    
+                    ## 주의사항
+                    - 이미 해당 랩실에 신청한 경우 중복 신청 불가
+                    - 면접 시간은 미래 시점이어야 함
+                    """
+    )
+    @RequestBody(
+            description = "랩실 지원 신청 정보",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = LabApplicationRequestDto.class),
+                    examples = @ExampleObject(
+                            name = "지원 신청 예시",
+                            summary = "일반적인 랩실 지원 신청",
+                            value = """
+                                    {
+                                      "interviewTime": "2024-02-15T14:30:00"
+                                    }
+                                    """
+                    )
+            )
+    )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "201", description = "가입 신청 성공",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class)
+                    responseCode = "201", 
+                    description = "가입 신청 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                                            {
+                                              "success": true,
+                                              "message": "가입 신청 성공",
+                                              "data": {
+                                                "id": 1,
+                                                "userId": 1,
+                                                "labId": 1,
+                                                "interviewTime": "2024-02-15T14:30:00",
+                                                "status": "PENDING",
+                                                "appliedAt": "2024-01-15T10:30:00"
+                                              },
+                                              "timestamp": "2024-01-15T10:30:00"
+                                            }
+                                            """
+                            )
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400", description = "입력 검증 실패 또는 면접 시스템 사용 필요",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class)
+                    responseCode = "400", 
+                    description = "입력 검증 실패 또는 면접 시스템 사용 필요",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "검증 실패",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "이 랩실은 면접 시스템을 사용합니다. /slot-based 엔드포인트를 이용해주세요",
+                                              "data": null,
+                                              "timestamp": "2024-01-15T10:30:00"
+                                            }
+                                            """
+                            )
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404", description = "랩실 또는 사용자 정보 없음",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class)
+                    responseCode = "404", 
+                    description = "랩실 또는 사용자 정보 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "리소스 없음",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "해당 랩실을 찾을 수 없습니다",
+                                              "data": null,
+                                              "timestamp": "2024-01-15T10:30:00"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "409", 
+                    description = "중복 신청",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "중복 신청",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "이미 해당 랩실에 신청하셨습니다",
+                                              "data": null,
+                                              "timestamp": "2024-01-15T10:30:00"
+                                            }
+                                            """
+                            )
                     )
             )
     })
@@ -63,6 +168,7 @@ public class LabApplicationController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<LabApplicationResponseDto>> applyToLab(
+            @Parameter(description = "지원할 랩실의 ID", required = true, example = "1")
             @PathVariable @Positive Long labId,
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestBody @Valid LabApplicationRequestDto dto

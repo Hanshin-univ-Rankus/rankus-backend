@@ -1,7 +1,9 @@
 package org.univ.rankus.adapter.in.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -34,17 +36,99 @@ public class RankingController {
     private final RankingQueryUseCase rankingQueryUseCase;
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "전체 랩실 랭킹 조회", description = "모든 랩실의 랭킹을 페이징하여 조회합니다.")
+    @Operation(
+            summary = "전체 랩실 랭킹 조회", 
+            description = """
+                    모든 랩실의 랭킹을 점수순으로 페이징하여 조회합니다.
+                    
+                    ## 기능 설명
+                    - 전체 랩실의 종합 점수 기반 순위 제공
+                    - 점수 구성: 프로젝트, 논문, 대회, 특별활동 등
+                    - 실시간 랭킹 업데이트
+                    - 페이지 단위로 효율적인 데이터 로딩
+                    
+                    ## 정렬 기준
+                    1. 총 점수 내림차순
+                    2. 최근 활동일 기준 (동점시)
+                    3. 랩실 생성일 기준 (최종)
+                    
+                    ## 활용 용도
+                    - 랩실간 경쟁 현황 파악
+                    - 우수 랩실 발굴 및 벤치마킹
+                    - 랩실 홍보 효과 측정
+                    """
+    )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200", description = "랭킹 조회 성공",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class))
+                    responseCode = "200", 
+                    description = "랭킹 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                                            {
+                                              "success": true,
+                                              "message": "랭킹 조회 성공",
+                                              "data": {
+                                                "content": [
+                                                  {
+                                                    "labId": 1,
+                                                    "labName": "AI 연구실",
+                                                    "totalScore": 850,
+                                                    "rank": 1,
+                                                    "memberCount": 12,
+                                                    "recentActivityDate": "2024-02-15T10:30:00"
+                                                  },
+                                                  {
+                                                    "labId": 2,
+                                                    "labName": "소프트웨어 연구실",
+                                                    "totalScore": 720,
+                                                    "rank": 2,
+                                                    "memberCount": 8,
+                                                    "recentActivityDate": "2024-02-14T15:20:00"
+                                                  }
+                                                ],
+                                                "page": 0,
+                                                "size": 20,
+                                                "totalElements": 45,
+                                                "totalPages": 3,
+                                                "hasNext": true
+                                              },
+                                              "timestamp": "2024-02-15T14:00:00"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401", 
+                    description = "인증되지 않음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "인증 실패",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "인증이 필요합니다",
+                                              "data": null,
+                                              "timestamp": "2024-02-15T14:00:00"
+                                            }
+                                            """
+                            )
+                    )
             )
     })
     @GetMapping("/labs")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<PageResponse<RankingResponseDto>>> getLabRankings(
+            @Parameter(
+                    description = "페이지 정보 (page: 페이지 번호, size: 페이지 크기, sort: 정렬 기준)",
+                    example = "page=0&size=20&sort=totalScore,desc"
+            )
             @PageableDefault(size = 20) Pageable pageable) {
 
         Page<RankingQueryUseCase.LabRankingResult> rankings = rankingQueryUseCase.getLabRankings(pageable);
