@@ -12,6 +12,7 @@ import org.univ.rankus.application.port.out.LabRepositoryPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
 import org.univ.rankus.application.port.out.VoteRepositoryPort;
 import org.univ.rankus.domain.model.lab.core.Lab;
+import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.vote.Vote;
 import org.univ.rankus.domain.model.vote.VoteStatus;
@@ -19,16 +20,15 @@ import org.univ.rankus.testutil.config.BaseRepositoryTest;
 import org.univ.rankus.testutil.factory.integration.IntegrationLabFactory;
 import org.univ.rankus.testutil.factory.integration.IntegrationUserFactory;
 import org.univ.rankus.testutil.factory.integration.IntegrationVoteFactory;
-import org.univ.rankus.domain.model.user.Role;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Import({VoteRepositoryAdapter.class, 
-         org.univ.rankus.adapter.out.persistence.impl.LabRepositoryAdapter.class,
-         org.univ.rankus.adapter.out.persistence.impl.UserRepositoryAdapter.class})
+@Import({VoteRepositoryAdapter.class,
+        org.univ.rankus.adapter.out.persistence.impl.LabRepositoryAdapter.class,
+        org.univ.rankus.adapter.out.persistence.impl.UserRepositoryAdapter.class})
 @DisplayName("Spring Data JPA VoteRepository 통합 테스트")
 class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
 
@@ -47,9 +47,9 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         // given
         Lab lab = IntegrationLabFactory.persistValidLab(labRepo);
         User creator = IntegrationUserFactory.persistUserWithRole(userRepo, Role.STUDENT);
-        Vote vote = IntegrationVoteFactory.persistCustomVote(voteRepo, "테스트 투표", "설명", 
+        Vote vote = IntegrationVoteFactory.persistCustomVote(voteRepo, "테스트 투표", "설명",
                 java.time.LocalDateTime.now().plusDays(7), creator, lab);
-        
+
         // then
         assertNotNull(vote.getId(), "저장된 Vote는 ID가 자동 생성되어야 한다");
         assertTrue(vote.getId() > 0, "생성된 ID는 양수여야 한다");
@@ -61,7 +61,7 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         // given
         Lab lab = IntegrationLabFactory.persistValidLab(labRepo);
         User creator = IntegrationUserFactory.persistUserWithRole(userRepo, Role.STUDENT);
-        Vote saved = IntegrationVoteFactory.persistCustomVote(voteRepo, "테스트 투표", "설명", 
+        Vote saved = IntegrationVoteFactory.persistCustomVote(voteRepo, "테스트 투표", "설명",
                 java.time.LocalDateTime.now().plusDays(7), creator, lab);
 
         // when
@@ -88,10 +88,10 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         // given
         Lab lab = IntegrationLabFactory.persistValidLab(labRepo);
         User creator = IntegrationUserFactory.persistUserWithRole(userRepo, Role.STUDENT);
-        
-        Vote vote1 = IntegrationVoteFactory.persistCustomVote(voteRepo, "첫 번째 투표", "설명1", 
+
+        Vote vote1 = IntegrationVoteFactory.persistCustomVote(voteRepo, "첫 번째 투표", "설명1",
                 java.time.LocalDateTime.now().plusDays(7), creator, lab);
-        Vote vote2 = IntegrationVoteFactory.persistCustomVote(voteRepo, "두 번째 투표", "설명2", 
+        Vote vote2 = IntegrationVoteFactory.persistCustomVote(voteRepo, "두 번째 투표", "설명2",
                 java.time.LocalDateTime.now().plusDays(14), creator, lab);
 
         // when
@@ -101,8 +101,8 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         assertEquals(2, votes.size(), "랩실의 투표 2개가 조회되어야 한다");
         // 최신순 정렬 확인 (vote2가 먼저)
         assertTrue(votes.get(0).getCreatedAt().isAfter(votes.get(1).getCreatedAt()) ||
-                  votes.get(0).getCreatedAt().isEqual(votes.get(1).getCreatedAt()),
-                  "최신순으로 정렬되어야 한다");
+                        votes.get(0).getCreatedAt().isEqual(votes.get(1).getCreatedAt()),
+                "최신순으로 정렬되어야 한다");
     }
 
     @Test
@@ -111,12 +111,12 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         // given
         Lab lab = IntegrationLabFactory.persistValidLab(labRepo);
         User creator = IntegrationUserFactory.persistUserWithRole(userRepo, Role.STUDENT);
-        
-        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표1", "설명1", 
+
+        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표1", "설명1",
                 java.time.LocalDateTime.now().plusDays(7), creator, lab);
-        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표2", "설명2", 
+        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표2", "설명2",
                 java.time.LocalDateTime.now().plusDays(14), creator, lab);
-        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표3", "설명3", 
+        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표3", "설명3",
                 java.time.LocalDateTime.now().plusDays(21), creator, lab);
 
         Pageable pageable = PageRequest.of(0, 2);
@@ -136,10 +136,10 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         // given
         Lab lab = IntegrationLabFactory.persistValidLab(labRepo);
         User creator = IntegrationUserFactory.persistUserWithRole(userRepo, Role.STUDENT);
-        
-        Vote activeVote = IntegrationVoteFactory.persistCustomVote(voteRepo, "활성 투표", "설명", 
+
+        Vote activeVote = IntegrationVoteFactory.persistCustomVote(voteRepo, "활성 투표", "설명",
                 java.time.LocalDateTime.now().plusDays(7), creator, lab);
-        Vote closedVote = IntegrationVoteFactory.persistCustomVote(voteRepo, "종료된 투표", "설명", 
+        Vote closedVote = IntegrationVoteFactory.persistCustomVote(voteRepo, "종료된 투표", "설명",
                 java.time.LocalDateTime.now().plusDays(14), creator, lab);
         closedVote.close();
         voteRepo.save(closedVote);
@@ -159,12 +159,12 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         User creator1 = IntegrationUserFactory.persistUserWithRole(userRepo, Role.STUDENT);
         User creator2 = IntegrationUserFactory.persistUserWithRole(userRepo, Role.PROFESSOR);
         Lab lab = IntegrationLabFactory.persistValidLab(labRepo);
-        
-        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표1", "설명1", 
+
+        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표1", "설명1",
                 java.time.LocalDateTime.now().plusDays(7), creator1, lab);
-        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표2", "설명2", 
+        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표2", "설명2",
                 java.time.LocalDateTime.now().plusDays(14), creator1, lab);
-        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표3", "설명3", 
+        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표3", "설명3",
                 java.time.LocalDateTime.now().plusDays(21), creator2, lab);
 
         // when
@@ -172,7 +172,7 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
 
         // then
         assertEquals(2, creator1Votes.size(), "creator1이 생성한 투표 2개가 조회되어야 한다");
-        creator1Votes.forEach(vote -> 
+        creator1Votes.forEach(vote ->
                 assertEquals(creator1.getId(), vote.getCreator().getId()));
     }
 
@@ -182,10 +182,10 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         // given
         Lab lab = IntegrationLabFactory.persistValidLab(labRepo);
         User creator = IntegrationUserFactory.persistUserWithRole(userRepo, Role.STUDENT);
-        
-        Vote activeVote = IntegrationVoteFactory.persistCustomVote(voteRepo, "활성 투표", "설명", 
+
+        Vote activeVote = IntegrationVoteFactory.persistCustomVote(voteRepo, "활성 투표", "설명",
                 java.time.LocalDateTime.now().plusDays(7), creator, lab);
-        Vote closedVote = IntegrationVoteFactory.persistCustomVote(voteRepo, "종료된 투표", "설명", 
+        Vote closedVote = IntegrationVoteFactory.persistCustomVote(voteRepo, "종료된 투표", "설명",
                 java.time.LocalDateTime.now().plusDays(14), creator, lab);
         closedVote.close();
         voteRepo.save(closedVote);
@@ -204,10 +204,10 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         // given
         Lab lab = IntegrationLabFactory.persistValidLab(labRepo);
         User creator = IntegrationUserFactory.persistUserWithRole(userRepo, Role.STUDENT);
-        
-        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표1", "설명1", 
+
+        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표1", "설명1",
                 java.time.LocalDateTime.now().plusDays(7), creator, lab);
-        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표2", "설명2", 
+        IntegrationVoteFactory.persistCustomVote(voteRepo, "투표2", "설명2",
                 java.time.LocalDateTime.now().plusDays(14), creator, lab);
 
         // when
@@ -223,12 +223,12 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         // given
         Lab lab = IntegrationLabFactory.persistValidLab(labRepo);
         User creator = IntegrationUserFactory.persistUserWithRole(userRepo, Role.STUDENT);
-        
-        IntegrationVoteFactory.persistCustomVote(voteRepo, "활성 투표1", "설명", 
+
+        IntegrationVoteFactory.persistCustomVote(voteRepo, "활성 투표1", "설명",
                 java.time.LocalDateTime.now().plusDays(7), creator, lab);
-        IntegrationVoteFactory.persistCustomVote(voteRepo, "활성 투표2", "설명", 
+        IntegrationVoteFactory.persistCustomVote(voteRepo, "활성 투표2", "설명",
                 java.time.LocalDateTime.now().plusDays(14), creator, lab);
-        Vote closedVote = IntegrationVoteFactory.persistCustomVote(voteRepo, "종료된 투표", "설명", 
+        Vote closedVote = IntegrationVoteFactory.persistCustomVote(voteRepo, "종료된 투표", "설명",
                 java.time.LocalDateTime.now().plusDays(21), creator, lab);
         closedVote.close();
         voteRepo.save(closedVote);
@@ -246,7 +246,7 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         // given
         Lab lab = IntegrationLabFactory.persistValidLab(labRepo);
         User creator = IntegrationUserFactory.persistUserWithRole(userRepo, Role.STUDENT);
-        Vote saved = IntegrationVoteFactory.persistCustomVote(voteRepo, "테스트 투표", "설명", 
+        Vote saved = IntegrationVoteFactory.persistCustomVote(voteRepo, "테스트 투표", "설명",
                 java.time.LocalDateTime.now().plusDays(7), creator, lab);
         Long voteId = saved.getId();
 
@@ -264,7 +264,7 @@ class SpringDataVoteRepositoryTest extends BaseRepositoryTest {
         // given
         Lab lab = IntegrationLabFactory.persistValidLab(labRepo);
         User creator = IntegrationUserFactory.persistUserWithRole(userRepo, Role.STUDENT);
-        Vote saved = IntegrationVoteFactory.persistCustomVote(voteRepo, "테스트 투표", "설명", 
+        Vote saved = IntegrationVoteFactory.persistCustomVote(voteRepo, "테스트 투표", "설명",
                 java.time.LocalDateTime.now().plusDays(7), creator, lab);
 
         // when & then

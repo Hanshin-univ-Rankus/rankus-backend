@@ -13,7 +13,6 @@ import org.univ.rankus.application.port.out.*;
 import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
-import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
@@ -139,7 +138,7 @@ class VoteCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() -> service.createVote(
-                    "투표 제목", "투표 설명", USER_ID, LAB_ID, 
+                    "투표 제목", "투표 설명", USER_ID, LAB_ID,
                     LocalDateTime.now().plusDays(7), Arrays.asList("선택지1", "선택지2")
             ))
                     .isInstanceOf(UserNotFoundException.class)

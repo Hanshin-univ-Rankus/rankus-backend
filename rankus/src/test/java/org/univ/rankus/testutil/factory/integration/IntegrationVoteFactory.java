@@ -67,14 +67,14 @@ public final class IntegrationVoteFactory {
         return vote;
     }
 
-    public static Vote persistCustomVote(VoteRepositoryPort repo, String title, String description, 
-                                       LocalDateTime deadline, User creator, Lab lab) {
+    public static Vote persistCustomVote(VoteRepositoryPort repo, String title, String description,
+                                         LocalDateTime deadline, User creator, Lab lab) {
         Vote vote = DomainVoteFactory.buildCustomVote(title, description, deadline, Arrays.asList("옵션1", "옵션2"), creator, lab);
         return repo.save(vote);
     }
 
     public static Vote persistCustomVote(TestEntityManager em, String title, String description,
-                                       LocalDateTime deadline, User creator, Lab lab) {
+                                         LocalDateTime deadline, User creator, Lab lab) {
         Vote vote = DomainVoteFactory.buildCustomVote(title, description, deadline, Arrays.asList("옵션1", "옵션2"), creator, lab);
         em.persist(vote);
         em.flush();

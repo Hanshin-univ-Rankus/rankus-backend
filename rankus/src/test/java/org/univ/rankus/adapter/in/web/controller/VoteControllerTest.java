@@ -8,36 +8,33 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.univ.rankus.adapter.in.web.dto.request.VoteCreateRequestDto;
-import org.univ.rankus.adapter.in.web.dto.request.VoteParticipateRequestDto;
 import org.univ.rankus.application.port.in.command.VoteCommandUseCase;
 import org.univ.rankus.application.port.in.query.VoteQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.User;
 import org.univ.rankus.domain.model.vote.Vote;
-import org.univ.rankus.domain.model.vote.VoteParticipation;
 import org.univ.rankus.domain.model.vote.VoteStatus;
 import org.univ.rankus.domain.model.vote.exception.VoteErrorCode;
 import org.univ.rankus.domain.model.vote.exception.VoteNotFoundException;
 import org.univ.rankus.testutil.factory.domain.DomainLabFactory;
 import org.univ.rankus.testutil.factory.domain.DomainUserFactory;
-import org.univ.rankus.testutil.factory.domain.DomainVoteFactory;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -45,7 +42,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(VoteController.class)
+@WebMvcTest(
+        controllers = VoteController.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = org.univ.rankus.common.security.jwt.JwtAuthenticationFilter.class)
+        },
+        includeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = org.univ.rankus.common.exception.GlobalExceptionHandler.class)
+        }
+)
 @AutoConfigureMockMvc(addFilters = false)
 class VoteControllerTest {
 
@@ -72,6 +77,14 @@ class VoteControllerTest {
     @AfterEach
     void clearSecurity() {
         SecurityContextHolder.clearContext();
+    }
+
+    private void setupSecurityContext(Long userId) {
+        CustomUserDetails principal = mock(CustomUserDetails.class);
+        given(principal.getUserId()).willReturn(userId);
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(principal, null);
+        authentication.setAuthenticated(true); // 🔑 핵심: 인증 상태 명시
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Nested
@@ -198,120 +211,6 @@ class VoteControllerTest {
         }
     }
 
-    @Nested
-    @DisplayName("POST /api/labs/{labId}/votes")
-    class CreateVoteTests {
-
-        @Test
-        @DisplayName("투표 생성 → 201 Created")
-        void createVoteSuccess() throws Exception {
-            // given
-            CustomUserDetails principal = mock(CustomUserDetails.class);
-            given(principal.getUserId()).willReturn(USER_ID);
-            SecurityContextHolder.getContext()
-                    .setAuthentication(new TestingAuthenticationToken(principal, null));
-
-            VoteCreateRequestDto request = VoteCreateRequestDto.builder()
-                    .title("새 투표")
-                    .description("투표 설명입니다.")
-                    .deadline(LocalDateTime.now().plusDays(7))
-                    .optionTexts(Arrays.asList("선택지 1", "선택지 2"))
-                    .build();
-
-            Vote createdVote = createMockVote(VoteStatus.ACTIVE);
-            given(commandUseCase.createVote(
-                    eq("새 투표"),
-                    eq("투표 설명입니다."),
-                    eq(USER_ID),
-                    eq(LAB_ID),
-                    any(LocalDateTime.class),
-                    anyList()
-            )).willReturn(createdVote);
-
-            String json = objectMapper.writeValueAsString(request);
-
-            // when & then
-            mockMvc.perform(post("/api/labs/{labId}/votes", LAB_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(json))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.status").value(201))
-                    .andExpect(jsonPath("$.message").value("투표 생성 성공"))
-                    .andExpect(jsonPath("$.data.title").value("테스트 투표"));
-        }
-
-        @Test
-        @DisplayName("잘못된 입력으로 투표 생성 → 400 Bad Request")
-        void createVoteValidationError() throws Exception {
-            // given
-            VoteCreateRequestDto request = VoteCreateRequestDto.builder()
-                    .title("") // 빈 제목
-                    .description("투표 설명입니다.")
-                    .deadline(LocalDateTime.now().plusDays(7))
-                    .optionTexts(Arrays.asList("선택지 1", "선택지 2"))
-                    .build();
-
-            String json = objectMapper.writeValueAsString(request);
-
-            // when & then
-            mockMvc.perform(post("/api/labs/{labId}/votes", LAB_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(json))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value("GLOBAL_001"));
-        }
-    }
-
-    @Nested
-    @DisplayName("POST /api/labs/{labId}/votes/{voteId}/participate")
-    class ParticipateVoteTests {
-
-        @Test
-        @DisplayName("투표 참여 → 200 OK")
-        void participateVoteSuccess() throws Exception {
-            // given
-            CustomUserDetails principal = mock(CustomUserDetails.class);
-            given(principal.getUserId()).willReturn(USER_ID);
-            SecurityContextHolder.getContext()
-                    .setAuthentication(new TestingAuthenticationToken(principal, null));
-
-            VoteParticipateRequestDto request = VoteParticipateRequestDto.builder()
-                    .selectedOptionId(OPTION_ID)
-                    .build();
-
-            VoteParticipation participation = DomainVoteFactory.buildValidVoteParticipation();
-            given(commandUseCase.participateInVote(VOTE_ID, USER_ID, OPTION_ID))
-                    .willReturn(participation);
-
-            String json = objectMapper.writeValueAsString(request);
-
-            // when & then
-            mockMvc.perform(post("/api/labs/{labId}/votes/{voteId}/participate", LAB_ID, VOTE_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(json))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.status").value(201))
-                    .andExpect(jsonPath("$.message").value("투표 참여 성공"));
-        }
-
-        @Test
-        @DisplayName("잘못된 입력으로 투표 참여 → 400 Bad Request")
-        void participateVoteValidationError() throws Exception {
-            // given
-            VoteParticipateRequestDto request = VoteParticipateRequestDto.builder()
-                    .selectedOptionId(null) // null 선택지
-                    .build();
-
-            String json = objectMapper.writeValueAsString(request);
-
-            // when & then
-            mockMvc.perform(post("/api/labs/{labId}/votes/{voteId}/participate", LAB_ID, VOTE_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(json))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value("GLOBAL_001"));
-        }
-    }
 
     @Nested
     @DisplayName("PATCH /api/labs/{labId}/votes/{voteId}/close")

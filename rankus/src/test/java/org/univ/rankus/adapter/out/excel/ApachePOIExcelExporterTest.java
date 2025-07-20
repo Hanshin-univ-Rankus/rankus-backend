@@ -407,10 +407,12 @@ class ApachePOIExcelExporterTest {
             byte[] excelBytes2 = excelExporter.exportAttendanceToExcel(sessions, records, fileName);
 
             // Then
-            // Excel 파일에는 생성 시간 등의 메타데이터가 포함되므로 동일하지 않을 수 있음
+            // Excel 파일에는 생성 시간 등의 메타데이터가 포함되므로 크기가 약간 다를 수 있음
             assertThat(excelBytes1).isNotNull();
             assertThat(excelBytes2).isNotNull();
-            assertThat(excelBytes1.length).isEqualTo(excelBytes2.length);
+            // 타임스탬프 차이로 인해 파일 크기가 약간 다를 수 있으므로 허용 범위 내에서 검증
+            int sizeDifference = Math.abs(excelBytes1.length - excelBytes2.length);
+            assertThat(sizeDifference).isLessThanOrEqualTo(10); // 10바이트 이하 차이 허용
         }
     }
 }

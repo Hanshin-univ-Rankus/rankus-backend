@@ -10,7 +10,8 @@ import org.univ.rankus.domain.model.vote.exception.VoteErrorCode;
 import org.univ.rankus.domain.model.vote.exception.VoteValidationException;
 import org.univ.rankus.testutil.factory.domain.DomainVoteFactory;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("VoteOption 도메인 단위 테스트")
 class VoteOptionTest {

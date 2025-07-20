@@ -152,7 +152,7 @@ class VoteParticipationTest {
             User user = DomainUserFactory.buildValidUserWithId(1L);
             VoteOption option1 = DomainVoteFactory.buildVoteOptionWithVote(vote);
             VoteOption option2 = DomainVoteFactory.buildVoteOptionWithVote(vote);
-            
+
             assertEquals(0, option1.getVoteCount());
             assertEquals(0, option2.getVoteCount());
 
