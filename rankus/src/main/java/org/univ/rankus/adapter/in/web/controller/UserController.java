@@ -70,7 +70,7 @@ public class UserController {
                                                 "phoneNumber": "010-1234-5678",
                                                 "grade": 3,
                                                 "enrollmentStatus": "ENROLLED",
-                                                "role": "STUDENT",
+                                                "labId": null,
                                                 "createdAt": "2024-01-15T10:30:00",
                                                 "updatedAt": "2024-01-15T10:30:00"
                                               },

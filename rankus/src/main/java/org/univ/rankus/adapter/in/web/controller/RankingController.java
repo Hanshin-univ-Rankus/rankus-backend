@@ -78,16 +78,30 @@ public class RankingController {
                                                     "labName": "AI 연구실",
                                                     "totalScore": 850,
                                                     "rank": 1,
-                                                    "memberCount": 12,
-                                                    "recentActivityDate": "2024-02-15T10:30:00"
+                                                    "recentSubmissions": [
+                                                      {
+                                                        "submissionId": 1,
+                                                        "title": "AI 모델 성능 개선",
+                                                        "score": 85,
+                                                        "submittedAt": "2024-02-15T10:30:00"
+                                                      }
+                                                    ],
+                                                    "topContributors": [
+                                                      {
+                                                        "userId": 1,
+                                                        "userName": "홍길동",
+                                                        "contributionScore": 120,
+                                                        "approvedSubmissionCount": 5
+                                                      }
+                                                    ]
                                                   },
                                                   {
                                                     "labId": 2,
                                                     "labName": "소프트웨어 연구실",
                                                     "totalScore": 720,
                                                     "rank": 2,
-                                                    "memberCount": 8,
-                                                    "recentActivityDate": "2024-02-14T15:20:00"
+                                                    "recentSubmissions": [],
+                                                    "topContributors": []
                                                   }
                                                 ],
                                                 "page": 0,

@@ -96,15 +96,15 @@ public class AttendanceSessionController {
                                               "success": true,
                                               "message": "출석 세션이 생성되었습니다",
                                               "data": {
-                                                "id": 1,
+                                                "sessionId": 1,
                                                 "labId": 1,
                                                 "title": "2024-02-15 정기 미팅",
                                                 "status": "ACTIVE",
                                                 "qrValidityMinutes": 10,
-                                                "createdAt": "2024-02-15T14:00:00",
                                                 "createdBy": 1,
-                                                "attendanceCount": 0,
-                                                "totalMembers": 5
+                                                "createdAt": "2024-02-15T14:00:00",
+                                                "updatedAt": "2024-02-15T14:00:00",
+                                                "endTime": null
                                               },
                                               "timestamp": "2024-02-15T14:00:00"
                                             }
@@ -371,3 +371,4 @@ public class AttendanceSessionController {
         return ResponseEntity.ok(ApiResponse.success(responseList, "내 참여 세션 목록 조회 성공"));
     }
 }
+

@@ -75,7 +75,9 @@ public class AuthController {
                                                 "phoneNumber": "010-1234-5678",
                                                 "grade": 3,
                                                 "enrollmentStatus": "ENROLLED",
-                                                "role": "STUDENT"
+                                                "labId": null,
+                                                "createdAt": "2024-01-15T10:30:00",
+                                                "updatedAt": "2024-01-15T10:30:00"
                                               },
                                               "timestamp": "2024-01-15T10:30:00"
                                             }
@@ -152,8 +154,8 @@ public class AuthController {
                     4. 사용자 정보와 함께 응답
                     
                     ## 토큰 사용법
-                    - 반환받은 `accessToken`을 요청 헤더에 포함하여 API 호출
-                    - 헤더 형식: `Authorization: Bearer {accessToken}`
+                    - 반환받은 `token`을 요청 헤더에 포함하여 API 호출
+                    - 헤더 형식: `Authorization: Bearer {token}`
                     - 토큰 만료 시 재로그인 필요
                     """
     )
@@ -171,14 +173,18 @@ public class AuthController {
                                               "success": true,
                                               "message": "로그인 성공",
                                               "data": {
-                                                "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                                                "tokenType": "Bearer",
-                                                "expiresIn": 3600,
+                                                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                                                 "user": {
                                                   "id": 1,
                                                   "name": "홍길동",
                                                   "email": "hong@example.com",
-                                                  "role": "STUDENT"
+                                                  "studentNumber": "20210001",
+                                                  "phoneNumber": "010-1234-5678",
+                                                  "grade": 3,
+                                                  "enrollmentStatus": "ENROLLED",
+                                                  "labId": null,
+                                                  "createdAt": "2024-01-15T10:30:00",
+                                                  "updatedAt": "2024-01-15T10:30:00"
                                                 }
                                               },
                                               "timestamp": "2024-01-15T10:30:00"

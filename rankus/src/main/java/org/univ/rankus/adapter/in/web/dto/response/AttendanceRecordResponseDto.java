@@ -1,5 +1,6 @@
 package org.univ.rankus.adapter.in.web.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.univ.rankus.domain.model.attendance.AttendanceRecord;
@@ -12,16 +13,34 @@ import java.time.LocalDateTime;
  */
 @Data
 @NoArgsConstructor
+@Schema(description = "출석 기록 응답 정보")
 public class AttendanceRecordResponseDto {
 
+    @Schema(description = "출석 기록 ID", example = "1")
     private Long recordId;
+
+    @Schema(description = "출석 세션 ID", example = "1")
     private Long sessionId;
+
+    @Schema(description = "사용자 ID", example = "1")
     private Long userId;
+
+    @Schema(description = "출석 상태")
     private AttendanceStatus status;
+
+    @Schema(description = "출석 체크 시간")
     private LocalDateTime checkedAt;
+
+    @Schema(description = "수동 조정 여부", example = "false")
     private Boolean isManuallyAdjusted;
+
+    @Schema(description = "조정 사유", nullable = true)
     private String adjustmentReason;
+
+    @Schema(description = "조정한 사용자 ID", nullable = true)
     private Long adjustedBy;
+
+    @Schema(description = "조정 시간", nullable = true)
     private LocalDateTime adjustedAt;
 
     public AttendanceRecordResponseDto(AttendanceRecord record) {
