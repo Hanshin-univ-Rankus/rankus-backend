@@ -44,6 +44,8 @@ import static org.mockito.Mockito.*;
 @DisplayName("AttendanceSessionCommandService 테스트")
 class AttendanceSessionCommandServiceTest {
 
+    private static final Long LAB_ID = 1L;
+
     @Mock
     private AttendanceSessionRepositoryPort attendanceSessionRepositoryPort;
 
@@ -199,7 +201,7 @@ class AttendanceSessionCommandServiceTest {
             givenCompleteSessionChain(sessionId, userId);
 
             // when
-            AttendanceSession result = service.endSession(sessionId, userId);
+            AttendanceSession result = service.endSession(LAB_ID, sessionId, userId);
 
             // then
             assertThat(result).isNotNull();
@@ -215,7 +217,7 @@ class AttendanceSessionCommandServiceTest {
             givenSessionNotFound(sessionId);
 
             // when & then
-            assertThatThrownBy(() -> service.endSession(sessionId, 1L))
+            assertThatThrownBy(() -> service.endSession(LAB_ID, sessionId, 1L))
                     .isInstanceOf(AttendanceNotFoundException.class)
                     .satisfies(ex -> {
                         AttendanceNotFoundException e = (AttendanceNotFoundException) ex;
@@ -243,7 +245,7 @@ class AttendanceSessionCommandServiceTest {
             givenCompleteSessionChain(sessionId, userId);
 
             // when
-            AttendanceSession result = service.cancelSession(sessionId, userId);
+            AttendanceSession result = service.cancelSession(LAB_ID, sessionId, userId);
 
             // then
             assertThat(result).isNotNull();
@@ -259,7 +261,7 @@ class AttendanceSessionCommandServiceTest {
             givenSessionNotFound(sessionId);
 
             // when & then
-            assertThatThrownBy(() -> service.cancelSession(sessionId, 1L))
+            assertThatThrownBy(() -> service.cancelSession(LAB_ID, sessionId, 1L))
                     .isInstanceOf(AttendanceNotFoundException.class)
                     .satisfies(ex -> {
                         AttendanceNotFoundException e = (AttendanceNotFoundException) ex;
@@ -288,7 +290,7 @@ class AttendanceSessionCommandServiceTest {
             givenCompleteSessionChain(sessionId, userId);
 
             // when
-            AttendanceSession result = service.updateSessionTitle(sessionId, newTitle, userId);
+            AttendanceSession result = service.updateSessionTitle(LAB_ID, sessionId, newTitle, userId);
 
             // then
             assertThat(result).isNotNull();
@@ -304,7 +306,7 @@ class AttendanceSessionCommandServiceTest {
             givenSessionNotFound(sessionId);
 
             // when & then
-            assertThatThrownBy(() -> service.updateSessionTitle(sessionId, "새 제목", 1L))
+            assertThatThrownBy(() -> service.updateSessionTitle(LAB_ID, sessionId, "새 제목", 1L))
                     .isInstanceOf(AttendanceNotFoundException.class)
                     .satisfies(ex -> {
                         AttendanceNotFoundException e = (AttendanceNotFoundException) ex;
@@ -333,7 +335,7 @@ class AttendanceSessionCommandServiceTest {
             givenCompleteSessionChain(sessionId, userId);
 
             // when
-            AttendanceSession result = service.updateQRValidityMinutes(sessionId, newValidityMinutes, userId);
+            AttendanceSession result = service.updateQRValidityMinutes(LAB_ID, sessionId, newValidityMinutes, userId);
 
             // then
             assertThat(result).isNotNull();
@@ -349,7 +351,7 @@ class AttendanceSessionCommandServiceTest {
             givenSessionNotFound(sessionId);
 
             // when & then
-            assertThatThrownBy(() -> service.updateQRValidityMinutes(sessionId, 10, 1L))
+            assertThatThrownBy(() -> service.updateQRValidityMinutes(LAB_ID, sessionId, 10, 1L))
                     .isInstanceOf(AttendanceNotFoundException.class)
                     .satisfies(ex -> {
                         AttendanceNotFoundException e = (AttendanceNotFoundException) ex;
@@ -385,7 +387,7 @@ class AttendanceSessionCommandServiceTest {
             when(labRepositoryPort.findById(session.getLabId())).thenReturn(Optional.of(lab));
 
             // when
-            QRToken result = service.generateQRCode(sessionId, userId);
+            QRToken result = service.generateQRCode(LAB_ID, sessionId, userId);
 
             // then
             assertThat(result).isNotNull();
@@ -404,7 +406,7 @@ class AttendanceSessionCommandServiceTest {
             givenSessionNotFound(sessionId);
 
             // when & then
-            assertThatThrownBy(() -> service.generateQRCode(sessionId, 1L))
+            assertThatThrownBy(() -> service.generateQRCode(LAB_ID, sessionId, 1L))
                     .isInstanceOf(AttendanceNotFoundException.class)
                     .satisfies(ex -> {
                         AttendanceNotFoundException e = (AttendanceNotFoundException) ex;
@@ -453,7 +455,7 @@ class AttendanceSessionCommandServiceTest {
             when(attendanceRecordRepositoryPort.save(any(AttendanceRecord.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
             // when
-            AttendanceRecord result = service.checkAttendance(qrToken, userId);
+            AttendanceRecord result = service.checkAttendance(LAB_ID, qrToken, userId);
 
             // then
             assertThat(result).isNotNull();
@@ -473,7 +475,7 @@ class AttendanceSessionCommandServiceTest {
             // 잘못된 토큰은 QRToken.fromString()에서 예외 발생하므로 Mock 설정 불필요
 
             // when & then
-            assertThatThrownBy(() -> service.checkAttendance(invalidToken, userId))
+            assertThatThrownBy(() -> service.checkAttendance(LAB_ID, invalidToken, userId))
                     .isInstanceOf(AttendanceValidationException.class)
                     .satisfies(ex -> {
                         AttendanceValidationException e = (AttendanceValidationException) ex;
@@ -497,7 +499,7 @@ class AttendanceSessionCommandServiceTest {
             givenSessionNotFound(999L);
 
             // when & then
-            assertThatThrownBy(() -> service.checkAttendance(qrToken, userId))
+            assertThatThrownBy(() -> service.checkAttendance(LAB_ID, qrToken, userId))
                     .isInstanceOf(AttendanceNotFoundException.class)
                     .satisfies(ex -> {
                         AttendanceNotFoundException e = (AttendanceNotFoundException) ex;
@@ -527,7 +529,7 @@ class AttendanceSessionCommandServiceTest {
             givenUserNotFound(userId);
 
             // when & then
-            assertThatThrownBy(() -> service.checkAttendance(qrToken, userId))
+            assertThatThrownBy(() -> service.checkAttendance(LAB_ID, qrToken, userId))
                     .isInstanceOf(UserNotFoundException.class);
 
             verify(attendanceSessionRepositoryPort).findById(sessionId);

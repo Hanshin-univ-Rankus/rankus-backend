@@ -107,7 +107,7 @@ class AttendanceSessionControllerTest {
             setupSecurityContext(USER_ID);
 
             AttendanceSession mockSession = DomainAttendanceFactory.buildValidSessionWithId(SESSION_ID);
-            given(commandUseCase.endSession(eq(SESSION_ID), eq(USER_ID)))
+            given(commandUseCase.endSession(eq(LAB_ID), eq(SESSION_ID), eq(USER_ID)))
                     .willReturn(mockSession);
 
             // when & then
@@ -124,6 +124,23 @@ class AttendanceSessionControllerTest {
     @Nested
     @DisplayName("POST /api/labs/{labId}/attendance/sessions/{sessionId}/cancel")
     class CancelSessionTests {
+
+        @Test
+        @DisplayName("출석 세션 취소 성공 → 200 OK")
+        void cancelSession_success() throws Exception {
+            // given
+            setupSecurityContext(USER_ID);
+
+            AttendanceSession mockSession = DomainAttendanceFactory.buildValidSessionWithId(SESSION_ID);
+            given(commandUseCase.cancelSession(eq(LAB_ID), eq(SESSION_ID), eq(USER_ID)))
+                    .willReturn(mockSession);
+
+            // when & then
+            mockMvc.perform(post("/api/labs/{labId}/attendance/sessions/{sessionId}/cancel", LAB_ID, SESSION_ID))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.data.sessionId").value(SESSION_ID));
+        }
     }
 
     // ——————————————————————————————————————————————————————————
@@ -140,7 +157,7 @@ class AttendanceSessionControllerTest {
             setupSecurityContext(USER_ID);
 
             QRToken mockToken = QRToken.create(LAB_ID, SESSION_ID, 5);
-            given(commandUseCase.generateQRCode(eq(SESSION_ID), eq(USER_ID)))
+            given(commandUseCase.generateQRCode(eq(LAB_ID), eq(SESSION_ID), eq(USER_ID)))
                     .willReturn(mockToken);
 
             // when & then

@@ -42,21 +42,21 @@ public class LabApplicationController {
     private final LabApplicationQueryUseCase queryUseCase;
 
     @Operation(
-            summary = "랩실 가입 신청 (레거시)", 
+            summary = "랩실 가입 신청 (레거시)",
             description = """
                     로그인한 사용자가 특정 랩실에 가입 신청을 합니다. (구형 시간 기반 방식)
-                    
+                                        
                     ## 기능 설명
                     - **레거시 API**: 면접 시스템 도입 전 호환성을 위해 유지
                     - 직접 면접 시간을 지정하여 신청
                     - 새로운 면접 시스템 사용 시 `/slot-based` 엔드포인트 권장
-                    
+                                        
                     ## 신청 절차
                     1. 원하는 면접 시간 입력
                     2. 랩실 지원 신청서 제출
                     3. 랩장/매니저의 승인 대기
                     4. 승인 시 랩실 멤버로 등록
-                    
+                                        
                     ## 주의사항
                     - 이미 해당 랩실에 신청한 경우 중복 신청 불가
                     - 면접 시간은 미래 시점이어야 함
@@ -81,7 +81,7 @@ public class LabApplicationController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "201", 
+                    responseCode = "201",
                     description = "가입 신청 성공",
                     content = @Content(
                             mediaType = "application/json",
@@ -107,7 +107,7 @@ public class LabApplicationController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400", 
+                    responseCode = "400",
                     description = "입력 검증 실패 또는 면접 시스템 사용 필요",
                     content = @Content(
                             mediaType = "application/json",
@@ -126,7 +126,7 @@ public class LabApplicationController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404", 
+                    responseCode = "404",
                     description = "랩실 또는 사용자 정보 없음",
                     content = @Content(
                             mediaType = "application/json",
@@ -145,7 +145,7 @@ public class LabApplicationController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "409", 
+                    responseCode = "409",
                     description = "중복 신청",
                     content = @Content(
                             mediaType = "application/json",

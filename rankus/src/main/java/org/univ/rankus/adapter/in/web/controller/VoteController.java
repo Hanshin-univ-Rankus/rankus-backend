@@ -126,20 +126,20 @@ public class VoteController {
 
     @SecurityRequirement(name = "bearerAuth")
     @Operation(
-            summary = "투표 생성", 
+            summary = "투표 생성",
             description = """
                     랩실에 새로운 투표를 생성합니다.
-                    
+                                        
                     ## 기능 설명
                     - 랩실 내 의사결정을 위한 투표 생성
                     - 2개 이상 5개 이하의 선택지 제공
                     - 투표 마감일 설정 가능
                     - 투표 생성 후 자동으로 활성 상태로 변경
-                    
+                                        
                     ## 권한 요구사항
                     - 랩장, 매니저, 교수, 관리자만 투표 생성 가능
                     - 일반 멤버는 투표 참여만 가능
-                    
+                                        
                     ## 투표 규칙
                     - 각 사용자는 투표당 1번만 참여 가능
                     - 마감일 이후 자동으로 투표 종료
@@ -173,7 +173,7 @@ public class VoteController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "201", 
+                    responseCode = "201",
                     description = "투표 생성 성공",
                     content = @Content(
                             mediaType = "application/json",
@@ -208,7 +208,7 @@ public class VoteController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400", 
+                    responseCode = "400",
                     description = "입력값 검증 실패",
                     content = @Content(
                             mediaType = "application/json",
@@ -232,7 +232,7 @@ public class VoteController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "403", 
+                    responseCode = "403",
                     description = "투표 생성 권한 없음",
                     content = @Content(
                             mediaType = "application/json",

@@ -52,9 +52,11 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
     }
 
     @Override
-    public AttendanceSession endSession(Long sessionId, Long userId) {
-        // 1. 세션 조회 및 권한 검증
+    public AttendanceSession endSession(Long labId, Long sessionId, Long userId) {
+        // 1. 세션 조회 및 경로 일관성 검증
         AttendanceSession session = findSessionById(sessionId);
+        validatePathConsistency(labId, session.getLabId());
+
         User user = findUserById(userId);
         Lab lab = findLabById(session.getLabId());
 
@@ -68,9 +70,11 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
     }
 
     @Override
-    public AttendanceSession cancelSession(Long sessionId, Long userId) {
-        // 1. 세션 조회 및 권한 검증
+    public AttendanceSession cancelSession(Long labId, Long sessionId, Long userId) {
+        // 1. 세션 조회 및 경로 일관성 검증
         AttendanceSession session = findSessionById(sessionId);
+        validatePathConsistency(labId, session.getLabId());
+
         User user = findUserById(userId);
         Lab lab = findLabById(session.getLabId());
 
@@ -84,9 +88,11 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
     }
 
     @Override
-    public AttendanceSession updateSessionTitle(Long sessionId, String newTitle, Long userId) {
-        // 1. 세션 조회 및 권한 검증
+    public AttendanceSession updateSessionTitle(Long labId, Long sessionId, String newTitle, Long userId) {
+        // 1. 세션 조회 및 경로 일관성 검증
         AttendanceSession session = findSessionById(sessionId);
+        validatePathConsistency(labId, session.getLabId());
+
         User user = findUserById(userId);
         Lab lab = findLabById(session.getLabId());
 
@@ -100,9 +106,11 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
     }
 
     @Override
-    public AttendanceSession updateQRValidityMinutes(Long sessionId, Integer newValidityMinutes, Long userId) {
-        // 1. 세션 조회 및 권한 검증
+    public AttendanceSession updateQRValidityMinutes(Long labId, Long sessionId, Integer newValidityMinutes, Long userId) {
+        // 1. 세션 조회 및 경로 일관성 검증
         AttendanceSession session = findSessionById(sessionId);
+        validatePathConsistency(labId, session.getLabId());
+
         User user = findUserById(userId);
         Lab lab = findLabById(session.getLabId());
 
@@ -116,9 +124,11 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
     }
 
     @Override
-    public QRToken generateQRCode(Long sessionId, Long userId) {
-        // 1. 세션 조회 및 권한 검증
+    public QRToken generateQRCode(Long labId, Long sessionId, Long userId) {
+        // 1. 세션 조회 및 경로 일관성 검증
         AttendanceSession session = findSessionById(sessionId);
+        validatePathConsistency(labId, session.getLabId());
+
         User user = findUserById(userId);
         Lab lab = findLabById(session.getLabId());
 
@@ -129,7 +139,7 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
     }
 
     @Override
-    public AttendanceRecord checkAttendance(String qrToken, Long userId) {
+    public AttendanceRecord checkAttendance(Long labId, String qrToken, Long userId) {
         // 1. QR 토큰 검증
         QRToken token = QRToken.fromString(qrToken);
 
@@ -137,8 +147,10 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
             throw new AttendancePermissionException(AttendanceErrorCode.QR_TOKEN_EXPIRED);
         }
 
-        // 2. 세션 조회 및 검증
+        // 2. 세션 조회 및 경로 일관성 검증
         AttendanceSession session = findSessionById(token.getSessionId());
+        validatePathConsistency(labId, session.getLabId());
+
         User user = findUserById(userId);
         Lab lab = findLabById(session.getLabId());
 
@@ -184,6 +196,13 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
         // 출석 체크 권한: 랩실 멤버 이상
         if (!user.canViewLabAttendance(lab)) {
             throw new AttendancePermissionException(AttendanceErrorCode.INSUFFICIENT_PERMISSION_FOR_ATTENDANCE);
+        }
+    }
+
+    private void validatePathConsistency(Long pathLabId, Long sessionLabId) {
+        // 경로의 labId와 세션이 속한 labId가 일치하는지 검증
+        if (!pathLabId.equals(sessionLabId)) {
+            throw new AttendanceNotFoundException(AttendanceErrorCode.SESSION_NOT_FOUND);
         }
     }
 }

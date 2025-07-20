@@ -43,23 +43,23 @@ public class LabPromotionController {
      * - 모든 랩실을 랭킹 내림차순으로 조회합니다.
      */
     @Operation(
-            summary = "랩실 목록 조회", 
+            summary = "랩실 목록 조회",
             description = """
                     모든 공개된 랩실을 랭킹 순으로 조회합니다.
-                    
+                                        
                     ## 기능 설명
                     - 인증 없이 접근 가능한 공개 API
                     - 랩실 홍보 및 정보 제공 목적
                     - 랭킹 순으로 정렬된 목록 반환
                     - 랩실 기본 정보와 통계 포함
-                    
+                                        
                     ## 포함 정보
                     - 랩실 기본 정보 (이름, 설명, 카테고리)
                     - 현재 멤버 수 및 모집 현황
                     - 랩실 점수 및 순위
                     - 최근 활동 정보
                     - 랩실 대표 이미지
-                    
+                                        
                     ## 활용 용도
                     - 랩실 탐색 및 비교
                     - 지원할 랩실 선택
@@ -68,7 +68,7 @@ public class LabPromotionController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200", 
+                    responseCode = "200",
                     description = "랩실 목록 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
@@ -134,16 +134,16 @@ public class LabPromotionController {
      * - ID로 특정 랩실을 조회합니다.
      */
     @Operation(
-            summary = "랩실 상세 조회", 
+            summary = "랩실 상세 조회",
             description = """
                     특정 랩실의 상세 정보를 조회합니다.
-                    
+                                        
                     ## 기능 설명
                     - 인증 없이 접근 가능한 공개 API
                     - 랩실의 모든 공개 정보 제공
                     - 지원 전 랩실 정보 확인 용도
                     - 랩실 홍보 페이지 데이터 소스
-                    
+                                        
                     ## 포함 정보
                     - 랩실 기본 정보 (이름, 설명, 연구분야)
                     - 교수 및 멤버 정보
@@ -151,7 +151,7 @@ public class LabPromotionController {
                     - 모집 정보 (모집 여부, 면접 정보)
                     - 랩실 이미지 및 연락처
                     - 최근 공지사항 및 성과
-                    
+                                        
                     ## 활용 용도
                     - 랩실 지원 전 정보 확인
                     - 랩실 비교 및 분석
@@ -160,7 +160,7 @@ public class LabPromotionController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200", 
+                    responseCode = "200",
                     description = "랩실 정보 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
@@ -197,7 +197,7 @@ public class LabPromotionController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404", 
+                    responseCode = "404",
                     description = "랩실 정보 없음",
                     content = @Content(
                             mediaType = "application/json",

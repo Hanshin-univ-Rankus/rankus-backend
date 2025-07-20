@@ -21,8 +21,8 @@ import java.util.List;
 public class VoteCreateRequestDto {
 
     @Schema(
-            description = "투표 제목", 
-            example = "다음 주 랩실 회식 장소 투표", 
+            description = "투표 제목",
+            example = "다음 주 랩실 회식 장소 투표",
             maxLength = 200,
             requiredMode = Schema.RequiredMode.REQUIRED
     )
@@ -31,8 +31,8 @@ public class VoteCreateRequestDto {
     private String title;
 
     @Schema(
-            description = "투표 설명 (선택사항)", 
-            example = "2024년 2월 랩실 회식 장소를 결정하기 위한 투표입니다. 많은 참여 부탁드립니다!", 
+            description = "투표 설명 (선택사항)",
+            example = "2024년 2월 랩실 회식 장소를 결정하기 위한 투표입니다. 많은 참여 부탁드립니다!",
             maxLength = 1000,
             requiredMode = Schema.RequiredMode.NOT_REQUIRED
     )
@@ -40,8 +40,8 @@ public class VoteCreateRequestDto {
     private String description;
 
     @Schema(
-            description = "투표 마감일시 (현재 시간 이후)", 
-            example = "2024-02-10T23:59:59", 
+            description = "투표 마감일시 (현재 시간 이후)",
+            example = "2024-02-10T23:59:59",
             type = "string",
             format = "date-time",
             requiredMode = Schema.RequiredMode.REQUIRED
@@ -50,7 +50,7 @@ public class VoteCreateRequestDto {
     private LocalDateTime deadline;
 
     @Schema(
-            description = "투표 선택지 목록 (2-5개)", 
+            description = "투표 선택지 목록 (2-5개)",
             example = "[\"한식당 (삼겹살)\", \"중식당 (짜장면)\", \"일식당 (초밥)\", \"치킨집 (후라이드)\"]",
             requiredMode = Schema.RequiredMode.REQUIRED
     )

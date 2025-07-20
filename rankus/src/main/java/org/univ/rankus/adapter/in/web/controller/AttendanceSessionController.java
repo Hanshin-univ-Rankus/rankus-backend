@@ -43,20 +43,20 @@ public class AttendanceSessionController {
 
     @SecurityRequirement(name = "bearerAuth")
     @Operation(
-            summary = "출석 세션 생성", 
+            summary = "출석 세션 생성",
             description = """
                     랩실의 새로운 출석 세션을 생성합니다.
-                    
+                                        
                     ## 기능 설명
                     - QR 코드 기반 출석 체크 시스템
                     - 세션별로 독립적인 출석 관리
                     - 실시간 출석 현황 모니터링
                     - 자동 QR 코드 유효시간 설정
-                    
+                                        
                     ## 권한 요구사항
                     - 랩장, 매니저, 교수, 관리자만 세션 생성 가능
                     - 해당 랩실의 출석 관리 권한 필요
-                    
+                                        
                     ## 사용 시나리오
                     1. 세션 생성 (제목, QR 유효시간 설정)
                     2. QR 코드 생성 및 표시
@@ -84,7 +84,7 @@ public class AttendanceSessionController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "201", 
+                    responseCode = "201",
                     description = "출석 세션 생성 성공",
                     content = @Content(
                             mediaType = "application/json",
@@ -113,7 +113,7 @@ public class AttendanceSessionController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400", 
+                    responseCode = "400",
                     description = "입력값 검증 실패",
                     content = @Content(
                             mediaType = "application/json",
@@ -136,7 +136,7 @@ public class AttendanceSessionController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "403", 
+                    responseCode = "403",
                     description = "출석 관리 권한 없음",
                     content = @Content(
                             mediaType = "application/json",
@@ -176,7 +176,38 @@ public class AttendanceSessionController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "출석 세션 종료", description = "활성 상태의 출석 세션을 종료합니다.")
+    @Operation(summary = "출석 세션 종료", description = """
+            활성 상태의 출석 세션을 종료합니다.
+                        
+            ## 보안 검증
+            - 경로의 labId와 세션이 속한 랩이 일치하지 않으면 404 에러 반환
+            - 다른 랩의 세션에 접근할 수 없음
+            """)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "출석 세션 종료 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "세션을 찾을 수 없음 또는 경로 불일치",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "경로 불일치",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "세션을 찾을 수 없습니다",
+                                              "data": null,
+                                              "timestamp": "2024-02-15T14:00:00"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @PostMapping("/{sessionId}/end")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
             "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
@@ -185,13 +216,19 @@ public class AttendanceSessionController {
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        AttendanceSession session = attendanceSessionCommandUseCase.endSession(sessionId, userDetails.getUserId());
+        AttendanceSession session = attendanceSessionCommandUseCase.endSession(labId, sessionId, userDetails.getUserId());
 
         return ResponseEntity.ok(ApiResponse.success(AttendanceSessionResponseDto.from(session), "출석 세션이 종료되었습니다"));
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "출석 세션 취소", description = "출석 세션을 취소합니다.")
+    @Operation(summary = "출석 세션 취소", description = """
+            출석 세션을 취소합니다.
+                        
+            ## 보안 검증
+            - 경로의 labId와 세션이 속한 랩이 일치하지 않으면 404 에러 반환
+            - 다른 랩의 세션에 접근할 수 없음
+            """)
     @PostMapping("/{sessionId}/cancel")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
             "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
@@ -200,13 +237,19 @@ public class AttendanceSessionController {
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        AttendanceSession session = attendanceSessionCommandUseCase.cancelSession(sessionId, userDetails.getUserId());
+        AttendanceSession session = attendanceSessionCommandUseCase.cancelSession(labId, sessionId, userDetails.getUserId());
 
         return ResponseEntity.ok(ApiResponse.success(AttendanceSessionResponseDto.from(session), "출석 세션이 취소되었습니다"));
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "출석 세션 제목 수정", description = "출석 세션의 제목을 수정합니다.")
+    @Operation(summary = "출석 세션 제목 수정", description = """
+            출석 세션의 제목을 수정합니다.
+                        
+            ## 보안 검증
+            - 경로의 labId와 세션이 속한 랩이 일치하지 않으면 404 에러 반환
+            - 다른 랩의 세션에 접근할 수 없음
+            """)
     @PutMapping("/{sessionId}/title")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
             "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
@@ -217,6 +260,7 @@ public class AttendanceSessionController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         AttendanceSession session = attendanceSessionCommandUseCase.updateSessionTitle(
+                labId,
                 sessionId,
                 request.getTitle(),
                 userDetails.getUserId()
@@ -226,7 +270,13 @@ public class AttendanceSessionController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "QR 유효시간 수정", description = "출석 세션의 QR 유효시간을 수정합니다.")
+    @Operation(summary = "QR 유효시간 수정", description = """
+            출석 세션의 QR 유효시간을 수정합니다.
+                        
+            ## 보안 검증
+            - 경로의 labId와 세션이 속한 랩이 일치하지 않으면 404 에러 반환
+            - 다른 랩의 세션에 접근할 수 없음
+            """)
     @PutMapping("/{sessionId}/qr-validity")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
             "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
@@ -237,6 +287,7 @@ public class AttendanceSessionController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         AttendanceSession session = attendanceSessionCommandUseCase.updateQRValidityMinutes(
+                labId,
                 sessionId,
                 request.getQrValidityMinutes(),
                 userDetails.getUserId()
@@ -246,7 +297,38 @@ public class AttendanceSessionController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "QR 코드 생성", description = "출석 체크용 QR 코드를 생성합니다.")
+    @Operation(summary = "QR 코드 생성", description = """
+            출석 체크용 QR 코드를 생성합니다.
+                        
+            ## 보안 검증
+            - 경로의 labId와 세션이 속한 랩이 일치하지 않으면 404 에러 반환
+            - 다른 랩의 세션에 접근할 수 없음
+            """)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "QR 코드 생성 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "세션을 찾을 수 없음 또는 경로 불일치",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "경로 불일치",
+                                    value = """
+                                            {
+                                              "success": false,
+                                              "message": "세션을 찾을 수 없습니다",
+                                              "data": null,
+                                              "timestamp": "2024-02-15T14:00:00"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @PostMapping("/{sessionId}/qr")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
             "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
@@ -255,13 +337,19 @@ public class AttendanceSessionController {
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        QRToken qrToken = attendanceSessionCommandUseCase.generateQRCode(sessionId, userDetails.getUserId());
+        QRToken qrToken = attendanceSessionCommandUseCase.generateQRCode(labId, sessionId, userDetails.getUserId());
 
         return ResponseEntity.ok(ApiResponse.success(QRTokenResponseDto.from(qrToken), "QR 코드가 생성되었습니다"));
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "출석 체크", description = "QR 코드를 스캔하여 출석을 체크합니다.")
+    @Operation(summary = "출석 체크", description = """
+            QR 코드를 스캔하여 출석을 체크합니다.
+                        
+            ## 보안 검증
+            - 경로의 labId와 세션이 속한 랩이 일치하지 않으면 404 에러 반환
+            - 다른 랩의 세션에 접근할 수 없음
+            """)
     @PostMapping("/check")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<AttendanceRecordResponseDto>> checkAttendance(
@@ -270,6 +358,7 @@ public class AttendanceSessionController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         AttendanceRecord record = attendanceSessionCommandUseCase.checkAttendance(
+                labId,
                 request.getQrToken(),
                 userDetails.getUserId()
         );

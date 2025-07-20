@@ -26,9 +26,9 @@ public class SwaggerConfig {
                         .version("v1.0.0")
                         .description("""
                                 # Rankus - 대학 랩실 통합 관리 플랫폼 API
-                                
+                                                                
                                 랩실 홍보, 지원 관리, 운영 효율화, 동기 부여를 위한 종합적인 REST API를 제공합니다.
-                                
+                                                                
                                 ## 주요 기능
                                 - 🔐 **사용자 인증**: JWT 기반 회원가입/로그인
                                 - 🏢 **랩실 관리**: 랩실 생성, 홍보, 멤버 관리
@@ -38,7 +38,7 @@ public class SwaggerConfig {
                                 - 🗳️ **투표 시스템**: 랩실 내 의사결정 도구
                                 - 📢 **공지사항**: 랩실 공지사항 관리
                                 - 📆 **캘린더**: 일정 및 면접 관리
-                                
+                                                                
                                 ## 인증 방법
                                 1. `/api/auth/login`으로 로그인하여 JWT 토큰 획득
                                 2. 요청 헤더에 `Authorization: Bearer {token}` 추가

@@ -37,21 +37,21 @@ public class RankingController {
 
     @SecurityRequirement(name = "bearerAuth")
     @Operation(
-            summary = "전체 랩실 랭킹 조회", 
+            summary = "전체 랩실 랭킹 조회",
             description = """
                     모든 랩실의 랭킹을 점수순으로 페이징하여 조회합니다.
-                    
+                                        
                     ## 기능 설명
                     - 전체 랩실의 종합 점수 기반 순위 제공
                     - 점수 구성: 프로젝트, 논문, 대회, 특별활동 등
                     - 실시간 랭킹 업데이트
                     - 페이지 단위로 효율적인 데이터 로딩
-                    
+                                        
                     ## 정렬 기준
                     1. 총 점수 내림차순
                     2. 최근 활동일 기준 (동점시)
                     3. 랩실 생성일 기준 (최종)
-                    
+                                        
                     ## 활용 용도
                     - 랩실간 경쟁 현황 파악
                     - 우수 랩실 발굴 및 벤치마킹
@@ -60,7 +60,7 @@ public class RankingController {
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200", 
+                    responseCode = "200",
                     description = "랭킹 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
@@ -117,7 +117,7 @@ public class RankingController {
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "401", 
+                    responseCode = "401",
                     description = "인증되지 않음",
                     content = @Content(
                             mediaType = "application/json",
