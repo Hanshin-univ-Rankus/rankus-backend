@@ -19,6 +19,7 @@ public class UserResponseDto {
     private final String phoneNumber;
     private final Integer grade;
     private final EnrollmentStatus enrollmentStatus;
+    private final Long labId;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
@@ -31,6 +32,7 @@ public class UserResponseDto {
                 .phoneNumber(user.getPhoneNumber())
                 .grade(user.getGrade())
                 .enrollmentStatus(user.getEnrollmentStatus())
+                .labId(user.getLab() != null ? user.getLab().getId() : null)
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
