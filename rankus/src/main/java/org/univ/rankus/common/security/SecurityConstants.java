@@ -10,7 +10,9 @@ public final class SecurityConstants {
      */
     public static final String[] PUBLIC_URLS = {
             "/api/auth/**",
-            "/api/labs/**", // GET /api/labs 만 허용하려면, POST/PUT 엔드포인트는 별도 인증 필요
+            "/api/labs",              // GET /api/labs (랩실 목록 조회만)
+            "/api/labs/*/images/**",  // 랩실 이미지 조회
+            "/api/labs/*/promotions", // 랩실 홍보 정보 조회
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/v3/api-docs/**",

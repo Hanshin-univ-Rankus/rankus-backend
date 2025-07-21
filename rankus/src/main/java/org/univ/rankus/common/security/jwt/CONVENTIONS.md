@@ -72,22 +72,23 @@ public class JwtTokenProvider {
 ## JwtAuthenticationFilter 구조
 
 ```java
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    
+
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService userDetailsService;
-    
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                  HttpServletResponse response,
-                                  FilterChain filterChain) throws ServletException, IOException {
-        
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+
         try {
             String token = resolveToken(request);
-            
+
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 authenticateUser(token);
             }
@@ -95,19 +96,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.error("JWT authentication failed", e);
             SecurityContextHolder.clearContext();
         }
-        
+
         filterChain.doFilter(request, response);
     }
-    
+
     private void authenticateUser(String token) {
         String email = jwtTokenProvider.getEmail(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-        
+
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-            userDetails, null, userDetails.getAuthorities());
+                userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
-    
+
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER);
         if (bearerToken != null && bearerToken.startsWith(SecurityConstants.BEARER_PREFIX)) {

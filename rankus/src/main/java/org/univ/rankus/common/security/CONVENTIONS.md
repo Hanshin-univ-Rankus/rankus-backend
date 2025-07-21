@@ -12,33 +12,33 @@
 
 ```java
 public final class SecurityConstants {
-    
+
     // JWT 관련 상수
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
-    
+
     // 공개 엔드포인트
     public static final String[] PUBLIC_ENDPOINTS = {
-        "/api/auth/**",
-        "/api/labs",
-        "/api/labs/*",
-        "/api/labs/*/images",
-        "/swagger-ui/**",
-        "/v3/api-docs/**"
+            "/api/auth/**",
+            "/api/labs",
+            "/api/labs/*",
+            "/api/labs/*/images",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
     };
-    
+
     // 권한 상수
     public static final String ROLE_PREFIX = "ROLE_";
-    
+
     // 지원되는 권한 타입
     public static final String[] SUPPORTED_PERMISSIONS = {
-        "VIEW", "CREATE", "UPDATE", "DELETE", "MANAGE", "APPROVE", "REJECT"
+            "VIEW", "CREATE", "UPDATE", "DELETE", "MANAGE", "APPROVE", "REJECT"
     };
-    
+
     public static final String[] RESOURCE_TYPES = {
-        "Lab", "LabApplication", "LabImage", "User"
+            "Lab", "LabApplication", "LabImage", "User"
     };
-    
+
     private SecurityConstants() {
         throw new AssertionError("Utility class should not be instantiated");
     }

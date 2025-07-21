@@ -8,7 +8,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.univ.rankus.common.security.SecurityConstants;
 
 import java.io.IOException;
 
@@ -24,6 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider tokenProvider;
     // 사용자 정보를 로드하는 서비스
     private final UserDetailsService userDetailsService;
+    // URL 패턴 매칭을 위한 PathMatcher
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     /**
      * JwtAuthenticationFilter 생성자
@@ -48,6 +52,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain chain
     ) throws ServletException, IOException {
+        // 공개 URL인지 확인
+        String requestURI = request.getRequestURI();
+        boolean isPublicUrl = isPublicUrl(requestURI);
+
         // Authorization 헤더에서 Bearer 토큰 추출
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header != null && header.startsWith("Bearer ")) {
@@ -57,10 +65,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 토큰에서 인증 정보 추출 및 SecurityContext에 저장
                 Authentication auth = tokenProvider.getAuthentication(token, userDetailsService);
                 SecurityContextHolder.getContext().setAuthentication(auth);
-            } else {
-                // 토큰이 유효하지 않으면 SecurityContext 초기화
+            } else if (!isPublicUrl) {
+                // 토큰이 유효하지 않고 공개 URL이 아닌 경우에만 오류 응답
                 SecurityContextHolder.clearContext();
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
                 response.getWriter().write("{\"error\":\"Invalid JWT token\"}");
                 response.getWriter().flush();
                 return; // 필터 체인 중단
@@ -68,5 +77,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         // 다음 필터로 요청 전달
         chain.doFilter(request, response);
+    }
+
+    /**
+     * 요청 URI가 공개 URL인지 확인합니다.
+     */
+    private boolean isPublicUrl(String requestURI) {
+        for (String publicPattern : SecurityConstants.PUBLIC_URLS) {
+            if (pathMatcher.match(publicPattern, requestURI)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
