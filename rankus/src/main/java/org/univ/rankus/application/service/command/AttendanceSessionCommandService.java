@@ -11,9 +11,11 @@ import org.univ.rankus.application.port.out.UserRepositoryPort;
 import org.univ.rankus.domain.model.attendance.AttendanceRecord;
 import org.univ.rankus.domain.model.attendance.AttendanceSession;
 import org.univ.rankus.domain.model.attendance.QRToken;
+import org.univ.rankus.domain.model.attendance.SecureQRToken;
 import org.univ.rankus.domain.model.attendance.exception.AttendanceErrorCode;
 import org.univ.rankus.domain.model.attendance.exception.AttendanceNotFoundException;
 import org.univ.rankus.domain.model.attendance.exception.AttendancePermissionException;
+import org.univ.rankus.domain.model.attendance.exception.AttendanceValidationException;
 import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.exception.LabErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabNotFoundException;
@@ -139,16 +141,66 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
     }
 
     @Override
-    public AttendanceRecord checkAttendance(Long labId, String qrToken, Long userId) {
-        // 1. QR 토큰 검증
-        QRToken token = QRToken.fromString(qrToken);
+    public SecureQRToken generateSecureQRCode(Long labId, Long sessionId, Long userId) {
+        // 1. 세션 조회 및 경로 일관성 검증
+        AttendanceSession session = findSessionById(sessionId);
+        validatePathConsistency(labId, session.getLabId());
 
-        if (token.isExpired()) {
-            throw new AttendancePermissionException(AttendanceErrorCode.QR_TOKEN_EXPIRED);
+        User user = findUserById(userId);
+        Lab lab = findLabById(session.getLabId());
+
+        validateCanManageAttendance(user, lab);
+
+        // 2. 보안 QR 코드 생성
+        // TODO: 실제 환경에서는 설정에서 secretKey를 가져와야 함
+        String secretKey = "MySecretKey1234567890123456789012"; // 32바이트
+        return session.generateSecureQRToken(secretKey);
+    }
+
+    @Override
+    public AttendanceRecord checkAttendance(Long labId, String qrToken, Long userId) {
+        // 1. QR 토큰 검증 (보안 강화 + 레거시 지원)
+        Long sessionId;
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        // 우선 보안 토큰으로 시도, 실패시 레거시 토큰으로 폴백
+        try {
+            // 보안 강화된 토큰 처리
+            String secretKey = "MySecretKey1234567890123456789012"; // 32바이트
+            SecureQRToken.QRTokenPayload payload = SecureQRToken.decrypt(qrToken, secretKey);
+
+            // 토큰 만료 검증
+            if (currentTime.isAfter(payload.getParsedExpiresAt())) {
+                throw new AttendancePermissionException(AttendanceErrorCode.QR_TOKEN_EXPIRED);
+            }
+
+            // 경로 일관성 검증
+            validatePathConsistency(labId, payload.getLabId());
+            sessionId = payload.getSessionId();
+
+        } catch (Exception e) {
+            // 보안 토큰 복호화 실패, 레거시 토큰으로 시도
+            try {
+                QRToken legacyToken = QRToken.fromString(qrToken);
+
+                // 레거시 토큰 만료 검증
+                if (legacyToken.isExpired()) {
+                    throw new AttendancePermissionException(AttendanceErrorCode.QR_TOKEN_EXPIRED);
+                }
+
+                sessionId = legacyToken.getSessionId();
+
+            } catch (AttendanceValidationException validationException) {
+                // 레거시 토큰 검증 실패 - 원본 예외 유지
+                throw validationException;
+            } catch (Exception legacyException) {
+                // 기타 예외는 일반적인 토큰 무효 처리
+                throw new AttendancePermissionException(AttendanceErrorCode.QR_TOKEN_INVALID);
+            }
         }
 
         // 2. 세션 조회 및 경로 일관성 검증
-        AttendanceSession session = findSessionById(token.getSessionId());
+        AttendanceSession session = findSessionById(sessionId);
         validatePathConsistency(labId, session.getLabId());
 
         User user = findUserById(userId);
@@ -164,7 +216,7 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
         }
 
         // 5. 출석 체크 (도메인 로직)
-        AttendanceRecord record = session.checkAttendance(userId, LocalDateTime.now());
+        AttendanceRecord record = session.checkAttendance(userId, currentTime);
 
         // 6. 저장 및 반환
         return attendanceRecordRepository.save(record);

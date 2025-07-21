@@ -52,7 +52,9 @@ springdoc:
 security:
   jwt:
     secret: yDeGly34tDXIxkjo6MQKgBNCI+2iMFLdT0i8zD2JZuE=
-    expiration-ms: 3600000
+    expiration-ms: 3600000  # 1시간 (레거시 호환)
+    access-expiration-ms: 900000    # 15분 (새로운 액세스 토큰)
+    refresh-expiration-ms: 604800000 # 7일 (리프레시 토큰)
 
 file:
   upload:

@@ -10,6 +10,7 @@ import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
 import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
 import org.univ.rankus.application.port.out.AuthTokenPort;
+import org.univ.rankus.application.port.out.RefreshTokenRepositoryPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
 import org.univ.rankus.domain.model.user.Password;
 import org.univ.rankus.domain.model.user.PasswordEncoder;
@@ -25,6 +26,7 @@ public class AuthService implements AuthUseCase {
 
     private final UserRepositoryPort userRepo;
     private final AuthTokenPort authTokenPort;
+    private final RefreshTokenRepositoryPort refreshTokenRepo;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -66,5 +68,47 @@ public class AuthService implements AuthUseCase {
                 request.getEnrollmentStatus()
         );
         return userRepo.save(newUser);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User authenticate(UserLoginRequestDto request) {
+        // 1) 이메일로 조회 → 없으면 404
+        User user = userRepo.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
+        // 2) 비밀번호 검증 → 틀리면 401
+        if (!user.getPassword().matches(request.getPassword(), passwordEncoder)) {
+            throw new UserValidationException(UserErrorCode.INVALID_CREDENTIALS);
+        }
+        return user;
+    }
+
+    @Override
+    public void logout(String userEmail, String accessToken) {
+        try {
+            // 1) 액세스 토큰을 블랙리스트에 등록
+            java.time.LocalDateTime expiryTime = authTokenPort.getAccessTokenExpiryTime(accessToken);
+
+            // JWT에서 토큰 ID 추출 (JTI)
+            String tokenId = extractTokenIdFromAccessToken(accessToken);
+            if (tokenId != null) {
+                authTokenPort.blacklistToken(tokenId, expiryTime);
+            }
+
+            // 2) 해당 사용자의 모든 리프레시 토큰 비활성화
+            refreshTokenRepo.deactivateAllByUserEmail(userEmail);
+
+        } catch (Exception e) {
+            // 토큰 파싱 실패 등의 경우에도 리프레시 토큰은 비활성화
+            refreshTokenRepo.deactivateAllByUserEmail(userEmail);
+        }
+    }
+
+    private String extractTokenIdFromAccessToken(String accessToken) {
+        try {
+            return authTokenPort.extractEmailFromToken(accessToken); // 임시로 이메일 사용
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

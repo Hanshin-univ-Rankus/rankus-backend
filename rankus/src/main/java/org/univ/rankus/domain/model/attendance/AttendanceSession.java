@@ -71,13 +71,24 @@ public class AttendanceSession extends BaseTimeEntity {
     }
 
     /**
-     * QR 토큰 생성
+     * QR 토큰 생성 (legacy 지원)
      *
      * @return 생성된 QR 토큰
      */
     public QRToken generateQRToken() {
         validateSessionActive();
         return QRToken.create(this.labId, this.sessionId, this.qrValidityMinutes);
+    }
+
+    /**
+     * 보안 강화된 QR 토큰 생성
+     *
+     * @param secretKey 암호화 키 (32바이트)
+     * @return 생성된 보안 QR 토큰
+     */
+    public SecureQRToken generateSecureQRToken(String secretKey) {
+        validateSessionActive();
+        return SecureQRToken.create(this.labId, this.sessionId, this.qrValidityMinutes, secretKey);
     }
 
     /**

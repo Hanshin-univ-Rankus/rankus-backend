@@ -3,6 +3,7 @@ package org.univ.rankus.application.port.in;
 import org.univ.rankus.domain.model.attendance.AttendanceRecord;
 import org.univ.rankus.domain.model.attendance.AttendanceSession;
 import org.univ.rankus.domain.model.attendance.QRToken;
+import org.univ.rankus.domain.model.attendance.SecureQRToken;
 
 /**
  * 출석 세션 명령 유스케이스
@@ -66,7 +67,7 @@ public interface AttendanceSessionCommandUseCase {
     AttendanceSession updateQRValidityMinutes(Long labId, Long sessionId, Integer newValidityMinutes, Long userId);
 
     /**
-     * QR 코드 생성
+     * QR 코드 생성 (legacy 지원)
      *
      * @param labId     랩실 ID (경로 일관성 검증용)
      * @param sessionId 세션 ID
@@ -74,6 +75,16 @@ public interface AttendanceSessionCommandUseCase {
      * @return 생성된 QR 토큰
      */
     QRToken generateQRCode(Long labId, Long sessionId, Long userId);
+
+    /**
+     * 보안 강화된 QR 코드 생성
+     *
+     * @param labId     랩실 ID (경로 일관성 검증용)
+     * @param sessionId 세션 ID
+     * @param userId    요청자 ID
+     * @return 생성된 보안 QR 토큰
+     */
+    SecureQRToken generateSecureQRCode(Long labId, Long sessionId, Long userId);
 
     /**
      * QR 코드를 통한 출석 체크

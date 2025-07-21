@@ -16,6 +16,9 @@ public enum AttendanceErrorCode implements ErrorCode {
     ALREADY_CHECKED_IN("ATT_007", BAD_REQUEST, "이미 출석 체크되었습니다"),
     QR_TOKEN_EXPIRED("ATT_008", BAD_REQUEST, "QR 코드가 만료되었습니다"),
     QR_TOKEN_INVALID("ATT_009", BAD_REQUEST, "유효하지 않은 QR 코드입니다"),
+    QR_TOKEN_CORRUPTED("ATT_020", BAD_REQUEST, "QR 코드가 손상되었습니다"),
+    QR_TOKEN_REPLAY_ATTACK("ATT_021", BAD_REQUEST, "이미 사용된 QR 코드입니다"),
+    QR_TOKEN_WRONG_SESSION("ATT_022", BAD_REQUEST, "다른 세션의 QR 코드입니다"),
     INVALID_STATUS_TRANSITION("ATT_010", BAD_REQUEST, "현재 상태에서는 변경할 수 없습니다"),
     STATUS_REQUIRED("ATT_019", BAD_REQUEST, "출석 상태는 필수입니다"),
 

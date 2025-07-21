@@ -39,6 +39,20 @@ public enum UserErrorCode implements ErrorCode {
     INVALID_CREDENTIALS("USER_009", HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 일치하지 않습니다."),
 
     // ------------------------------------------------------------------------
+    // 401 Unauthorized: 토큰 관련 오류
+    // ------------------------------------------------------------------------
+    TOKEN_EXPIRED("USER_019", HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
+    TOKEN_INVALID("USER_020", HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
+    REFRESH_TOKEN_NOT_FOUND("USER_021", HttpStatus.UNAUTHORIZED, "리프레시 토큰을 찾을 수 없습니다."),
+    REFRESH_TOKEN_EXPIRED("USER_022", HttpStatus.UNAUTHORIZED, "리프레시 토큰이 만료되었습니다."),
+    REFRESH_TOKEN_INVALID("USER_023", HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
+
+    // ------------------------------------------------------------------------
+    // 400 Bad Request: 토큰 검증 오류
+    // ------------------------------------------------------------------------
+    TOKEN_EXPIRATION_INVALID("USER_024", HttpStatus.BAD_REQUEST, "토큰 만료시간이 올바르지 않습니다."),
+
+    // ------------------------------------------------------------------------
     // 404 Not Found: 조회 실패
     // ------------------------------------------------------------------------
     USER_NOT_FOUND("USER_010", HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다.");
