@@ -211,6 +211,7 @@ public class AttendanceSessionController {
     @PostMapping("/{sessionId}/end")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
             "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
+    @Deprecated // Phase 3: Use PATCH /{sessionId}/status instead
     public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> endSession(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
@@ -232,6 +233,7 @@ public class AttendanceSessionController {
     @PostMapping("/{sessionId}/cancel")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
             "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
+    @Deprecated // Phase 3: Use PATCH /{sessionId}/status instead
     public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> cancelSession(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
@@ -458,6 +460,67 @@ public class AttendanceSessionController {
                 .toList();
 
         return ResponseEntity.ok(ApiResponse.success(responseList, "내 참여 세션 목록 조회 성공"));
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "출석 세션 상태 변경 (RESTful)", description = """
+            출석 세션의 상태를 RESTful하게 변경합니다. Phase 3 개선사항.
+                        
+            ## 지원 가능한 상태
+            - `COMPLETED`: 세션 종료
+            - `CANCELLED`: 세션 취소
+                        
+            ## 보안 검증
+            - 경로의 labId와 세션이 속한 랩이 일치하지 않으면 404 에러 반환
+            - 다른 랩의 세션에 접근할 수 없음
+            """)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "세션 상태 변경 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400", description = "잘못된 요청 - 지원하지 않는 상태 또는 필수값 누락",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404", description = "세션을 찾을 수 없음",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class))
+            )
+    })
+    @PatchMapping("/{sessionId}/status")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
+            "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
+    public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> changeSessionStatus(
+            @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
+            @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
+            @Valid @RequestBody AttendanceSessionUpdateRequestDto request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        // 상태 필드가 제공되지 않으면 예외 발생
+        if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
+            throw new IllegalArgumentException("변경할 상태는 필수입니다");
+        }
+
+        AttendanceSession session;
+        String message;
+
+        switch (request.getStatus().toUpperCase()) {
+            case "COMPLETED" -> {
+                session = attendanceSessionCommandUseCase.endSession(labId, sessionId, userDetails.getUserId());
+                message = "출석 세션이 종료되었습니다";
+            }
+            case "CANCELLED" -> {
+                session = attendanceSessionCommandUseCase.cancelSession(labId, sessionId, userDetails.getUserId());
+                message = "출석 세션이 취소되었습니다";
+            }
+            default -> throw new IllegalArgumentException("지원하지 않는 상태입니다: " + request.getStatus());
+        }
+
+        return ResponseEntity.ok(ApiResponse.success(AttendanceSessionResponseDto.from(session), message));
     }
 }
 

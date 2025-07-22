@@ -3,6 +3,7 @@ package org.univ.rankus.adapter.in.web.dto.request;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -30,4 +31,11 @@ public class InterviewUpdateRequestDto {
     @NotNull(message = "슬롯당 최대 지원자 수는 필수입니다.")
     @Min(value = 1, message = "슬롯당 최대 지원자 수는 1명 이상이어야 합니다.")
     private final Integer maxApplicantsPerSlot;
+
+    // Phase 3: 상태 변경을 위한 필드 추가
+    @Size(max = 20, message = "상태값은 20자 이하여야 합니다")
+    private final String status;
+
+    @Size(max = 500, message = "변경 사유는 500자 이하여야 합니다")
+    private final String reason;
 }

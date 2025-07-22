@@ -105,8 +105,10 @@ VALUES (1, 1, 'SCHEDULE', 'AI랩 정기 미팅', '매주 월요일 정기 미팅
 
 -- 12. lab_creation_requests (랩실 생성 신청)
 INSERT INTO lab_creation_requests (id, requested_lab_name, requested_category, requested_description, requester_id,
-                                   status, processed_at, processed_by_id, rejection_reason, version, created_at, updated_at)
-VALUES (1, '로봇공학랩', 'ROBOTICS', '로봇공학 연구를 위한 랩실입니다.', 1, 'APPROVED', NOW(), 7, NULL, 0, DATE_SUB(NOW(), INTERVAL 1 MONTH),
+                                   status, processed_at, processed_by_id, rejection_reason, version, created_at,
+                                   updated_at)
+VALUES (1, '로봇공학랩', 'ROBOTICS', '로봇공학 연구를 위한 랩실입니다.', 1, 'APPROVED', NOW(), 7, NULL, 0,
+        DATE_SUB(NOW(), INTERVAL 1 MONTH),
         NOW()),
        (2, '블록체인랩', 'COMPUTER_SCIENCE', '블록체인 기술 연구 및 개발', 4, 'PENDING', NULL, NULL, NULL, 0,
         DATE_SUB(NOW(), INTERVAL 2 WEEK), NOW()),

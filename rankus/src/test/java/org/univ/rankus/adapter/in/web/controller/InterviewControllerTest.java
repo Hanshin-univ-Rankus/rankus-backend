@@ -548,6 +548,278 @@ class InterviewControllerTest {
         }
     }
 
+    @Nested
+    @DisplayName("PATCH /api/labs/{labId}/interviews/{interviewId}/status - 면접 상태 변경 (RESTful)")
+    class ChangeInterviewStatusTests {
+
+        @Test
+        @DisplayName("면접 활성화 상태 변경 성공")
+        @WithMockUser(roles = "LAB_LEADER")
+        void changeInterviewStatus_Activate_Success() throws Exception {
+            // given
+            Long labId = 1L;
+            Long interviewId = 1L;
+
+            InterviewUpdateRequestDto request = InterviewUpdateRequestDto.builder()
+                    .status("ACTIVE")
+                    .startDate(LocalDate.now().plusDays(7))
+                    .endDate(LocalDate.now().plusDays(14))
+                    .durationMinutes(60)
+                    .maxApplicantsPerSlot(5)
+                    .build();
+
+            Interview interview = DomainInterviewFactory.buildActiveInterview();
+            given(commandUseCase.activateInterview(interviewId)).willReturn(interview);
+
+            // when & then
+            mockMvc.perform(patch("/api/labs/{labId}/interviews/{interviewId}/status", labId, interviewId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.data.status").value("ACTIVE"));
+
+            verify(commandUseCase).activateInterview(interviewId);
+        }
+
+        @Test
+        @DisplayName("면접 비활성화 상태 변경 성공")
+        @WithMockUser(roles = "LAB_LEADER")
+        void changeInterviewStatus_Deactivate_Success() throws Exception {
+            // given
+            Long labId = 1L;
+            Long interviewId = 1L;
+
+            InterviewUpdateRequestDto request = InterviewUpdateRequestDto.builder()
+                    .status("INACTIVE")
+                    .startDate(LocalDate.now().plusDays(7))
+                    .endDate(LocalDate.now().plusDays(14))
+                    .durationMinutes(60)
+                    .maxApplicantsPerSlot(5)
+                    .build();
+
+            Interview interview = DomainInterviewFactory.buildInactiveInterview();
+            given(commandUseCase.deactivateInterview(interviewId)).willReturn(interview);
+
+            // when & then
+            mockMvc.perform(patch("/api/labs/{labId}/interviews/{interviewId}/status", labId, interviewId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.data.status").value("INACTIVE"));
+
+            verify(commandUseCase).deactivateInterview(interviewId);
+        }
+
+        @Test
+        @DisplayName("면접 종료 상태 변경 성공")
+        @WithMockUser(roles = "LAB_LEADER")
+        void changeInterviewStatus_Close_Success() throws Exception {
+            // given
+            Long labId = 1L;
+            Long interviewId = 1L;
+
+            InterviewUpdateRequestDto request = InterviewUpdateRequestDto.builder()
+                    .status("CLOSED")
+                    .startDate(LocalDate.now().plusDays(7))
+                    .endDate(LocalDate.now().plusDays(14))
+                    .durationMinutes(60)
+                    .maxApplicantsPerSlot(5)
+                    .build();
+
+            Interview interview = DomainInterviewFactory.buildClosedInterview();
+            given(commandUseCase.closeInterview(interviewId)).willReturn(interview);
+
+            // when & then
+            mockMvc.perform(patch("/api/labs/{labId}/interviews/{interviewId}/status", labId, interviewId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.data.status").value("CLOSED"));
+
+            verify(commandUseCase).closeInterview(interviewId);
+        }
+
+        @Test
+        @DisplayName("상태값 누락 시 500 Internal Server Error 반환 (컨트롤러 내부 검증)")
+        @WithMockUser(roles = "LAB_LEADER")
+        void changeInterviewStatus_MissingStatus_InternalServerError() throws Exception {
+            // given
+            Long labId = 1L;
+            Long interviewId = 1L;
+
+            InterviewUpdateRequestDto request = InterviewUpdateRequestDto.builder()
+                    .startDate(LocalDate.now().plusDays(7))
+                    .endDate(LocalDate.now().plusDays(14))
+                    .durationMinutes(60)
+                    .maxApplicantsPerSlot(5)
+                    .build(); // status 없음
+
+            // when & then
+            mockMvc.perform(patch("/api/labs/{labId}/interviews/{interviewId}/status", labId, interviewId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500));
+
+            verify(commandUseCase, never()).activateInterview(anyLong());
+            verify(commandUseCase, never()).deactivateInterview(anyLong());
+            verify(commandUseCase, never()).closeInterview(anyLong());
+        }
+
+        @Test
+        @DisplayName("지원하지 않는 상태값 시 500 Internal Server Error 반환 (컨트롤러 내부 검증)")
+        @WithMockUser(roles = "LAB_LEADER")
+        void changeInterviewStatus_UnsupportedStatus_InternalServerError() throws Exception {
+            // given
+            Long labId = 1L;
+            Long interviewId = 1L;
+
+            InterviewUpdateRequestDto request = InterviewUpdateRequestDto.builder()
+                    .status("INVALID_STATUS")
+                    .startDate(LocalDate.now().plusDays(7))
+                    .endDate(LocalDate.now().plusDays(14))
+                    .durationMinutes(60)
+                    .maxApplicantsPerSlot(5)
+                    .build();
+
+            // when & then
+            mockMvc.perform(patch("/api/labs/{labId}/interviews/{interviewId}/status", labId, interviewId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500));
+
+            verify(commandUseCase, never()).activateInterview(anyLong());
+            verify(commandUseCase, never()).deactivateInterview(anyLong());
+            verify(commandUseCase, never()).closeInterview(anyLong());
+        }
+    }
+
+    @Nested
+    @DisplayName("PATCH /api/labs/{labId}/interviews/{interviewId}/slots/{slotId}/status - 면접 슬롯 상태 변경 (RESTful)")
+    class ChangeSlotStatusTests {
+
+        @Test
+        @DisplayName("면접 슬롯 취소 상태 변경 성공")
+        @WithMockUser(roles = "LAB_LEADER")
+        void changeSlotStatus_Cancel_Success() throws Exception {
+            // given
+            Long labId = 1L;
+            Long interviewId = 1L;
+            Long slotId = 1L;
+
+            InterviewUpdateRequestDto request = InterviewUpdateRequestDto.builder()
+                    .status("CANCELLED")
+                    .startDate(LocalDate.now().plusDays(7))
+                    .endDate(LocalDate.now().plusDays(14))
+                    .durationMinutes(60)
+                    .maxApplicantsPerSlot(5)
+                    .build();
+
+            InterviewSlot slot = DomainInterviewSlotFactory.buildCancelledSlot();
+            given(commandUseCase.cancelInterviewSlot(slotId)).willReturn(slot);
+
+            // when & then
+            mockMvc.perform(patch("/api/labs/{labId}/interviews/{interviewId}/slots/{slotId}/status", labId, interviewId, slotId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.data.status").value("CANCELLED"));
+
+            verify(commandUseCase).cancelInterviewSlot(slotId);
+        }
+
+        @Test
+        @DisplayName("면접 슬롯 재활성화 상태 변경 성공")
+        @WithMockUser(roles = "LAB_LEADER")
+        void changeSlotStatus_Reactivate_Success() throws Exception {
+            // given
+            Long labId = 1L;
+            Long interviewId = 1L;
+            Long slotId = 1L;
+
+            InterviewUpdateRequestDto request = InterviewUpdateRequestDto.builder()
+                    .status("AVAILABLE")
+                    .startDate(LocalDate.now().plusDays(7))
+                    .endDate(LocalDate.now().plusDays(14))
+                    .durationMinutes(60)
+                    .maxApplicantsPerSlot(5)
+                    .build();
+
+            InterviewSlot slot = DomainInterviewSlotFactory.buildAvailableSlot();
+            given(commandUseCase.reactivateInterviewSlot(slotId)).willReturn(slot);
+
+            // when & then
+            mockMvc.perform(patch("/api/labs/{labId}/interviews/{interviewId}/slots/{slotId}/status", labId, interviewId, slotId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.data.status").value("AVAILABLE"));
+
+            verify(commandUseCase).reactivateInterviewSlot(slotId);
+        }
+
+        @Test
+        @DisplayName("상태값 누락 시 500 Internal Server Error 반환 (컨트롤러 내부 검증)")
+        @WithMockUser(roles = "LAB_LEADER")
+        void changeSlotStatus_MissingStatus_InternalServerError() throws Exception {
+            // given
+            Long labId = 1L;
+            Long interviewId = 1L;
+            Long slotId = 1L;
+
+            InterviewUpdateRequestDto request = InterviewUpdateRequestDto.builder()
+                    .startDate(LocalDate.now().plusDays(7))
+                    .endDate(LocalDate.now().plusDays(14))
+                    .durationMinutes(60)
+                    .maxApplicantsPerSlot(5)
+                    .build(); // status 없음
+
+            // when & then
+            mockMvc.perform(patch("/api/labs/{labId}/interviews/{interviewId}/slots/{slotId}/status", labId, interviewId, slotId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500));
+
+            verify(commandUseCase, never()).cancelInterviewSlot(anyLong());
+            verify(commandUseCase, never()).reactivateInterviewSlot(anyLong());
+        }
+
+        @Test
+        @DisplayName("지원하지 않는 상태값 시 500 Internal Server Error 반환 (컨트롤러 내부 검증)")
+        @WithMockUser(roles = "LAB_LEADER")
+        void changeSlotStatus_UnsupportedStatus_InternalServerError() throws Exception {
+            // given
+            Long labId = 1L;
+            Long interviewId = 1L;
+            Long slotId = 1L;
+
+            InterviewUpdateRequestDto request = InterviewUpdateRequestDto.builder()
+                    .status("INVALID_STATUS")
+                    .startDate(LocalDate.now().plusDays(7))
+                    .endDate(LocalDate.now().plusDays(14))
+                    .durationMinutes(60)
+                    .maxApplicantsPerSlot(5)
+                    .build();
+
+            // when & then
+            mockMvc.perform(patch("/api/labs/{labId}/interviews/{interviewId}/slots/{slotId}/status", labId, interviewId, slotId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500));
+
+            verify(commandUseCase, never()).cancelInterviewSlot(anyLong());
+            verify(commandUseCase, never()).reactivateInterviewSlot(anyLong());
+        }
+    }
+
     // NOTE: @AutoConfigureMockMvc(addFilters = false)를 사용했기 때문에
     // 인증/인가 관련 테스트는 실제 보안 필터가 작동하지 않아 의미가 없음
     // 실제 보안 테스트는 별도의 통합 테스트에서 수행해야 함

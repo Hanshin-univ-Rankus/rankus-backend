@@ -111,6 +111,7 @@ public class InterviewController {
     @Operation(summary = "면접 활성화", description = "면접을 활성화하여 지원을 받을 수 있도록 합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/activate")
     @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @Deprecated // Phase 3: Use PATCH /{interviewId}/status instead
     public ResponseEntity<ApiResponse<InterviewResponseDto>> activateInterview(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long interviewId,
@@ -125,6 +126,7 @@ public class InterviewController {
     @Operation(summary = "면접 비활성화", description = "면접을 비활성화하여 지원을 중단합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/deactivate")
     @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @Deprecated // Phase 3: Use PATCH /{interviewId}/status instead
     public ResponseEntity<ApiResponse<InterviewResponseDto>> deactivateInterview(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long interviewId,
@@ -139,6 +141,7 @@ public class InterviewController {
     @Operation(summary = "면접 종료", description = "면접을 종료합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/close")
     @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @Deprecated // Phase 3: Use PATCH /{interviewId}/status instead
     public ResponseEntity<ApiResponse<InterviewResponseDto>> closeInterview(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long interviewId,
@@ -257,6 +260,7 @@ public class InterviewController {
 
     @Operation(summary = "면접 슬롯 취소", description = "면접 슬롯을 취소합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/slots/{slotId}/cancel")
+    @Deprecated // Phase 3: Use PATCH /{interviewId}/slots/{slotId}/status instead
     @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<InterviewSlotResponseDto>> cancelInterviewSlot(
             @PathVariable @Positive Long labId,
@@ -272,6 +276,7 @@ public class InterviewController {
 
     @Operation(summary = "면접 슬롯 재활성화", description = "취소된 면접 슬롯을 재활성화합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/slots/{slotId}/reactivate")
+    @Deprecated // Phase 3: Use PATCH /{interviewId}/slots/{slotId}/status instead
     @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<InterviewSlotResponseDto>> reactivateInterviewSlot(
             @PathVariable @Positive Long labId,
@@ -296,5 +301,66 @@ public class InterviewController {
 
         commandUseCase.deleteInterviewSlot(slotId);
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @Operation(summary = "면접 상태 변경 (RESTful)", description = """
+            면접의 상태를 RESTful하게 변경합니다. Phase 3 개선사항.
+                        
+            ## 지원 가능한 상태
+            - `ACTIVE`: 면접 활성화
+            - `INACTIVE`: 면접 비활성화 
+            - `CLOSED`: 면접 종료
+            """)
+    @PatchMapping("/{interviewId}/status")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    public ResponseEntity<ApiResponse<InterviewResponseDto>> changeInterviewStatus(
+            @PathVariable @Positive Long labId,
+            @PathVariable @Positive Long interviewId,
+            @RequestBody InterviewUpdateRequestDto request,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
+            throw new IllegalArgumentException("변경할 상태는 필수입니다");
+        }
+
+        Interview interview;
+        switch (request.getStatus().toUpperCase()) {
+            case "ACTIVE" -> interview = commandUseCase.activateInterview(interviewId);
+            case "INACTIVE" -> interview = commandUseCase.deactivateInterview(interviewId);
+            case "CLOSED" -> interview = commandUseCase.closeInterview(interviewId);
+            default -> throw new IllegalArgumentException("지원하지 않는 상태입니다: " + request.getStatus());
+        }
+
+        return ResponseEntity.ok(ApiResponse.success(InterviewResponseDto.from(interview)));
+    }
+
+    @Operation(summary = "면접 슬롯 상태 변경 (RESTful)", description = """
+            면접 슬롯의 상태를 RESTful하게 변경합니다. Phase 3 개선사항.
+                        
+            ## 지원 가능한 상태
+            - `CANCELLED`: 슬롯 취소
+            - `AVAILABLE`: 슬롯 재활성화
+            """)
+    @PatchMapping("/{interviewId}/slots/{slotId}/status")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    public ResponseEntity<ApiResponse<InterviewSlotResponseDto>> changeSlotStatus(
+            @PathVariable @Positive Long labId,
+            @PathVariable @Positive Long interviewId,
+            @PathVariable @Positive Long slotId,
+            @RequestBody InterviewUpdateRequestDto request,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
+            throw new IllegalArgumentException("변경할 상태는 필수입니다");
+        }
+
+        InterviewSlot slot;
+        switch (request.getStatus().toUpperCase()) {
+            case "CANCELLED" -> slot = commandUseCase.cancelInterviewSlot(slotId);
+            case "AVAILABLE" -> slot = commandUseCase.reactivateInterviewSlot(slotId);
+            default -> throw new IllegalArgumentException("지원하지 않는 상태입니다: " + request.getStatus());
+        }
+
+        return ResponseEntity.ok(ApiResponse.success(InterviewSlotResponseDto.from(slot)));
     }
 }

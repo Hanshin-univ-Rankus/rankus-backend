@@ -196,6 +196,7 @@ public class ScoreSubmissionController {
     })
     @PostMapping("/{submissionId}/approve")
     @PreAuthorize("hasRole('LAB_MANAGER') or hasRole('LAB_LEADER') or hasRole('PROFESSOR') or hasRole('ADMIN')")
+    @Deprecated // Phase 3: Use PATCH /{submissionId}/status instead
     public ResponseEntity<ApiResponse<Void>> approveScoreSubmission(
             @PathVariable @Positive Long submissionId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -226,6 +227,7 @@ public class ScoreSubmissionController {
     })
     @PostMapping("/{submissionId}/reject")
     @PreAuthorize("hasRole('LAB_MANAGER') or hasRole('LAB_LEADER') or hasRole('PROFESSOR') or hasRole('ADMIN')")
+    @Deprecated // Phase 3: Use PATCH /{submissionId}/status instead
     public ResponseEntity<ApiResponse<Void>> rejectScoreSubmission(
             @PathVariable @Positive Long submissionId,
             @Valid @RequestBody ScoreSubmissionApprovalRequestDto request,
@@ -459,5 +461,60 @@ public class ScoreSubmissionController {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                     .body(ApiResponse.error(422, "파일 업로드 또는 점수 신청 실패: " + e.getMessage(), null));
         }
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "점수 신청 상태 변경 (RESTful)", description = """
+            점수 신청의 상태를 RESTful하게 변경합니다. Phase 3 개선사항.
+                        
+            ## 지원 가능한 상태
+            - `APPROVED`: 승인
+            - `REJECTED`: 거부 (rejectionReason 필수)
+            """)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "점수 신청 상태 변경 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400", description = "잘못된 요청 - 지원하지 않는 상태 또는 필수값 누락",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404", description = "점수 신청을 찾을 수 없음",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class))
+            )
+    })
+    @PatchMapping("/{submissionId}/status")
+    @PreAuthorize("hasRole('LAB_MANAGER') or hasRole('LAB_LEADER') or hasRole('PROFESSOR') or hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> changeSubmissionStatus(
+            @PathVariable @Positive Long submissionId,
+            @Valid @RequestBody ScoreSubmissionApprovalRequestDto request,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
+            throw new IllegalArgumentException("변경할 상태는 필수입니다");
+        }
+
+        String message;
+        switch (request.getStatus().toUpperCase()) {
+            case "APPROVED" -> {
+                scoreSubmissionCommandUseCase.approveSubmission(submissionId, userDetails.getUserId());
+                message = "점수 신청이 승인되었습니다";
+            }
+            case "REJECTED" -> {
+                if (request.getRejectionReason() == null || request.getRejectionReason().trim().isEmpty()) {
+                    throw new IllegalArgumentException("거부 사유는 필수입니다");
+                }
+                scoreSubmissionCommandUseCase.rejectSubmission(submissionId, userDetails.getUserId(), request.getRejectionReason());
+                message = "점수 신청이 거부되었습니다";
+            }
+            default -> throw new IllegalArgumentException("지원하지 않는 상태입니다: " + request.getStatus());
+        }
+
+        return ResponseEntity.ok(ApiResponse.success(null, message));
     }
 }

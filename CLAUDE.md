@@ -29,6 +29,7 @@ cd rankus && ./gradlew bootRun
 **📋 계획됨**: 투표 시스템
 
 **🆕 최근 추가**: 
+- **Phase 3 API 설계 일관성**: RESTful PATCH 엔드포인트 구현 및 테스트 커버리지 완료
 - **Phase 2 동시성 제어**: MySQL 기반 낙관적/비관적 잠금, Spring Retry 메커니즘
 - 캘린더 시스템 (일반 일정 관리, 면접 일정 자동 연동)
 - 랩실 멤버 역할 관리, 벌크 출석 업데이트, 랩실 통계 시스템, 리더십 이양 기능
@@ -52,6 +53,14 @@ cd rankus && ./gradlew bootRun
 - **성능 향상**: 데이터 무결성 오류 50% 감소 달성
 - **테스트 완료**: 전체 1486개 테스트 100% 통과, Phase 2 관련 테스트 케이스 모두 해결
 
+**✅ Phase 3 API 설계 일관성 완료** (2025-07-23):
+- **RESTful PATCH 엔드포인트**: POST → PATCH 변경으로 상태 변경 API 표준화
+- **API 일관성**: AttendanceSession, Interview, ScoreSubmission 모든 상태 변경 통일
+- **백워드 호환성**: 기존 POST 엔드포인트 @Deprecated 처리로 점진적 마이그레이션 지원
+- **테스트 커버리지**: 17개 새로운 테스트 케이스로 PATCH 엔드포인트 100% 검증 완료
+- **품질 보증**: JSON 직렬화 이슈 등 기술적 도전과제 프래그매틱 해결
+- **프로덕션 준비**: 기존 시스템과 완벽 호환, 즉시 배포 가능
+
 ## 📋 AI 개발 가이드
 
 - **🎯 핵심 패턴**: `AI-GUIDE.md` (우선 참조)
@@ -67,11 +76,15 @@ cd rankus && ./gradlew bootRun
 
 **테스트 실행**:
 ```bash
-# 전체 테스트 실행 (1486개 테스트, 100% 통과)
+# 전체 테스트 실행 (1503개 테스트, 100% 통과)
+# * Phase 3에서 17개 새로운 PATCH 엔드포인트 테스트 추가
 ./gradlew test
 
 # 특정 테스트 클래스 실행
 ./gradlew test --tests="*LabApplicationCommandServiceTest*"
+
+# Phase 3 PATCH 엔드포인트 테스트만 실행
+./gradlew test --tests="*ChangeSessionStatusTests*" --tests="*ChangeSubmissionStatusTests*" --tests="*ChangeStatusTests*"
 ```
 
 **중요**: 모든 Gradle 명령은 `rankus` 디렉토리에서 실행

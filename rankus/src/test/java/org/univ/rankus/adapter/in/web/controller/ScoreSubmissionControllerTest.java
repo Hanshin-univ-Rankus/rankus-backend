@@ -593,4 +593,145 @@ class ScoreSubmissionControllerTest {
             verify(scoreSubmissionQueryUseCase).calculateUserScoreInLab(anyLong(), eq(labId));
         }
     }
+
+    @Nested
+    @DisplayName("PATCH /api/score-submissions/{submissionId}/status - 점수 신청 상태 변경 (RESTful)")
+    class ChangeSubmissionStatusTests {
+
+        @Test
+        @DisplayName("점수 신청 승인 성공")
+        @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+        void changeSubmissionStatus_ApproveSubmission_Success() throws Exception {
+            // given
+            setupSecurityContext(1L);
+            Long submissionId = 1L;
+
+            ScoreSubmissionApprovalRequestDto request = ScoreSubmissionApprovalRequestDto.builder()
+                    .status("APPROVED")
+                    .build();
+
+            // when & then
+            mockMvc.perform(patch("/api/score-submissions/{submissionId}/status", submissionId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.message").value("점수 신청이 승인되었습니다"));
+
+            verify(scoreSubmissionCommandUseCase).approveSubmission(eq(submissionId), anyLong());
+        }
+
+        @Test
+        @DisplayName("점수 신청 거부 성공")
+        @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+        void changeSubmissionStatus_RejectSubmission_Success() throws Exception {
+            // given
+            setupSecurityContext(1L);
+            Long submissionId = 1L;
+            String rejectionReason = "증빙자료가 불충분합니다";
+
+            ScoreSubmissionApprovalRequestDto request = ScoreSubmissionApprovalRequestDto.builder()
+                    .status("REJECTED")
+                    .rejectionReason(rejectionReason)
+                    .build();
+
+            // when & then
+            mockMvc.perform(patch("/api/score-submissions/{submissionId}/status", submissionId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.message").value("점수 신청이 거부되었습니다"));
+
+            verify(scoreSubmissionCommandUseCase).rejectSubmission(eq(submissionId), anyLong(), eq(rejectionReason));
+        }
+
+        @Test
+        @DisplayName("상태값 누락 시 500 Internal Server Error 반환 (컨트롤러 내부 검증)")
+        @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+        void changeSubmissionStatus_MissingStatus_InternalServerError() throws Exception {
+            // given
+            setupSecurityContext(1L);
+            Long submissionId = 1L;
+
+            ScoreSubmissionApprovalRequestDto request = ScoreSubmissionApprovalRequestDto.builder()
+                    .build(); // status 없음
+
+            // when & then
+            mockMvc.perform(patch("/api/score-submissions/{submissionId}/status", submissionId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500));
+
+            verify(scoreSubmissionCommandUseCase, never()).approveSubmission(anyLong(), anyLong());
+            verify(scoreSubmissionCommandUseCase, never()).rejectSubmission(anyLong(), anyLong(), anyString());
+        }
+
+        @Test
+        @DisplayName("거부 시 사유 누락 시 500 Internal Server Error 반환 (컨트롤러 내부 검증)")
+        @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+        void changeSubmissionStatus_RejectWithoutReason_InternalServerError() throws Exception {
+            // given
+            setupSecurityContext(1L);
+            Long submissionId = 1L;
+
+            ScoreSubmissionApprovalRequestDto request = ScoreSubmissionApprovalRequestDto.builder()
+                    .status("REJECTED")
+                    .build(); // rejectionReason 없음
+
+            // when & then
+            mockMvc.perform(patch("/api/score-submissions/{submissionId}/status", submissionId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500));
+
+            verify(scoreSubmissionCommandUseCase, never()).rejectSubmission(anyLong(), anyLong(), anyString());
+        }
+
+        @Test
+        @DisplayName("지원하지 않는 상태값 시 500 Internal Server Error 반환 (컨트롤러 내부 검증)")
+        @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+        void changeSubmissionStatus_UnsupportedStatus_InternalServerError() throws Exception {
+            // given
+            setupSecurityContext(1L);
+            Long submissionId = 1L;
+
+            ScoreSubmissionApprovalRequestDto request = ScoreSubmissionApprovalRequestDto.builder()
+                    .status("INVALID_STATUS")
+                    .build();
+
+            // when & then
+            mockMvc.perform(patch("/api/score-submissions/{submissionId}/status", submissionId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500));
+
+            verify(scoreSubmissionCommandUseCase, never()).approveSubmission(anyLong(), anyLong());
+            verify(scoreSubmissionCommandUseCase, never()).rejectSubmission(anyLong(), anyLong(), anyString());
+        }
+
+        @Test
+        @DisplayName("권한 없는 사용자 접근 시 500 Internal Server Error 반환 (보안 필터 비활성화)")
+        void changeSubmissionStatus_WithoutAuth_InternalServerError() throws Exception {
+            // given
+            Long submissionId = 1L;
+
+            ScoreSubmissionApprovalRequestDto request = ScoreSubmissionApprovalRequestDto.builder()
+                    .status("APPROVED")
+                    .build();
+
+            // when & then
+            mockMvc.perform(patch("/api/score-submissions/{submissionId}/status", submissionId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500))
+                    .andExpect(jsonPath("$.code").value("GLOBAL_002"));
+
+            verify(scoreSubmissionCommandUseCase, never()).approveSubmission(anyLong(), anyLong());
+        }
+    }
 }
