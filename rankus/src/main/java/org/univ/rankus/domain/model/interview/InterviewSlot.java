@@ -46,6 +46,10 @@ public class InterviewSlot extends BaseTimeEntity {
     @Column(name = "status", nullable = false, length = 20)
     private SlotStatus status;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
     /**
      * 면접 슬롯 생성자
      *

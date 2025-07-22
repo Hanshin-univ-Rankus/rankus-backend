@@ -47,4 +47,12 @@ public interface LabRepositoryPort {
      * @param lab 삭제할 Lab 엔티티
      */
     void delete(Lab lab);
+
+    /**
+     * 특정 이름의 Lab이 존재하는지 확인합니다.
+     *
+     * @param name 확인할 Lab 이름
+     * @return Lab이 존재하면 true, 없으면 false
+     */
+    boolean existsByName(String name);
 }

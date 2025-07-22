@@ -2,7 +2,11 @@ package org.univ.rankus.application.service.command;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.univ.rankus.application.port.in.command.LabApplicationCommandUseCase;
 import org.univ.rankus.application.port.out.InterviewSlotRepositoryPort;
@@ -49,6 +53,12 @@ public class LabApplicationCommandService implements LabApplicationCommandUseCas
     }
 
     @Override
+    @Retryable(
+            value = {ObjectOptimisticLockingFailureException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100, multiplier = 2)
+    )
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public LabApplication applyToLabWithSlot(Long labId, Long userId, Long slotId) {
         // 1) 랩실 검증
         Lab lab = labRepositoryPort.findById(labId)
@@ -58,16 +68,21 @@ public class LabApplicationCommandService implements LabApplicationCommandUseCas
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        // 3) 면접 슬롯 검증
-        InterviewSlot slot = interviewSlotRepositoryPort.findById(slotId)
-                .orElseThrow(() -> new InterviewNotFoundException(InterviewErrorCode.SLOT_NOT_FOUND));
-
-        // 4) 중복 신청 검증
+        // 3) 중복 신청 검증
         if (labApplicationRepositoryPort.existsByLabIdAndUserId(labId, userId)) {
             throw new LabApplicationValidationException(LabApplicationErrorCode.DUPLICATE_APPLICATION);
         }
 
-        // 5) 신청서 생성 및 저장 (슬롯 예약 포함)
+        // 4) 면접 슬롯 비관적 잠금으로 조회 및 검증
+        InterviewSlot slot = interviewSlotRepositoryPort.findByIdForUpdate(slotId)
+                .orElseThrow(() -> new InterviewNotFoundException(InterviewErrorCode.SLOT_NOT_FOUND));
+
+        // 5) 슬롯 예약 가능 여부 재확인 (비관적 잠금 후)
+        if (!slot.isAvailable()) {
+            throw new LabApplicationValidationException(LabApplicationErrorCode.SLOT_NOT_AVAILABLE);
+        }
+
+        // 6) 신청서 생성 및 저장 (슬롯 예약 포함)
         LabApplication app = new LabApplication(lab, user, slot);
         return labApplicationRepositoryPort.save(app);
     }

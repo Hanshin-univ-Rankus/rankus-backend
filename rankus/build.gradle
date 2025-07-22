@@ -36,6 +36,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'com.h2database:h2'
 
     // Spring Boot DevTools
     implementation 'me.paulschwarz:spring-dotenv:3.0.0'
@@ -55,6 +56,10 @@ dependencies {
     // Excel Export
     implementation 'org.apache.poi:poi:5.2.4'
     implementation 'org.apache.poi:poi-ooxml:5.2.4'
+
+    // Spring Retry for concurrency handling
+    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework:spring-aspects'
 
 }
 

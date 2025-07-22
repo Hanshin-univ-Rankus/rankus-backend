@@ -35,12 +35,12 @@ VALUES (1, 1, '2025-07-15', '2025-07-16', 30, 2, 'ACTIVE', NOW(), NOW()),
 
 -- 5. interview_slots (면접 슬롯)
 INSERT INTO interview_slots (id, interview_id, start_time, end_time, max_applicants, current_applicants, status,
-                             created_at, updated_at)
-VALUES (1, 1, '2025-07-15 09:00:00', '2025-07-15 09:30:00', 2, 1, 'AVAILABLE', NOW(), NOW()),
-       (2, 1, '2025-07-15 10:00:00', '2025-07-15 10:30:00', 2, 0, 'AVAILABLE', NOW(), NOW()),
-       (3, 1, '2025-07-15 14:00:00', '2025-07-15 14:30:00', 2, 2, 'FULL', NOW(), NOW()),
-       (4, 2, '2025-07-20 13:00:00', '2025-07-20 13:45:00', 1, 0, 'AVAILABLE', NOW(), NOW()),
-       (5, 2, '2025-07-20 15:00:00', '2025-07-20 15:45:00', 1, 1, 'FULL', NOW(), NOW());
+                             version, created_at, updated_at)
+VALUES (1, 1, '2025-07-15 09:00:00', '2025-07-15 09:30:00', 2, 1, 'AVAILABLE', 0, NOW(), NOW()),
+       (2, 1, '2025-07-15 10:00:00', '2025-07-15 10:30:00', 2, 0, 'AVAILABLE', 0, NOW(), NOW()),
+       (3, 1, '2025-07-15 14:00:00', '2025-07-15 14:30:00', 2, 2, 'FULL', 0, NOW(), NOW()),
+       (4, 2, '2025-07-20 13:00:00', '2025-07-20 13:45:00', 1, 0, 'AVAILABLE', 0, NOW(), NOW()),
+       (5, 2, '2025-07-20 15:00:00', '2025-07-20 15:45:00', 1, 1, 'FULL', 0, NOW(), NOW());
 
 -- 6. lab_applications (새로운 스키마에 맞춘 지원서)
 INSERT INTO lab_applications (id, lab_id, user_id, interview_slot_id, status, created_at, updated_at)
@@ -105,14 +105,14 @@ VALUES (1, 1, 'SCHEDULE', 'AI랩 정기 미팅', '매주 월요일 정기 미팅
 
 -- 12. lab_creation_requests (랩실 생성 신청)
 INSERT INTO lab_creation_requests (id, requested_lab_name, requested_category, requested_description, requester_id,
-                                   status, processed_at, processed_by_id, rejection_reason, created_at, updated_at)
-VALUES (1, '로봇공학랩', 'ROBOTICS', '로봇공학 연구를 위한 랩실입니다.', 1, 'APPROVED', NOW(), 7, NULL, DATE_SUB(NOW(), INTERVAL 1 MONTH),
+                                   status, processed_at, processed_by_id, rejection_reason, version, created_at, updated_at)
+VALUES (1, '로봇공학랩', 'ROBOTICS', '로봇공학 연구를 위한 랩실입니다.', 1, 'APPROVED', NOW(), 7, NULL, 0, DATE_SUB(NOW(), INTERVAL 1 MONTH),
         NOW()),
-       (2, '블록체인랩', 'COMPUTER_SCIENCE', '블록체인 기술 연구 및 개발', 4, 'PENDING', NULL, NULL, NULL,
+       (2, '블록체인랩', 'COMPUTER_SCIENCE', '블록체인 기술 연구 및 개발', 4, 'PENDING', NULL, NULL, NULL, 0,
         DATE_SUB(NOW(), INTERVAL 2 WEEK), NOW()),
-       (3, '보안랩', 'SECURITY', '정보보안 및 사이버보안 연구', 5, 'REJECTED', NOW(), 3, '기존 보안 랩실이 이미 존재합니다.',
+       (3, '보안랩', 'SECURITY', '정보보안 및 사이버보안 연구', 5, 'REJECTED', NOW(), 3, '기존 보안 랩실이 이미 존재합니다.', 0,
         DATE_SUB(NOW(), INTERVAL 3 WEEK), NOW()),
-       (4, '게임개발랩', 'GAME', '게임 개발 및 엔진 연구', 1, 'APPROVED', NOW(), 7, NULL, DATE_SUB(NOW(), INTERVAL 1 WEEK), NOW());
+       (4, '게임개발랩', 'GAME', '게임 개발 및 엔진 연구', 1, 'APPROVED', NOW(), 7, NULL, 0, DATE_SUB(NOW(), INTERVAL 1 WEEK), NOW());
 
 -- 13. votes (투표)
 INSERT INTO votes (id, creator_id, lab_id, title, description, status, deadline, total_votes, created_at, updated_at)

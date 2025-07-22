@@ -85,4 +85,9 @@ public class InterviewSlotRepositoryAdapter implements InterviewSlotRepositoryPo
     public List<InterviewSlot> findByStartTimeBefore(LocalDateTime dateTime) {
         return springDataInterviewSlotRepository.findByStartTimeBefore(dateTime);
     }
+
+    @Override
+    public Optional<InterviewSlot> findByIdForUpdate(Long id) {
+        return Optional.ofNullable(springDataInterviewSlotRepository.findByIdForUpdate(id));
+    }
 }

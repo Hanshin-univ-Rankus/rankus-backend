@@ -1,7 +1,11 @@
 package org.univ.rankus.application.service.command;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.univ.rankus.application.port.in.command.LabCreationRequestCommandUseCase;
 import org.univ.rankus.application.port.out.LabCreationRequestRepositoryPort;
@@ -55,7 +59,12 @@ public class LabCreationRequestCommandService implements LabCreationRequestComma
     }
 
     @Override
-    @Transactional
+    @Retryable(
+            value = {ObjectOptimisticLockingFailureException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100, multiplier = 2)
+    )
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void approveLabCreationRequest(Long requestId, Long approverId) {
         // 1) 신청 조회
         LabCreationRequest request = labCreationRequestRepositoryPort.findById(requestId)
@@ -65,10 +74,17 @@ public class LabCreationRequestCommandService implements LabCreationRequestComma
         User approver = userRepositoryPort.findById(approverId)
                 .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        // 3) 도메인 로직으로 승인 처리 (권한 검증 포함)
+        // 3) 동일한 이름의 랩실이 이미 존재하는지 확인 (동시 승인 방지)
+        if (labRepositoryPort.existsByName(request.getRequestedLabName())) {
+            throw new LabCreationRequestValidationException(
+                    LabCreationRequestErrorCode.DUPLICATE_LAB_NAME_REQUEST
+            );
+        }
+
+        // 4) 도메인 로직으로 승인 처리 (권한 검증 및 상태 변경)
         request.approve(approver);
 
-        // 4) 실제 Lab 엔티티 생성
+        // 5) 실제 Lab 엔티티 생성
         Lab newLab = new Lab(
                 request.getRequestedLabName(),
                 request.getRequestedCategory(),
@@ -76,16 +92,16 @@ public class LabCreationRequestCommandService implements LabCreationRequestComma
                 null  // 교수 이름은 나중에 설정
         );
 
-        // 5) Lab 저장
+        // 6) Lab 저장
         Lab savedLab = labRepositoryPort.save(newLab);
 
-        // 6) 신청자를 LAB_LEADER로 할당하고 Lab에 배정
+        // 7) 신청자를 LAB_LEADER로 할당하고 Lab에 배정
         User requester = request.getRequester();
         requester.changeRole(Role.LAB_LEADER);
         requester.assignLab(savedLab);
         userRepositoryPort.save(requester);
 
-        // 7) 신청서 상태 저장
+        // 8) 신청서 상태 저장
         labCreationRequestRepositoryPort.save(request);
     }
 

@@ -115,4 +115,13 @@ public interface InterviewSlotRepositoryPort {
      * @return 기준 시간 이전의 InterviewSlot 리스트
      */
     List<InterviewSlot> findByStartTimeBefore(LocalDateTime dateTime);
+
+    /**
+     * 슬롯 예약을 위한 비관적 잠금으로 슬롯을 조회합니다.
+     * 동시 예약을 방지하기 위해 SELECT FOR UPDATE를 사용합니다.
+     *
+     * @param id 조회할 InterviewSlot ID
+     * @return Optional.of(InterviewSlot) 또는 Optional.empty()
+     */
+    Optional<InterviewSlot> findByIdForUpdate(Long id);
 }

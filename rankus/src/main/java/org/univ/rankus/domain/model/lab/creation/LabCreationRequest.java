@@ -60,6 +60,10 @@ public class LabCreationRequest extends BaseTimeEntity {
     @Column(length = 500)
     private String rejectionReason;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
     /**
      * 생성자: 필수 필드 검증 후 세팅
      */

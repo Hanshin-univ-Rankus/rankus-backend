@@ -123,7 +123,7 @@ class LabApplicationCommandServiceTest {
             ReflectionTestUtils.setField(slot, "id", slotId);
 
             LabApplication expectedApplication = DomainLabApplicationFactory.buildValidPendingApplication(lab, user, slot);
-            when(interviewSlotRepositoryPort.findById(slotId)).thenReturn(Optional.of(slot));
+            when(interviewSlotRepositoryPort.findByIdForUpdate(slotId)).thenReturn(Optional.of(slot));
             when(labApplicationRepositoryPort.existsByLabIdAndUserId(labId, userId)).thenReturn(false);
             when(labApplicationRepositoryPort.save(any(LabApplication.class)))
                     .thenReturn(expectedApplication);
@@ -138,7 +138,7 @@ class LabApplicationCommandServiceTest {
 
             verify(labRepositoryPort).findById(labId);
             verify(userRepositoryPort).findById(userId);
-            verify(interviewSlotRepositoryPort).findById(slotId);
+            verify(interviewSlotRepositoryPort).findByIdForUpdate(slotId);
             verify(labApplicationRepositoryPort).existsByLabIdAndUserId(labId, userId);
             verify(labApplicationRepositoryPort).save(any(LabApplication.class));
         }

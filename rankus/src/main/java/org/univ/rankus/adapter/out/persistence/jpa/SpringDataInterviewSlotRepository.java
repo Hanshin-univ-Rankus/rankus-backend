@@ -1,6 +1,8 @@
 package org.univ.rankus.adapter.out.persistence.jpa;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -93,4 +95,20 @@ public interface SpringDataInterviewSlotRepository extends JpaRepository<Intervi
      */
     @Query("SELECT s FROM InterviewSlot s WHERE s.interview.id = :interviewId ORDER BY s.startTime ASC")
     List<InterviewSlot> findByInterviewIdOrderByStartTime(@Param("interviewId") Long interviewId);
+
+    /**
+     * 슬롯 예약을 위한 비관적 잠금으로 슬롯을 조회합니다.
+     * 동시 예약을 방지하기 위해 SELECT FOR UPDATE를 사용합니다.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT s FROM InterviewSlot s WHERE s.id = :id")
+    InterviewSlot findByIdForUpdate(@Param("id") Long id);
+
+    /**
+     * 특정 면접의 예약 가능한 슬롯을 비관적 잠금으로 조회합니다.
+     * 동시 예약을 방지하기 위해 SELECT FOR UPDATE를 사용합니다.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT s FROM InterviewSlot s WHERE s.interview.id = :interviewId AND s.status = 'AVAILABLE' AND s.currentApplicants < s.maxApplicants")
+    List<InterviewSlot> findAvailableSlotsByInterviewIdForUpdate(@Param("interviewId") Long interviewId);
 }

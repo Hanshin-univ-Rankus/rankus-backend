@@ -19,6 +19,7 @@ public enum LabApplicationErrorCode implements ErrorCode {
     DUPLICATE_APPLICATION("APP_004", HttpStatus.CONFLICT, "이미 동일한 랩실에 가입신청을 했습니다."),
     ALREADY_PROCESSED("APP_005", HttpStatus.BAD_REQUEST, "이미 처리된 신청입니다."),
     INVALID_STATUS("APP_006", HttpStatus.BAD_REQUEST, "유효하지 않은 신청 상태입니다. 신청 상태는 PENDING, APPROVED, REJECTED 중 하나여야 합니다."),
+    SLOT_NOT_AVAILABLE("APP_009", HttpStatus.BAD_REQUEST, "면접 슬롯이 가득 찼거나 예약할 수 없는 상태입니다."),
 
     // ------------------------------------------------------------------------
     // 401 Unauthorized: 인증/권한 오류

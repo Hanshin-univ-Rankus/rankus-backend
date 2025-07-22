@@ -44,4 +44,9 @@ public class LabRepositoryAdapter implements LabRepositoryPort {
     public void delete(Lab lab) {
         springDataLabRepository.delete(lab);
     }
+
+    @Override
+    public boolean existsByName(String name) {
+        return springDataLabRepository.existsByName(name);
+    }
 }
