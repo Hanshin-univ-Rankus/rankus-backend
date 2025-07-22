@@ -14,10 +14,15 @@ Rankus는 대학 연구실 정보 플랫폼으로, JWT 기반 인증을 사용�
 
 ## 🔐 인증 및 권한 관리
 
-### JWT 인증 플로우
-1. **로그인** → JWT 토큰 발급
-2. **헤더 추가**: `Authorization: Bearer {token}`
-3. **토큰 만료 시 재로그인 필요**
+### JWT 인증 플로우 - **Phase 1 보안 강화** ✨
+1. **로그인 (v2)** → 액세스 토큰 + 리프레시 토큰 발급
+2. **API 호출**: `Authorization: Bearer {accessToken}`
+3. **자동 갱신**: 액세스 토큰 만료 시 리프레시 토큰으로 갱신
+4. **로그아웃**: 토큰 블랙리스트로 즉시 무효화
+
+**토큰 수명**:
+- 액세스 토큰: 15분 (보안 강화)
+- 리프레시 토큰: 7일 (사용자 편의성)
 
 ### 사용자 권한 레벨
 - **STUDENT**: 일반 학생 (기본 권한)
@@ -106,6 +111,96 @@ Content-Type: application/json
   }
 }
 ```
+
+### 새로운 로그인 (v2) - **Phase 1 보안 강화** ✨
+> 리프레시 토큰을 포함한 향상된 로그인 시스템
+
+```http
+POST /api/auth/login/v2
+Content-Type: application/json
+
+{
+  "email": "student@univ.ac.kr",
+  "password": "password123"
+}
+```
+
+**응답 예시**:
+```json
+{
+  "success": true,
+  "message": "로그인 성공",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": 1,
+      "studentId": "20230001",
+      "email": "student@univ.ac.kr",
+      "name": "홍길동",
+      "role": "STUDENT"
+    },
+    "expiresAt": "2024-01-15T10:15:00",
+    "refreshExpiresAt": "2024-01-22T10:00:00"
+  }
+}
+```
+
+### 토큰 갱신 - **Phase 1 보안 강화** ✨
+> 액세스 토큰 만료 시 자동 갱신
+
+```http
+POST /api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**응답 예시**:
+```json
+{
+  "success": true,
+  "message": "토큰 갱신 성공",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expiresAt": "2024-01-15T10:15:00"
+  }
+}
+```
+
+**오류 응답 예시**:
+```json
+{
+  "success": false,
+  "message": "리프레시 토큰이 만료되었습니다. 다시 로그인해주세요.",
+  "data": null
+}
+```
+
+### 로그아웃 - **Phase 1 보안 강화** ✨
+> 토큰 무효화를 통한 안전한 로그아웃
+
+```http
+POST /api/auth/logout
+Authorization: Bearer {accessToken}
+```
+
+**응답 예시**:
+```json
+{
+  "success": true,
+  "message": "로그아웃되었습니다",
+  "data": null
+}
+```
+
+**🔒 Phase 1 보안 개선사항**:
+- **액세스 토큰**: 15분 수명으로 보안 강화
+- **리프레시 토큰**: 7일 수명으로 사용자 편의성 확보
+- **토큰 블랙리스트**: 로그아웃 시 즉시 토큰 무효화
+- **자동 갱신**: 토큰 만료 전 자동 갱신 지원
 
 ## 👤 User Management API
 
@@ -278,6 +373,69 @@ DELETE /api/interviews/slots/{slotId}/cancel
 Authorization: Bearer {token}
 ```
 
+### 면접 상태 변경 (RESTful) - **Phase 3 API 일관성** ✨
+> REST 원칙에 따른 면접 상태 관리
+
+```http
+PATCH /api/labs/{labId}/interviews/{interviewId}/status
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "status": "ACTIVE"
+}
+```
+
+**지원 가능한 상태**:
+- `ACTIVE`: 면접 활성화
+- `INACTIVE`: 면접 비활성화 
+- `CLOSED`: 면접 종료
+
+**응답 예시**:
+```json
+{
+  "success": true,
+  "message": "면접 상태가 변경되었습니다",
+  "data": {
+    "id": 1,
+    "title": "1차 면접",
+    "status": "ACTIVE",
+    "updatedAt": "2024-01-15T10:30:00"
+  }
+}
+```
+
+### 면접 슬롯 상태 변경 (RESTful) - **Phase 3 API 일관성** ✨
+> REST 원칙에 따른 면접 슬롯 상태 관리
+
+```http
+PATCH /api/labs/{labId}/interviews/{interviewId}/slots/{slotId}/status
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "status": "CANCELLED"
+}
+```
+
+**지원 가능한 상태**:
+- `CANCELLED`: 슬롯 취소
+- `AVAILABLE`: 슬롯 재활성화
+
+**응답 예시**:
+```json
+{
+  "success": true,
+  "message": "면접 슬롯 상태가 변경되었습니다",
+  "data": {
+    "id": 1,
+    "dateTime": "2024-01-15T10:00:00",
+    "status": "AVAILABLE",
+    "updatedAt": "2024-01-15T10:30:00"
+  }
+}
+```
+
 ## 📢 Notice Management API
 
 ### 공지사항 목록 조회
@@ -391,6 +549,103 @@ Content-Type: application/json
   "reason": "거부 사유"
 }
 ```
+
+### 점수 제출 상태 변경 (RESTful) - **Phase 3 API 일관성** ✨
+> REST 원칙에 따른 점수 제출 상태 관리
+
+```http
+PATCH /api/score-submissions/{submissionId}/status
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "status": "APPROVED"
+}
+```
+
+**지원 가능한 상태**:
+- `APPROVED`: 승인
+- `REJECTED`: 거부 (거부 사유 필수)
+
+**승인 요청 예시**:
+```json
+{
+  "status": "APPROVED"
+}
+```
+
+**거부 요청 예시**:
+```json
+{
+  "status": "REJECTED",
+  "rejectionReason": "제출된 자료가 기준에 미달됩니다"
+}
+```
+
+**응답 예시**:
+```json
+{
+  "success": true,
+  "message": "점수 제출 상태가 변경되었습니다",
+  "data": {
+    "id": 1,
+    "status": "APPROVED",
+    "updatedAt": "2024-01-15T10:30:00"
+  }
+}
+```
+
+## 📋 Attendance Management API
+
+### 출석 세션 상태 변경 (RESTful) - **Phase 3 API 일관성** ✨
+> REST 원칙에 따른 출석 세션 상태 관리
+
+```http
+PATCH /api/labs/{labId}/attendance/sessions/{sessionId}/status
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "status": "COMPLETED"
+}
+```
+
+**지원 가능한 상태**:
+- `COMPLETED`: 출석 세션 완료
+- `CANCELLED`: 출석 세션 취소
+
+**완료 요청 예시**:
+```json
+{
+  "status": "COMPLETED"
+}
+```
+
+**취소 요청 예시**:
+```json
+{
+  "status": "CANCELLED"
+}
+```
+
+**응답 예시**:
+```json
+{
+  "success": true,
+  "message": "출석 세션 상태가 변경되었습니다",
+  "data": {
+    "id": 1,
+    "title": "연구실 세미나",
+    "status": "COMPLETED",
+    "updatedAt": "2024-01-15T10:30:00"
+  }
+}
+```
+
+**🔄 Phase 3 RESTful 개선사항**:
+- **통일된 상태 변경**: 모든 상태 변경 작업을 PATCH 메서드로 표준화
+- **명확한 의미론**: POST(생성) vs PATCH(상태변경)의 의미론적 구분
+- **백워드 호환성**: 기존 POST 엔드포인트와 병행 운영 가능
 
 ## 📁 File Upload API
 

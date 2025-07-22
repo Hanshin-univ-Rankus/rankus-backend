@@ -1,7 +1,9 @@
 package org.univ.rankus.adapter.in.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -311,12 +313,27 @@ public class InterviewController {
             - `INACTIVE`: 면접 비활성화 
             - `CLOSED`: 면접 종료
             """)
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "면접 상태 변경 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(value = "{\"success\": true, \"message\": \"면접 상태가 변경되었습니다\", \"data\": {\"id\": 1, \"title\": \"면접 제목\", \"status\": \"ACTIVE\"}}"))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"success\": false, \"message\": \"지원하지 않는 상태입니다\", \"data\": null}"))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"success\": false, \"message\": \"접근 권한이 없습니다\", \"data\": null}"))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "면접을 찾을 수 없음",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"success\": false, \"message\": \"면접을 찾을 수 없습니다\", \"data\": null}")))
+    })
     @PatchMapping("/{interviewId}/status")
     @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<InterviewResponseDto>> changeInterviewStatus(
-            @PathVariable @Positive Long labId,
-            @PathVariable @Positive Long interviewId,
-            @RequestBody InterviewUpdateRequestDto request,
+            @Parameter(description = "랩실 ID", example = "1") @PathVariable @Positive Long labId,
+            @Parameter(description = "면접 ID", example = "1") @PathVariable @Positive Long interviewId,
+            @RequestBody @Valid InterviewUpdateRequestDto request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
@@ -341,13 +358,28 @@ public class InterviewController {
             - `CANCELLED`: 슬롯 취소
             - `AVAILABLE`: 슬롯 재활성화
             """)
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "면접 슬롯 상태 변경 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(value = "{\"success\": true, \"message\": \"면접 슬롯 상태가 변경되었습니다\", \"data\": {\"id\": 1, \"dateTime\": \"2024-01-15T10:00:00\", \"status\": \"AVAILABLE\"}}"))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"success\": false, \"message\": \"지원하지 않는 상태입니다\", \"data\": null}"))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"success\": false, \"message\": \"접근 권한이 없습니다\", \"data\": null}"))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "면접 슬롯을 찾을 수 없음",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"success\": false, \"message\": \"면접 슬롯을 찾을 수 없습니다\", \"data\": null}")))
+    })
     @PatchMapping("/{interviewId}/slots/{slotId}/status")
     @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<InterviewSlotResponseDto>> changeSlotStatus(
-            @PathVariable @Positive Long labId,
-            @PathVariable @Positive Long interviewId,
-            @PathVariable @Positive Long slotId,
-            @RequestBody InterviewUpdateRequestDto request,
+            @Parameter(description = "랩실 ID", example = "1") @PathVariable @Positive Long labId,
+            @Parameter(description = "면접 ID", example = "1") @PathVariable @Positive Long interviewId,
+            @Parameter(description = "면접 슬롯 ID", example = "1") @PathVariable @Positive Long slotId,
+            @RequestBody @Valid InterviewUpdateRequestDto request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {

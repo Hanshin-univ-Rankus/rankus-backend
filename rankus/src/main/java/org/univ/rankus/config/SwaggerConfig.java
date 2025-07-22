@@ -39,10 +39,11 @@ public class SwaggerConfig {
                                 - 📢 **공지사항**: 랩실 공지사항 관리
                                 - 📆 **캘린더**: 일정 및 면접 관리
                                                                 
-                                ## 인증 방법
-                                1. `/api/auth/login`으로 로그인하여 JWT 토큰 획득
-                                2. 요청 헤더에 `Authorization: Bearer {token}` 추가
-                                3. 인증이 필요한 API 호출
+                                ## 인증 방법 (Phase 1 보안 강화)
+                                1. `/api/auth/login/v2`로 로그인하여 액세스+리프레시 토큰 획득
+                                2. 요청 헤더에 `Authorization: Bearer {accessToken}` 추가
+                                3. 토큰 만료 시 `/api/auth/refresh`로 자동 갱신
+                                4. 로그아웃 시 `/api/auth/logout`으로 토큰 무효화
                                 """)
                         .contact(new Contact()
                                 .name("Rankus Team")
@@ -66,7 +67,7 @@ public class SwaggerConfig {
                         .description("Rankus 프로젝트 문서")
                         .url("https://github.com/rankus-team/rankus/wiki"))
                 .tags(List.of(
-                        new Tag().name("Auth").description("🔐 인증 관리 (회원가입, 로그인)"),
+                        new Tag().name("Auth").description("🔐 인증 관리 (회원가입, 로그인, 토큰 갱신, 로그아웃)"),
                         new Tag().name("User").description("👤 사용자 정보 관리"),
                         new Tag().name("LabPromotion").description("🏢 랩실 홍보 및 조회"),
                         new Tag().name("LabCreationRequest").description("🏗️ 랩실 생성 신청"),
