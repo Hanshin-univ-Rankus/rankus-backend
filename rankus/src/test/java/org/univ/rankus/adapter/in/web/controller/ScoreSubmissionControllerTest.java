@@ -197,7 +197,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("존재하는 점수 신청 조회 성공")
-        @WithMockUser(username = "user@test.com", roles = "STUDENT")
+        @WithMockUser(username = "user@hs.ac.kr", roles = "STUDENT")
         void getScoreSubmission_ExistingSubmission_Success() throws Exception {
             // given
             Long submissionId = 1L;
@@ -217,7 +217,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("존재하지 않는 점수 신청 조회 시 404 Not Found 반환")
-        @WithMockUser(username = "user@test.com", roles = "STUDENT")
+        @WithMockUser(username = "user@hs.ac.kr", roles = "STUDENT")
         void getScoreSubmission_NonExistingSubmission_NotFound() throws Exception {
             // given
             Long submissionId = 999L;
@@ -238,7 +238,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("내 점수 신청 목록 조회 성공")
-        @WithMockUser(username = "user@test.com", roles = "STUDENT")
+        @WithMockUser(username = "user@hs.ac.kr", roles = "STUDENT")
         void getMyScoreSubmissions_Success() throws Exception {
             // given: principal 세팅
             Long userId = 1L;
@@ -320,7 +320,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("STUDENT 역할로 승인 시도 시 403 Forbidden 반환")
-        @WithMockUser(username = "student@test.com", roles = "STUDENT")
+        @WithMockUser(username = "student@hs.ac.kr", roles = "STUDENT")
         void approveScoreSubmission_AsStudent_Forbidden() throws Exception {
             // given
             Long submissionId = 1L;
@@ -339,7 +339,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("권한 없는 사용자가 승인 시도 시 403 Forbidden 반환")
-        @WithMockUser(username = "manager@test.com", roles = "LAB_MANAGER")
+        @WithMockUser(username = "manager@hs.ac.kr", roles = "LAB_MANAGER")
         void approveScoreSubmission_InsufficientPermission_Forbidden() throws Exception {
             // given
             Long submissionId = 1L;
@@ -361,7 +361,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("유효한 거부 사유로 점수 신청 거부 성공")
-        @WithMockUser(username = "manager@test.com", roles = "LAB_MANAGER")
+        @WithMockUser(username = "manager@hs.ac.kr", roles = "LAB_MANAGER")
         void rejectScoreSubmission_ValidReason_Success() throws Exception {
             // given
             Long submissionId = 1L;
@@ -385,7 +385,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("STUDENT 역할로 거부 시도 시 403 Forbidden 반환")
-        @WithMockUser(username = "student@test.com", roles = "STUDENT")
+        @WithMockUser(username = "student@hs.ac.kr", roles = "STUDENT")
         void rejectScoreSubmission_AsStudent_Forbidden() throws Exception {
             // given
             Long submissionId = 1L;
@@ -414,7 +414,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("본인이 신청한 점수 삭제 성공")
-        @WithMockUser(username = "user@test.com", roles = "STUDENT")
+        @WithMockUser(username = "user@hs.ac.kr", roles = "STUDENT")
         void deleteScoreSubmission_OwnSubmission_Success() throws Exception {
             // given
             Long submissionId = 1L;
@@ -431,7 +431,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("타인이 신청한 점수 삭제 시도 시 403 Forbidden 반환")
-        @WithMockUser(username = "other@test.com", roles = "STUDENT")
+        @WithMockUser(username = "other@hs.ac.kr", roles = "STUDENT")
         void deleteScoreSubmission_NotOwner_Forbidden() throws Exception {
             // given
             Long submissionId = 1L;
@@ -448,7 +448,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("이미 처리된 점수 삭제 시도 시 409 Conflict 반환")
-        @WithMockUser(username = "user@test.com", roles = "STUDENT")
+        @WithMockUser(username = "user@hs.ac.kr", roles = "STUDENT")
         void deleteScoreSubmission_AlreadyProcessed_Conflict() throws Exception {
             // given
             Long submissionId = 1L;
@@ -470,7 +470,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("중복 검사 성공")
-        @WithMockUser(username = "user@test.com", roles = "STUDENT")
+        @WithMockUser(username = "user@hs.ac.kr", roles = "STUDENT")
         void checkDuplicates_Success() throws Exception {
             // given: principal 세팅
             Long userId = 1L;
@@ -522,7 +522,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("내 총 점수 조회 성공")
-        @WithMockUser(username = "user@test.com", roles = "STUDENT")
+        @WithMockUser(username = "user@hs.ac.kr", roles = "STUDENT")
         void getMyTotalScore_Success() throws Exception {
             // given
             setupSecurityContext(1L); // SecurityContext 설정
@@ -558,7 +558,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("랩실 내 내 점수 조회 성공")
-        @WithMockUser(username = "user@test.com", roles = "STUDENT")
+        @WithMockUser(username = "user@hs.ac.kr", roles = "STUDENT")
         void getMyLabScore_Success() throws Exception {
             // given
             setupSecurityContext(1L); // SecurityContext 설정
@@ -578,7 +578,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("존재하지 않는 랩실 조회 시 404 Not Found 반환")
-        @WithMockUser(username = "user@test.com", roles = "STUDENT")
+        @WithMockUser(username = "user@hs.ac.kr", roles = "STUDENT")
         void getMyLabScore_LabNotFound_NotFound() throws Exception {
             // given
             setupSecurityContext(1L); // SecurityContext 설정
@@ -600,7 +600,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("점수 신청 승인 성공")
-        @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+        @WithMockUser(username = "admin@hs.ac.kr", roles = "ADMIN")
         void changeSubmissionStatus_ApproveSubmission_Success() throws Exception {
             // given
             setupSecurityContext(1L);
@@ -623,7 +623,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("점수 신청 거부 성공")
-        @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+        @WithMockUser(username = "admin@hs.ac.kr", roles = "ADMIN")
         void changeSubmissionStatus_RejectSubmission_Success() throws Exception {
             // given
             setupSecurityContext(1L);
@@ -648,7 +648,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("상태값 누락 시 500 Internal Server Error 반환 (컨트롤러 내부 검증)")
-        @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+        @WithMockUser(username = "admin@hs.ac.kr", roles = "ADMIN")
         void changeSubmissionStatus_MissingStatus_InternalServerError() throws Exception {
             // given
             setupSecurityContext(1L);
@@ -670,7 +670,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("거부 시 사유 누락 시 500 Internal Server Error 반환 (컨트롤러 내부 검증)")
-        @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+        @WithMockUser(username = "admin@hs.ac.kr", roles = "ADMIN")
         void changeSubmissionStatus_RejectWithoutReason_InternalServerError() throws Exception {
             // given
             setupSecurityContext(1L);
@@ -692,7 +692,7 @@ class ScoreSubmissionControllerTest {
 
         @Test
         @DisplayName("지원하지 않는 상태값 시 500 Internal Server Error 반환 (컨트롤러 내부 검증)")
-        @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+        @WithMockUser(username = "admin@hs.ac.kr", roles = "ADMIN")
         void changeSubmissionStatus_UnsupportedStatus_InternalServerError() throws Exception {
             // given
             setupSecurityContext(1L);

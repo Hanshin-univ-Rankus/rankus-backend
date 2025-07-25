@@ -118,7 +118,7 @@ class LabApplicationControllerTest {
                 given(app.getUser()).willReturn(mockUser);
                 given(mockUser.getId()).willReturn(USER_ID);
                 given(mockUser.getName()).willReturn("테스트유저");
-                given(mockUser.getEmail()).willReturn("test@example.com");
+                given(mockUser.getEmail()).willReturn("test@hs.ac.kr");
                 given(app.getInterviewTime()).willReturn(t);
                 given(app.getStatus()).willReturn(ApplicationStatus.PENDING);
             }
@@ -163,7 +163,7 @@ class LabApplicationControllerTest {
             given(mockApp.getUser()).willReturn(mockUser);
             given(mockUser.getId()).willReturn(USER_ID);
             given(mockUser.getName()).willReturn("테스트유저");
-            given(mockUser.getEmail()).willReturn("test@example.com");
+            given(mockUser.getEmail()).willReturn("test@hs.ac.kr");
             given(mockApp.getInterviewTime()).willReturn(t);
             given(mockApp.getStatus()).willReturn(ApplicationStatus.APPROVED);
             given(queryUseCase.getApplicationById(APP_ID))

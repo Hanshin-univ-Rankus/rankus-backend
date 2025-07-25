@@ -24,7 +24,7 @@ public final class DtoFactory {
     public static UserRegisterRequestDto buildUserRegisterRequest() {
         return UserRegisterRequestDto.builder()
                 .name("테스트사용자")
-                .email("test@example.com")
+                .email("test@hs.ac.kr")
                 .password("Password!123")
                 .studentNumber("20201001")
                 .phoneNumber("010-1234-5678")
@@ -47,7 +47,7 @@ public final class DtoFactory {
 
     public static UserLoginRequestDto buildUserLoginRequest() {
         return UserLoginRequestDto.builder()
-                .email("test@example.com")
+                .email("test@hs.ac.kr")
                 .password("Password!123")
                 .build();
     }
@@ -85,7 +85,7 @@ public final class DtoFactory {
         return UserResponseDto.builder()
                 .id(1L)
                 .name("테스트사용자")
-                .email("test@example.com")
+                .email("test@hs.ac.kr")
                 .studentNumber("20201001")
                 .phoneNumber("010-1234-5678")
                 .grade(3)

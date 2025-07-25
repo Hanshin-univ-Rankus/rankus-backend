@@ -22,7 +22,7 @@ public final class DomainUserFactory {
         String suffix = String.valueOf(nameCounter++);
         return new User(
                 "TestUser" + suffix,
-                "testuser" + suffix + "@example.com",
+                "testuser" + suffix + "@hs.ac.kr",
                 Password.fromRaw("Password!23", ENCODER),
                 "2020100" + suffix,
                 "010-1234-567" + suffix,
@@ -38,7 +38,7 @@ public final class DomainUserFactory {
     }
 
     public static User buildInvalidUser_Name() {
-        return new User("", "user@example.com", Password.fromRaw("Password!23", ENCODER),
+        return new User("", "user@hs.ac.kr", Password.fromRaw("Password!23", ENCODER),
                 "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED);
     }
 

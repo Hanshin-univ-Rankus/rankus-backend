@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*;
  */
 public class AuthMockUtil {
 
-    public static final String VALID_EMAIL = "user@example.com";
+    public static final String VALID_EMAIL = "user@hs.ac.kr";
     public static final String RAW_PASSWORD = "password123";
     public static final String TOKEN = "jwt-token";
 

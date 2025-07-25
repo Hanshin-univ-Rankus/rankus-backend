@@ -56,7 +56,7 @@ class SpringDataLabApplicationRepositoryTest extends BaseRepositoryTest {
         Lab lab1 = IntegrationLabFactory.persistValidLab(entityManager);
         Lab lab2 = IntegrationLabFactory.persistCustomLab(entityManager, "OtherLab", lab1.getCategory(), "desc", "ProfX");
         User user1 = IntegrationUserFactory.persistValidUser(entityManager);
-        User user2 = IntegrationUserFactory.persistCustomUser(entityManager, "User2", "u2@example.com", "Password!23");
+        User user2 = IntegrationUserFactory.persistCustomUser(entityManager, "User2", "u2@hs.ac.kr", "Password!23");
         LocalDateTime t1 = LocalDateTime.now().plusDays(1);
         LocalDateTime t2 = LocalDateTime.now().plusDays(2);
 

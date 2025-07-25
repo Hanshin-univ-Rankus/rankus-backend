@@ -27,7 +27,7 @@ class UserTest {
         void constructor_nullPassword_throwsInvalidCredentials() {
             // given
             String name = "홍길동";
-            String email = "test@univ.ac.kr";
+            String email = "test@hs.ac.kr";
             Password pwd = null;
 
             // when & then
@@ -50,7 +50,7 @@ class UserTest {
             // when & then
             UserValidationException ex = assertThrows(
                     UserValidationException.class,
-                    () -> new User(name, "a@b.com", pwd, "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED)
+                    () -> new User(name, "a@hs.ac.kr", pwd, "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED)
             );
             assertEquals(UserErrorCode.NAME_REQUIRED, ex.getErrorCode());
         }
@@ -65,7 +65,7 @@ class UserTest {
             // when & then
             UserValidationException ex = assertThrows(
                     UserValidationException.class,
-                    () -> new User(longName, "a@b.com", pwd, "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED)
+                    () -> new User(longName, "a@hs.ac.kr", pwd, "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED)
             );
             assertEquals(UserErrorCode.NAME_TOO_LONG, ex.getErrorCode());
         }
@@ -102,7 +102,7 @@ class UserTest {
         void constructor_validInput_setsFields() {
             // given
             String name = " 홍길동 ";
-            String email = " test@univ.ac.kr ";
+            String email = " test@hs.ac.kr ";
             Password pwd = Password.fromRaw("Password!23", new TestPasswordEncoder());
 
             // when
@@ -111,7 +111,7 @@ class UserTest {
             // then
             assertNull(user.getId(), "생성 전에는 ID가 null이어야 한다");
             assertEquals("홍길동", user.getName());
-            assertEquals("test@univ.ac.kr", user.getEmail());
+            assertEquals("test@hs.ac.kr", user.getEmail());
             assertEquals("20201001", user.getStudentNumber());
             assertEquals("010-1234-5678", user.getPhoneNumber());
             assertEquals(3, user.getGrade());

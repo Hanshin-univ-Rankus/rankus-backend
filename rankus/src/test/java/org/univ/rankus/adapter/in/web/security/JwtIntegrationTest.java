@@ -80,7 +80,7 @@ class JwtIntegrationTest {
     @DisplayName("로그인 후 JWT로 보호된 엔드포인트에 접근하면 200 OK 반환")
     void accessWithValidToken() throws Exception {
         // 1) 로그인 모킹
-        String email = "user@example.com";
+        String email = "user@hs.ac.kr";
         String rawPassword = "password";
         String fakeToken = "fake-jwt-token";
 

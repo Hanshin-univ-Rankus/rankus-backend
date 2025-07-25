@@ -92,15 +92,29 @@ public class User extends BaseTimeEntity {
 
     /**
      * 이메일 유효성 검증
+     * - @hs.ac.kr 도메인만 허용
      */
     private String validateEmail(String email) {
         if (!StringUtils.hasText(email)) {
             throw new UserValidationException(UserErrorCode.EMAIL_REQUIRED);
         }
-        String trimmed = email.trim();
+        String trimmed = email.trim().toLowerCase();
+
+        // 기본 이메일 형식 검증
         if (!trimmed.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
             throw new UserValidationException(UserErrorCode.EMAIL_INVALID);
         }
+
+        // @hs.ac.kr 도메인 검증
+        if (!trimmed.endsWith("@hs.ac.kr")) {
+            throw new UserValidationException(UserErrorCode.EMAIL_DOMAIN_NOT_ALLOWED);
+        }
+
+        // @hs.ac.kr 도메인 정확한 형식 검증
+        if (!trimmed.matches("^[A-Za-z0-9._%+-]+@hs\\.ac\\.kr$")) {
+            throw new UserValidationException(UserErrorCode.EMAIL_INVALID);
+        }
+
         if (trimmed.length() > 100) {
             // 이메일 길이 초과 시에도 INVALID로 처리
             throw new UserValidationException(UserErrorCode.EMAIL_INVALID);

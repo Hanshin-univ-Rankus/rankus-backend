@@ -15,6 +15,7 @@ public enum UserErrorCode implements ErrorCode {
     NAME_REQUIRED("USER_001", HttpStatus.BAD_REQUEST, "이름은 필수입니다."),
     EMAIL_REQUIRED("USER_002", HttpStatus.BAD_REQUEST, "이메일은 필수입니다."),
     EMAIL_INVALID("USER_003", HttpStatus.BAD_REQUEST, "이메일 형식이 올바르지 않습니다."),
+    EMAIL_DOMAIN_NOT_ALLOWED("USER_025", HttpStatus.BAD_REQUEST, "@hs.ac.kr 도메인 이메일만 허용됩니다."),
     NAME_TOO_LONG("USER_004", HttpStatus.BAD_REQUEST, "이름은 10자 이하여야 합니다."),
     LAB_REQUIRED("USER_005", HttpStatus.BAD_REQUEST, "소속 랩은 필수입니다."),
     ROLE_REQUIRED("USER_006", HttpStatus.BAD_REQUEST, "권한(role)은 필수입니다."),

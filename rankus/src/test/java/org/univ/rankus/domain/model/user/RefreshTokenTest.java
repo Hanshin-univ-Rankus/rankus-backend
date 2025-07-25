@@ -25,7 +25,7 @@ class RefreshTokenTest {
         @DisplayName("유효한 정보로 리프레시 토큰 생성 성공")
         void create_validInput_success() {
             // given
-            String userEmail = "test@example.com";
+            String userEmail = "test@hs.ac.kr";
             long expirationMs = 7 * 24 * 60 * 60 * 1000L; // 7일
 
             // when
@@ -61,7 +61,7 @@ class RefreshTokenTest {
         @ValueSource(longs = {0L, -1L, -1000L})
         void create_invalidExpiration_throwsTokenExpirationInvalid(long invalidExpirationMs) {
             // given
-            String userEmail = "test@example.com";
+            String userEmail = "test@hs.ac.kr";
 
             // when & then
             assertThatThrownBy(() -> RefreshToken.create(userEmail, invalidExpirationMs))
@@ -76,7 +76,7 @@ class RefreshTokenTest {
         @DisplayName("토큰 ID는 매번 다른 UUID로 생성됨")
         void create_generatesDifferentUUIDs() {
             // given
-            String userEmail = "test@example.com";
+            String userEmail = "test@hs.ac.kr";
             long expirationMs = 7 * 24 * 60 * 60 * 1000L;
 
             // when
@@ -96,7 +96,7 @@ class RefreshTokenTest {
         @DisplayName("활성 상태이고 만료되지 않은 토큰은 유효함")
         void isValid_activeAndNotExpired_returnsTrue() {
             // given
-            String userEmail = "test@example.com";
+            String userEmail = "test@hs.ac.kr";
             long expirationMs = 7 * 24 * 60 * 60 * 1000L; // 7일
             RefreshToken refreshToken = RefreshToken.create(userEmail, expirationMs);
 
@@ -108,7 +108,7 @@ class RefreshTokenTest {
         @DisplayName("만료된 토큰은 유효하지 않음")
         void isValid_expired_returnsFalse() {
             // given - 매우 짧은 만료 시간으로 토큰 생성
-            String userEmail = "test@example.com";
+            String userEmail = "test@hs.ac.kr";
             long expirationMs = 1L; // 1ms 후 만료
             RefreshToken refreshToken = RefreshToken.create(userEmail, expirationMs);
 
@@ -128,7 +128,7 @@ class RefreshTokenTest {
         @DisplayName("비활성화된 토큰은 유효하지 않음")
         void isValid_inactive_returnsFalse() {
             // given
-            String userEmail = "test@example.com";
+            String userEmail = "test@hs.ac.kr";
             long expirationMs = 7 * 24 * 60 * 60 * 1000L;
             RefreshToken refreshToken = RefreshToken.create(userEmail, expirationMs);
 
@@ -148,7 +148,7 @@ class RefreshTokenTest {
         @DisplayName("토큰 비활성화 성공")
         void deactivate_activeToken_success() {
             // given
-            String userEmail = "test@example.com";
+            String userEmail = "test@hs.ac.kr";
             long expirationMs = 7 * 24 * 60 * 60 * 1000L;
             RefreshToken refreshToken = RefreshToken.create(userEmail, expirationMs);
 
@@ -164,7 +164,7 @@ class RefreshTokenTest {
         @DisplayName("만료 여부 확인")
         void isExpired_checkExpirationStatus() {
             // given - 1초 후 만료되는 토큰과 장기간 유효한 토큰
-            String userEmail = "test@example.com";
+            String userEmail = "test@hs.ac.kr";
             long shortExpirationMs = 1L; // 1ms 후 만료
             long longExpirationMs = 7 * 24 * 60 * 60 * 1000L; // 7일
 
@@ -189,7 +189,7 @@ class RefreshTokenTest {
         @DisplayName("토큰 정보 검증")
         void tokenProperties_checkAllFields() {
             // given
-            String userEmail = "user@test.com";
+            String userEmail = "user@hs.ac.kr";
             long expirationMs = 3 * 24 * 60 * 60 * 1000L; // 3일
 
             // when
@@ -212,7 +212,7 @@ class RefreshTokenTest {
         @DisplayName("같은 사용자의 토큰도 각각 고유한 ID를 가짐")
         void create_sameUser_differentTokenIds() {
             // given
-            String userEmail = "same@example.com";
+            String userEmail = "same@hs.ac.kr";
             long expirationMs = 7 * 24 * 60 * 60 * 1000L;
 
             // when
@@ -230,7 +230,7 @@ class RefreshTokenTest {
         @DisplayName("토큰 생성 시간이 만료 시간보다 이전임")
         void create_creationTimeBeforeExpiration() {
             // given
-            String userEmail = "test@example.com";
+            String userEmail = "test@hs.ac.kr";
             long expirationMs = 1 * 60 * 60 * 1000L; // 1시간
             LocalDateTime beforeCreation = LocalDateTime.now();
 
@@ -247,7 +247,7 @@ class RefreshTokenTest {
         @DisplayName("토큰 재활성화 성공")
         void reactivate_deactivatedToken_success() {
             // given
-            String userEmail = "test@example.com";
+            String userEmail = "test@hs.ac.kr";
             long expirationMs = 7 * 24 * 60 * 60 * 1000L;
             RefreshToken refreshToken = RefreshToken.create(userEmail, expirationMs);
             String originalTokenId = refreshToken.getTokenId();

@@ -61,7 +61,7 @@ class UserControllerTest {
             given(userQueryUseCase.getUserById(userId)).willReturn(mockUser);
             given(mockUser.getId()).willReturn(userId);
             given(mockUser.getName()).willReturn("테스트유저");
-            given(mockUser.getEmail()).willReturn("test@example.com");
+            given(mockUser.getEmail()).willReturn("test@hs.ac.kr");
 
             // when & then
             mockMvc.perform(get("/api/users/me")
@@ -71,7 +71,7 @@ class UserControllerTest {
                     .andExpect(jsonPath("$.message").value("사용자 정보 조회 성공"))
                     .andExpect(jsonPath("$.data.id").value(42))
                     .andExpect(jsonPath("$.data.name").value("테스트유저"))
-                    .andExpect(jsonPath("$.data.email").value("test@example.com"));
+                    .andExpect(jsonPath("$.data.email").value("test@hs.ac.kr"));
         }
 
         @Test

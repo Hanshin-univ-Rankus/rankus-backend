@@ -47,7 +47,7 @@ class SpringDataUserRepositoryTest extends BaseRepositoryTest {
     @DisplayName("findByEmail: 존재하지 않는 이메일 조회 시 Optional.empty() 반환")
     void findByEmail_nonExistingEmail_returnsEmpty() {
         // when
-        Optional<User> found = userRepo.findByEmail("no_such_user@example.com");
+        Optional<User> found = userRepo.findByEmail("no_such_user@hs.ac.kr");
         // then
         assertTrue(found.isEmpty(), "존재하지 않는 이메일 조회 시 빈 Optional을 반환해야 한다");
     }
@@ -65,6 +65,6 @@ class SpringDataUserRepositoryTest extends BaseRepositoryTest {
     @DisplayName("existsByEmail: 미존재 이메일에 대해 false 반환")
     void existsByEmail_nonExistingEmail_returnsFalse() {
         // when & then
-        assertFalse(userRepo.existsByEmail("no_such_user@example.com"), "미존재 이메일에 대해 existsByEmail은 false를 반환해야 한다");
+        assertFalse(userRepo.existsByEmail("no_such_user@hs.ac.kr"), "미존재 이메일에 대해 existsByEmail은 false를 반환해야 한다");
     }
 }

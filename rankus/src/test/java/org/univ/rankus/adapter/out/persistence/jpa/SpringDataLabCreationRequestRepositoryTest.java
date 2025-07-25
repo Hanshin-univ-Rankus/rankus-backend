@@ -115,7 +115,7 @@ class SpringDataLabCreationRequestRepositoryTest extends BaseRepositoryTest {
         void findByStatusOrderByCreatedAtDesc_pending_success() {
             // given
             User requester1 = IntegrationUserFactory.persistValidUser(userRepositoryPort);
-            User requester2 = IntegrationUserFactory.persistCustomUser(userRepositoryPort, "User2", "user2@test.com", "Password!23");
+            User requester2 = IntegrationUserFactory.persistCustomUser(userRepositoryPort, "User2", "user2@hs.ac.kr", "Password!23");
 
             LabCreationRequest request1 = IntegrationLabCreationRequestFactory.persistValidPendingRequest(
                     labCreationRequestRepositoryPort, requester1
@@ -165,7 +165,7 @@ class SpringDataLabCreationRequestRepositoryTest extends BaseRepositoryTest {
         void findByRequesterOrderByCreatedAtDesc_success() {
             // given
             User requester1 = IntegrationUserFactory.persistValidUser(userRepositoryPort);
-            User requester2 = IntegrationUserFactory.persistCustomUser(userRepositoryPort, "User2", "user2@test.com", "Password!23");
+            User requester2 = IntegrationUserFactory.persistCustomUser(userRepositoryPort, "User2", "user2@hs.ac.kr", "Password!23");
 
             // requester1의 신청서 2개 생성
             LabCreationRequest request1 = IntegrationLabCreationRequestFactory.persistValidPendingRequest(
@@ -224,7 +224,7 @@ class SpringDataLabCreationRequestRepositoryTest extends BaseRepositoryTest {
         void findAllByCreatedAtDesc_success() {
             // given
             User requester1 = IntegrationUserFactory.persistValidUser(userRepositoryPort);
-            User requester2 = IntegrationUserFactory.persistCustomUser(userRepositoryPort, "User2", "user2@test.com", "Password!23");
+            User requester2 = IntegrationUserFactory.persistCustomUser(userRepositoryPort, "User2", "user2@hs.ac.kr", "Password!23");
 
             LabCreationRequest request1 = IntegrationLabCreationRequestFactory.persistValidPendingRequest(
                     labCreationRequestRepositoryPort, requester1
@@ -369,8 +369,8 @@ class SpringDataLabCreationRequestRepositoryTest extends BaseRepositoryTest {
         void complexScenario_multipleUsersAndStatuses() {
             // given
             User requester1 = IntegrationUserFactory.persistValidUser(userRepositoryPort);
-            User requester2 = IntegrationUserFactory.persistCustomUser(userRepositoryPort, "User2", "user2@test.com", "Password!23");
-            User requester3 = IntegrationUserFactory.persistCustomUser(userRepositoryPort, "User3", "user3@test.com", "Password!23");
+            User requester2 = IntegrationUserFactory.persistCustomUser(userRepositoryPort, "User2", "user2@hs.ac.kr", "Password!23");
+            User requester3 = IntegrationUserFactory.persistCustomUser(userRepositoryPort, "User3", "user3@hs.ac.kr", "Password!23");
 
             // 다양한 신청서 생성
             LabCreationRequest request1 = IntegrationLabCreationRequestFactory.persistCustomRequest(

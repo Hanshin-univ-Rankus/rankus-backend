@@ -55,7 +55,7 @@ class AuthControllerTest {
         @DisplayName("정상 요청 → 201 Created + Location, Cache-Control 헤더 + ApiResponse body")
         void signupSuccess() throws Exception {
             // given
-            UserRegisterRequestDto request = DtoFactory.buildUserRegisterRequest("홍길동", "new@example.com", "password123");
+            UserRegisterRequestDto request = DtoFactory.buildUserRegisterRequest("홍길동", "new@hs.ac.kr", "password123");
             String json = objectMapper.writeValueAsString(request);
 
             User savedUser = DomainUserFactory.buildValidUserWithId(123L);
@@ -80,7 +80,7 @@ class AuthControllerTest {
         @DisplayName("이메일 중복 시 UserValidationException → 409 Conflict + ErrorResponse body")
         void signupDuplicateEmail() throws Exception {
             // given
-            UserRegisterRequestDto request = DtoFactory.buildUserRegisterRequest("홍길동", "exist@example.com", "password123");
+            UserRegisterRequestDto request = DtoFactory.buildUserRegisterRequest("홍길동", "exist@hs.ac.kr", "password123");
             String json = objectMapper.writeValueAsString(request);
 
             given(authUseCase.signUp(any(UserRegisterRequestDto.class)))
@@ -127,10 +127,10 @@ class AuthControllerTest {
         @DisplayName("정상 요청 → 200 OK + ApiResponse body")
         void loginSuccess() throws Exception {
             // given
-            UserLoginRequestDto request = DtoFactory.buildUserLoginRequest("user@example.com", "password");
+            UserLoginRequestDto request = DtoFactory.buildUserLoginRequest("user@hs.ac.kr", "password");
             String json = objectMapper.writeValueAsString(request);
 
-            UserResponseDto userDto = DtoFactory.buildUserResponseDto(10L, "테스터", "user@example.com", Role.STUDENT);
+            UserResponseDto userDto = DtoFactory.buildUserResponseDto(10L, "테스터", "user@hs.ac.kr", Role.STUDENT);
             AuthResponseDto authDto = DtoFactory.buildAuthResponseDto("jwt-token", userDto);
 
             given(authUseCase.login(any(UserLoginRequestDto.class)))
@@ -146,14 +146,14 @@ class AuthControllerTest {
                     .andExpect(jsonPath("$.data.token").value("jwt-token"))
                     .andExpect(jsonPath("$.data.user.id").value(10))
                     .andExpect(jsonPath("$.data.user.name").value("테스터"))
-                    .andExpect(jsonPath("$.data.user.email").value("user@example.com"));
+                    .andExpect(jsonPath("$.data.user.email").value("user@hs.ac.kr"));
         }
 
         @Test
         @DisplayName("인증 실패 → 401 Unauthorized + ErrorResponse body")
         void loginFailure() throws Exception {
             // given
-            UserLoginRequestDto request = DtoFactory.buildUserLoginRequest("user@example.com", "wrong");
+            UserLoginRequestDto request = DtoFactory.buildUserLoginRequest("user@hs.ac.kr", "wrong");
             String json = objectMapper.writeValueAsString(request);
 
             given(authUseCase.login(any(UserLoginRequestDto.class)))

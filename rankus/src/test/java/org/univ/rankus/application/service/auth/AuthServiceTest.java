@@ -72,11 +72,11 @@ class AuthServiceTest {
         @DisplayName("등록되지 않은 이메일로 로그인 시 UserNotFoundException을 던진다")
         void loginUserNotFound() {
             // given: 이메일 미존재
-            AuthMockUtil.mockUserNotFound(userRepo, "noone@example.com");
+            AuthMockUtil.mockUserNotFound(userRepo, "noone@hs.ac.kr");
 
             // when & then: 예외 및 에러코드 검증
             UserLoginRequestDto request = UserLoginRequestDto.builder()
-                    .email("noone@example.com")
+                    .email("noone@hs.ac.kr")
                     .password(AuthMockUtil.RAW_PASSWORD)
                     .build();
             assertThatThrownBy(() ->
@@ -120,7 +120,7 @@ class AuthServiceTest {
         void signUpSuccess() {
             // given: 이메일 중복 없음
             String name = "홍길동";
-            String email = "new@example.com";
+            String email = "new@hs.ac.kr";
             when(userRepo.existsByEmail(email)).thenReturn(false);
 
             // 비밀번호 해시 생성 설정
@@ -164,7 +164,7 @@ class AuthServiceTest {
         @DisplayName("이미 존재하는 이메일로 회원가입 시 UserValidationException을 던진다")
         void signUpDuplicateEmail() {
             // given: 이메일 중복
-            String email = "exist@example.com";
+            String email = "exist@hs.ac.kr";
             when(userRepo.existsByEmail(email)).thenReturn(true);
 
             // when & then: 예외 및 에러코드 검증

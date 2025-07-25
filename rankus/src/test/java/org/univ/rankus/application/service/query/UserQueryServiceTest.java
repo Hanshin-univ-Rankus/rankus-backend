@@ -73,7 +73,7 @@ class UserQueryServiceTest {
         @DisplayName("존재하는 이메일인 경우 User를 반환한다")
         void getUserByEmailSuccess() {
             // given
-            String email = "user@example.com";
+            String email = "user@hs.ac.kr";
             User mockUser = QueryMockUtil.mockExistingUserByEmail(userRepo, email);
 
             // when
@@ -88,7 +88,7 @@ class UserQueryServiceTest {
         @DisplayName("존재하지 않는 이메일인 경우 UserNotFoundException을 던진다")
         void getUserByEmailNotFound() {
             // given
-            String email = "notfound@example.com";
+            String email = "notfound@hs.ac.kr";
             QueryMockUtil.mockUserNotFoundByEmail(userRepo, email);
 
             // when & then
