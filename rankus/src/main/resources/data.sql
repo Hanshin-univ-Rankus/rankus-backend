@@ -175,14 +175,16 @@ VALUES
 -- 투표 5: 연구실 청소 일정 결정 (CLOSED) - 3명 참여
 (5, 5, 6, 14, DATE_SUB(NOW(), INTERVAL 2 WEEK), NOW()), -- 랩장2 → 격주 토요일 오전
 (6, 5, 3, 14, DATE_SUB(NOW(), INTERVAL 13 DAY), NOW()), -- 교수 → 격주 토요일 오전
-(7, 5, 1, 13, DATE_SUB(NOW(), INTERVAL 12 DAY), NOW()); -- 학생1 → 매주 금요일 오후
+(7, 5, 1, 13, DATE_SUB(NOW(), INTERVAL 12 DAY), NOW());
+-- 학생1 → 매주 금요일 오후
 
 -- 16. lab_resources (랩실 자료)
-INSERT INTO lab_resources (id, lab_id, uploader_id, title, description, file_name, file_url, file_size, category, is_public, download_count, version, created_at, updated_at)
-VALUES 
+INSERT INTO lab_resources (id, lab_id, uploader_id, title, description, file_name, file_url, file_size, category,
+                           is_public, download_count, version, created_at, updated_at)
+VALUES
 -- AI랩(1) 자료들
-(1, 1, 2, '머신러닝 기초 강의자료', '2024년 상반기 머신러닝 기초 강의 슬라이드입니다. 선형회귀부터 신경망까지 포함되어 있습니다.', 
- '머신러닝_기초_2024상반기.pdf', 'https://example.com/files/ml_basics_2024_1.pdf', 5242880, 'LECTURE_NOTE', true, 15, 0, 
+(1, 1, 2, '머신러닝 기초 강의자료', '2024년 상반기 머신러닝 기초 강의 슬라이드입니다. 선형회귀부터 신경망까지 포함되어 있습니다.',
+ '머신러닝_기초_2024상반기.pdf', 'https://example.com/files/ml_basics_2024_1.pdf', 5242880, 'LECTURE_NOTE', true, 15, 0,
  DATE_SUB(NOW(), INTERVAL 3 MONTH), NOW()),
 
 (2, 1, 2, 'PyTorch 실습 가이드', 'PyTorch를 활용한 딥러닝 모델 구현 실습 가이드입니다. CNN, RNN 예제 코드가 포함되어 있습니다.',
@@ -236,7 +238,8 @@ VALUES
  DATE_SUB(NOW(), INTERVAL 1 WEEK), NOW()),
 
 (14, 2, 6, '빅데이터 처리 프레임워크', 'Spark, Hadoop을 활용한 빅데이터 처리 방법론과 실습 예제입니다.',
- 'BigData_Processing_Framework.zip', 'https://example.com/files/bigdata_framework.zip', 25165824, 'REFERENCE', true, 9, 0,
+ 'BigData_Processing_Framework.zip', 'https://example.com/files/bigdata_framework.zip', 25165824, 'REFERENCE', true, 9,
+ 0,
  DATE_SUB(NOW(), INTERVAL 3 DAY), NOW()),
 
 (15, 1, 5, '컴퓨터 비전 프로젝트', 'OpenCV와 YOLO를 활용한 객체 인식 프로젝트 소스코드입니다.',

@@ -11,29 +11,31 @@ import org.mockito.quality.Strictness;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.adapter.in.web.dto.response.LabResourceResponseDto;
 import org.univ.rankus.application.port.in.command.LabResourceCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabResourceQueryUseCase;
+import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.lab.resource.ResourceCategory;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * LabResourceController 테스트
@@ -83,7 +85,7 @@ class LabResourceControllerTest {
         Long labId = 1L;
         List<LabResourceResponseDto> resources = List.of(createTestResourceResponseDto());
         Page<LabResourceResponseDto> resourcePage = new PageImpl<>(resources);
-        
+
         when(labResourceQueryUseCase.getLabResources(eq(labId), any(), any(), any(Pageable.class), any()))
                 .thenReturn(resourcePage);
 
@@ -107,7 +109,7 @@ class LabResourceControllerTest {
         Long labId = 1L;
         Long resourceId = 1L;
         LabResourceResponseDto resource = createTestResourceResponseDto();
-        
+
         when(labResourceQueryUseCase.getLabResource(eq(resourceId), any()))
                 .thenReturn(resource);
 
@@ -129,7 +131,7 @@ class LabResourceControllerTest {
         setupSecurityContext(1L);
         Long labId = 1L;
         List<ResourceCategory> categories = List.of(ResourceCategory.values());
-        
+
         when(labResourceQueryUseCase.getResourceCategories())
                 .thenReturn(categories);
 
@@ -150,10 +152,10 @@ class LabResourceControllerTest {
         setupSecurityContext(1L);
         Long labId = 1L;
         var stats = new LabResourceQueryUseCase.LabResourceStatsDto(
-                10L, 8L, 2L, 
+                10L, 8L, 2L,
                 java.util.Map.of(ResourceCategory.LECTURE_NOTE, 5L, ResourceCategory.RESEARCH, 3L)
         );
-        
+
         when(labResourceQueryUseCase.getLabResourceStats(eq(labId), any()))
                 .thenReturn(stats);
 
