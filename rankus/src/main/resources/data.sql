@@ -176,3 +176,69 @@ VALUES
 (5, 5, 6, 14, DATE_SUB(NOW(), INTERVAL 2 WEEK), NOW()), -- 랩장2 → 격주 토요일 오전
 (6, 5, 3, 14, DATE_SUB(NOW(), INTERVAL 13 DAY), NOW()), -- 교수 → 격주 토요일 오전
 (7, 5, 1, 13, DATE_SUB(NOW(), INTERVAL 12 DAY), NOW()); -- 학생1 → 매주 금요일 오후
+
+-- 16. lab_resources (랩실 자료)
+INSERT INTO lab_resources (id, lab_id, uploader_id, title, description, file_name, file_url, file_size, category, is_public, download_count, version, created_at, updated_at)
+VALUES 
+-- AI랩(1) 자료들
+(1, 1, 2, '머신러닝 기초 강의자료', '2024년 상반기 머신러닝 기초 강의 슬라이드입니다. 선형회귀부터 신경망까지 포함되어 있습니다.', 
+ '머신러닝_기초_2024상반기.pdf', 'https://example.com/files/ml_basics_2024_1.pdf', 5242880, 'LECTURE_NOTE', true, 15, 0, 
+ DATE_SUB(NOW(), INTERVAL 3 MONTH), NOW()),
+
+(2, 1, 2, 'PyTorch 실습 가이드', 'PyTorch를 활용한 딥러닝 모델 구현 실습 가이드입니다. CNN, RNN 예제 코드가 포함되어 있습니다.',
+ 'pytorch_실습가이드_v2.1.pdf', 'https://example.com/files/pytorch_guide_v2.1.pdf', 8388608, 'REFERENCE', true, 28, 0,
+ DATE_SUB(NOW(), INTERVAL 2 MONTH), NOW()),
+
+(3, 1, 5, '자연어처리 과제 제출물', 'BERT 모델을 활용한 감정 분석 과제 최종 제출물입니다.',
+ 'NLP_과제_감정분석_BERT.zip', 'https://example.com/files/nlp_assignment_bert.zip', 15728640, 'ASSIGNMENT', false, 3, 0,
+ DATE_SUB(NOW(), INTERVAL 1 MONTH), NOW()),
+
+(4, 1, 2, 'TensorFlow 2.0 설치 가이드', 'GPU 환경에서 TensorFlow 2.0 설치 및 환경 설정 가이드입니다.',
+ 'TensorFlow_2.0_설치가이드.docx', 'https://example.com/files/tf_install_guide.docx', 2097152, 'DOCUMENT', true, 42, 0,
+ DATE_SUB(NOW(), INTERVAL 4 MONTH), NOW()),
+
+(5, 1, 2, '연구 논문 템플릿', 'AI랩 연구 논문 작성을 위한 LaTeX 템플릿입니다. IEEE 형식을 따릅니다.',
+ 'AI_Lab_Paper_Template.zip', 'https://example.com/files/paper_template.zip', 1048576, 'RESEARCH', true, 12, 0,
+ DATE_SUB(NOW(), INTERVAL 5 MONTH), NOW()),
+
+(6, 1, 5, 'Anaconda 환경 설정', '머신러닝 프로젝트를 위한 Anaconda 가상환경 설정 방법입니다.',
+ 'anaconda_환경설정_가이드.pdf', 'https://example.com/files/anaconda_setup.pdf', 3145728, 'SOFTWARE', true, 35, 0,
+ DATE_SUB(NOW(), INTERVAL 6 WEEK), NOW()),
+
+-- DB랩(2) 자료들  
+(7, 2, 3, 'MySQL 고급 최적화 기법', '대용량 데이터베이스 최적화를 위한 인덱싱, 쿼리 튜닝 기법을 다룹니다.',
+ 'MySQL_고급최적화_2024.pdf', 'https://example.com/files/mysql_optimization_2024.pdf', 12582912, 'LECTURE_NOTE', true, 67, 0,
+ DATE_SUB(NOW(), INTERVAL 2 MONTH), NOW()),
+
+(8, 2, 6, 'NoSQL 데이터베이스 비교 분석', 'MongoDB, Redis, Cassandra 등 주요 NoSQL 데이터베이스 특징 비교 자료입니다.',
+ 'NoSQL_비교분석_보고서.pptx', 'https://example.com/files/nosql_comparison.pptx', 7340032, 'RESEARCH', true, 24, 0,
+ DATE_SUB(NOW(), INTERVAL 1 MONTH), NOW()),
+
+(9, 2, 6, '데이터베이스 설계 과제', '온라인 쇼핑몰 데이터베이스 설계 과제 및 ERD 작성 가이드입니다.',
+ 'DB설계과제_쇼핑몰ERD.pdf', 'https://example.com/files/db_design_assignment.pdf', 4194304, 'ASSIGNMENT', false, 8, 0,
+ DATE_SUB(NOW(), INTERVAL 3 WEEK), NOW()),
+
+(10, 2, 3, 'PostgreSQL 실습 매뉴얼', 'PostgreSQL 고급 기능 활용을 위한 실습 매뉴얼입니다. JSON, 전문검색 등을 포함합니다.',
+ 'PostgreSQL_실습매뉴얼_v3.2.pdf', 'https://example.com/files/postgresql_manual_v3.2.pdf', 9437184, 'REFERENCE', true, 18, 0,
+ DATE_SUB(NOW(), INTERVAL 5 WEEK), NOW()),
+
+(11, 2, 6, 'Redis 캐싱 전략', '웹 애플리케이션에서 Redis를 활용한 효과적인 캐싱 전략과 구현 방법입니다.',
+ 'Redis_캐싱전략_구현가이드.md', 'https://example.com/files/redis_caching_strategy.md', 524288, 'DOCUMENT', true, 31, 0,
+ DATE_SUB(NOW(), INTERVAL 4 WEEK), NOW()),
+
+(12, 2, 3, 'DB 백업 및 복구 스크립트', '자동화된 데이터베이스 백업 및 복구를 위한 쉘 스크립트 모음입니다.',
+ 'DB_백업복구_스크립트.tar.gz', 'https://example.com/files/db_backup_scripts.tar.gz', 2621440, 'SOFTWARE', false, 5, 0,
+ DATE_SUB(NOW(), INTERVAL 2 WEEK), NOW()),
+
+-- 추가 다양한 자료들
+(13, 1, 2, '딥러닝 논문 리뷰 모음', '2024년 상반기 주요 딥러닝 논문 리뷰 발표 자료 모음입니다.',
+ '딥러닝논문리뷰_2024상반기.pptx', 'https://example.com/files/dl_paper_reviews_2024.pptx', 18874368, 'RESEARCH', true, 22, 0,
+ DATE_SUB(NOW(), INTERVAL 1 WEEK), NOW()),
+
+(14, 2, 6, '빅데이터 처리 프레임워크', 'Spark, Hadoop을 활용한 빅데이터 처리 방법론과 실습 예제입니다.',
+ 'BigData_Processing_Framework.zip', 'https://example.com/files/bigdata_framework.zip', 25165824, 'REFERENCE', true, 9, 0,
+ DATE_SUB(NOW(), INTERVAL 3 DAY), NOW()),
+
+(15, 1, 5, '컴퓨터 비전 프로젝트', 'OpenCV와 YOLO를 활용한 객체 인식 프로젝트 소스코드입니다.',
+ 'CV_프로젝트_객체인식_YOLO.zip', 'https://example.com/files/cv_project_yolo.zip', 31457280, 'ASSIGNMENT', false, 1, 0,
+ NOW(), NOW());

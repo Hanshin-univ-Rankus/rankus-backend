@@ -337,6 +337,92 @@ public class User extends BaseTimeEntity {
     }
 
     /**
+     * 특정 랩실의 자료실 조회 권한을 확인
+     * 랩실 소속 멤버(LAB_MEMBER 이상) + 모든 PROFESSOR, ADMIN
+     */
+    public boolean canViewLabResources(Lab lab) {
+        if (lab == null) {
+            return false;
+        }
+
+        // ADMIN과 PROFESSOR는 모든 랩실의 자료실 조회 가능
+        if (this.role == Role.ADMIN || this.role == Role.PROFESSOR) {
+            return true;
+        }
+
+        // 랩실 소속 멤버(LAB_MEMBER 이상)는 해당 랩실 자료실 조회 가능
+        return this.lab != null && this.lab.equals(lab)
+                && (this.role == Role.LAB_MEMBER || this.role == Role.LAB_MANAGER || this.role == Role.LAB_LEADER);
+    }
+
+    /**
+     * 특정 랩실의 자료실 생성 권한을 확인
+     * 랩실 소속 멤버(LAB_MEMBER 이상) + 모든 PROFESSOR, ADMIN
+     */
+    public boolean canCreateLabResources(Lab lab) {
+        return canViewLabResources(lab); // 조회 권한과 동일
+    }
+
+    /**
+     * 특정 자료의 관리(수정/삭제) 권한을 확인
+     * 자료 소유자 + 랩실 관리자(LAB_MANAGER, LAB_LEADER) + 시스템 관리자(PROFESSOR, ADMIN)
+     */
+    public boolean canManageLabResource(org.univ.rankus.domain.model.lab.resource.LabResource resource) {
+        if (resource == null) {
+            return false;
+        }
+
+        // 자료 소유자
+        if (resource.isUploadedBy(this)) {
+            return true;
+        }
+
+        // 시스템 관리자
+        if (this.role == Role.ADMIN || this.role == Role.PROFESSOR) {
+            return true;
+        }
+
+        // 랩실 관리자
+        return this.lab != null && resource.getLab() != null && this.lab.equals(resource.getLab())
+                && (this.role == Role.LAB_MANAGER || this.role == Role.LAB_LEADER);
+    }
+
+    /**
+     * 특정 자료의 다운로드 권한을 확인
+     * 공개 자료: 랩실 멤버 이상 + 시스템 관리자
+     * 비공개 자료: 자료 소유자 + 랩실 관리자 + 시스템 관리자
+     */
+    public boolean canDownloadLabResource(org.univ.rankus.domain.model.lab.resource.LabResource resource) {
+        if (resource == null) {
+            return false;
+        }
+
+        // 시스템 관리자는 모든 자료 다운로드 가능
+        if (this.role == Role.ADMIN || this.role == Role.PROFESSOR) {
+            return true;
+        }
+
+        // 랩실에 소속되지 않은 경우 또는 자료의 랩실 정보가 없는 경우 다운로드 불가
+        if (this.lab == null || resource.getLab() == null || !this.lab.equals(resource.getLab())) {
+            return false;
+        }
+
+        // 랩실 소속이 아닌 경우 다운로드 불가
+        if (!(this.role == Role.LAB_MEMBER || this.role == Role.LAB_MANAGER || this.role == Role.LAB_LEADER)) {
+            return false;
+        }
+
+        // 공개 자료는 랩실 멤버 모두 다운로드 가능
+        if (resource.getIsPublic()) {
+            return true;
+        }
+
+        // 비공개 자료는 소유자 또는 랩실 관리자만 다운로드 가능
+        return resource.isUploadedBy(this)
+                || (this.role == Role.LAB_MANAGER || this.role == Role.LAB_LEADER);
+    }
+
+    /**
      * 학번 유효성 검증
      */
     private String validateStudentNumber(String studentNumber) {
