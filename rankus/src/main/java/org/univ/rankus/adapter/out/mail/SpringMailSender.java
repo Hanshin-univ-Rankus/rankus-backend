@@ -2,8 +2,10 @@ package org.univ.rankus.adapter.out.mail;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -13,7 +15,7 @@ import org.univ.rankus.application.port.out.EmailSendPort;
 /**
  * Spring Boot Mail을 활용한 이메일 발송 어댑터
  * - EmailSendPort의 구현체
- * - JavaMailSender를 통한 SMTP 이메일 발송
+ * - Mailjet SMTP를 통한 이메일 발송
  * - HTML 형식 이메일 지원
  */
 @Slf4j
@@ -22,6 +24,12 @@ import org.univ.rankus.application.port.out.EmailSendPort;
 public class SpringMailSender implements EmailSendPort {
 
     private final JavaMailSender mailSender;
+    
+    @Value("${mailjet.from.email}")
+    private String fromEmail;
+    
+    @Value("${mailjet.from.name}")
+    private String fromName;
 
     @Override
     public void sendVerificationCode(String toEmail, String verificationCode) {
@@ -56,10 +64,17 @@ public class SpringMailSender implements EmailSendPort {
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
         helper.setTo(toEmail);
+        try {
+            helper.setFrom(fromEmail, fromName);
+        } catch (UnsupportedEncodingException e) {
+            log.warn("발신자 이름 인코딩 실패, 이메일만 설정: {}", e.getMessage());
+            helper.setFrom(fromEmail);
+        }
         helper.setSubject(subject);
         helper.setText(htmlContent, true); // HTML 형식으로 전송
 
         mailSender.send(message);
+        log.debug("Mailjet 이메일 발송 완료: from={} to={} subject={}", fromEmail, toEmail, subject);
     }
 
     /**
@@ -69,10 +84,12 @@ public class SpringMailSender implements EmailSendPort {
     private void sendTextEmail(String toEmail, String subject, String textContent) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
+        message.setFrom(fromEmail);
         message.setSubject(subject);
         message.setText(textContent);
 
         mailSender.send(message);
+        log.debug("Mailjet 텍스트 이메일 발송 완료: from={} to={} subject={}", fromEmail, toEmail, subject);
     }
 
     /**

@@ -30,10 +30,10 @@ spring:
       file-size-threshold: 1MB
       location: ./temp
   mail:
-    host: smtp.gmail.com
+    host: in-v3.mailjet.com
     port: 587
-    username: ${MAIL_USERNAME:your-email@gmail.com}
-    password: ${MAIL_PASSWORD:your-app-password}
+    username: ${MAILJET_API_KEY:your-mailjet-api-key}
+    password: ${MAILJET_SECRET_KEY:your-mailjet-secret-key}
     properties:
       mail:
         smtp:
@@ -45,6 +45,12 @@ spring:
           timeout: 10000
           writetimeout: 10000
         debug: false
+
+# Mailjet 설정
+mailjet:
+  from:
+    email: ${MAILJET_FROM_EMAIL:noreply@rankus.com}
+    name: ${MAILJET_FROM_NAME:Rankus System}
 
 server:
   port: 8080

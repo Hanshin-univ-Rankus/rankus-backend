@@ -25,10 +25,10 @@ spring:
         connection.useUnicode: true
 
   mail:
-    host: smtp.gmail.com
+    host: in-v3.mailjet.com
     port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    username: ${MAILJET_API_KEY}
+    password: ${MAILJET_SECRET_KEY}
     properties:
       mail:
         smtp:
@@ -37,11 +37,17 @@ spring:
             enable: true
             required: true
           ssl:
-            trust: smtp.gmail.com
+            trust: in-v3.mailjet.com
           connectiontimeout: 10000
           timeout: 10000
           writetimeout: 10000
         debug: false
+
+# Mailjet 설정
+mailjet:
+  from:
+    email: ${MAILJET_FROM_EMAIL}
+    name: ${MAILJET_FROM_NAME}
 
 server:
   port: 8080
