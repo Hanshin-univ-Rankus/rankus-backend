@@ -109,6 +109,10 @@ jobs:
           export SPRING_DATASOURCE_USERNAME="${{ secrets.SPRING_DATASOURCE_USERNAME }}"
           export SPRING_DATASOURCE_PASSWORD="${{ secrets.SPRING_DATASOURCE_PASSWORD }}"
           export JWT_SECRET="${{ secrets.JWT_SECRET }}"
+          export MAILJET_API_KEY="${{ secrets.MAILJET_API_KEY }}"
+          export MAILJET_SECRET_KEY="${{ secrets.MAILJET_SECRET_KEY }}"
+          export MAILJET_FROM_EMAIL="${{ secrets.MAILJET_FROM_EMAIL }}"
+          export MAILJET_FROM_NAME="${{ secrets.MAILJET_FROM_NAME }}"
 
           # 5) 애플리케이션 실행 (백그라운드)
           nohup java -jar ${{ env.JAR_NAME }} --spring.profiles.active=aws \
