@@ -57,7 +57,7 @@ public class SwaggerConfig {
                                 .url("http://localhost:8080")
                                 .description("로컬 개발 서버"),
                         new Server()
-                                .url("https://api.rankus.dev")
+                                .url("http://3.34.229.56:8080")
                                 .description("개발 서버"),
                         new Server()
                                 .url("https://api.rankus.com")
