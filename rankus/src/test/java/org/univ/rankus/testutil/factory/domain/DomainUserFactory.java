@@ -37,6 +37,12 @@ public final class DomainUserFactory {
         return user;
     }
 
+    public static User buildUserWithStatus(UserStatus status) {
+        User user = buildValidUser();
+        ReflectionTestUtils.setField(user, "status", status);
+        return user;
+    }
+
     public static User buildInvalidUser_Name() {
         return new User("", "user@hs.ac.kr", Password.fromRaw("Password!23", ENCODER),
                 "20201001", "010-1234-5678", 3, EnrollmentStatus.ENROLLED);

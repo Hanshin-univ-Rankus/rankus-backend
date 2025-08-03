@@ -22,6 +22,7 @@ public enum EmailVerificationErrorCode implements ErrorCode {
     // 404 Not Found: 조회 실패
     // ------------------------------------------------------------------------
     VERIFICATION_NOT_FOUND("EMAIL_006", HttpStatus.NOT_FOUND, "해당 이메일의 인증 정보를 찾을 수 없습니다."),
+    USER_NOT_FOUND_FOR_VERIFICATION("EMAIL_009", HttpStatus.NOT_FOUND, "인증할 사용자를 찾을 수 없습니다."),
 
     // ------------------------------------------------------------------------
     // 429 Too Many Requests: 요청 제한

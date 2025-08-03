@@ -1,6 +1,7 @@
 package org.univ.rankus.application.service.auth;
 
 
+import org.univ.rankus.application.port.in.command.EmailVerificationUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class AuthService implements AuthUseCase {
     private final AuthTokenPort authTokenPort;
     private final RefreshTokenRepositoryPort refreshTokenRepo;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationUseCase emailVerificationUseCase;
 
     @Override
     @Transactional(readOnly = true)
@@ -67,7 +69,12 @@ public class AuthService implements AuthUseCase {
                 request.getGrade(),
                 request.getEnrollmentStatus()
         );
-        return userRepo.save(newUser);
+        userRepo.save(newUser);
+
+        // 4) 이메일 인증 코드 발송
+        emailVerificationUseCase.sendVerificationCode(newUser.getEmail());
+
+        return newUser;
     }
 
     @Override

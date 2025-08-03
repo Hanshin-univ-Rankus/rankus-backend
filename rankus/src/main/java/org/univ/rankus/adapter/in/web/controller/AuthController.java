@@ -54,7 +54,8 @@ public class AuthController {
                     1. 사용자 정보 입력 (이름, 이메일, 비밀번호, 학번, 전화번호, 학년, 재학상태)
                     2. 이메일 중복 검사 및 유효성 검증
                     3. 비밀번호 암호화 저장
-                    4. 사용자 계정 생성 완료
+                    4. 사용자 계정 생성 및 **인증 이메일 발송**
+                    5. **이메일 인증 완료 후 로그인 가능**
                                         
                     ## 주의사항
                     - 이메일은 중복될 수 없습니다
@@ -157,9 +158,10 @@ public class AuthController {
                                         
                     ## 로그인 절차
                     1. 이메일과 비밀번호 입력
-                    2. 사용자 인증 및 검증
-                    3. JWT 토큰 생성 및 반환
-                    4. 사용자 정보와 함께 응답
+                    2. **이메일 인증이 완료된 사용자인지 확인**
+                    3. 사용자 인증 및 검증
+                    4. JWT 토큰 생성 및 반환
+                    5. 사용자 정보와 함께 응답
                                         
                     ## 토큰 사용법
                     - 반환받은 `token`을 요청 헤더에 포함하여 API 호출
@@ -226,21 +228,34 @@ public class AuthController {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "401",
-                    description = "인증 실패(잘못된 이메일/비밀번호)",
+                    description = "인증 실패(잘못된 이메일/비밀번호 또는 이메일 미인증)",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ApiResponse.class),
-                            examples = @ExampleObject(
-                                    name = "인증 실패",
-                                    value = """
-                                            {
-                                              "success": false,
-                                              "message": "이메일 또는 비밀번호가 올바르지 않습니다",
-                                              "data": null,
-                                              "timestamp": "2024-01-15T10:30:00"
-                                            }
-                                            """
-                            )
+                            examples = {
+                                    @ExampleObject(
+                                            name = "잘못된 자격 증명",
+                                            value = """
+                                                    {
+                                                      "success": false,
+                                                      "message": "이메일 또는 비밀번호가 올바르지 않습니다",
+                                                      "data": null,
+                                                      "timestamp": "2024-01-15T10:30:00"
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "이메일 미인증",
+                                            value = """
+                                                    {
+                                                      "success": false,
+                                                      "message": "이메일 인증이 완료되지 않았습니다.",
+                                                      "data": null,
+                                                      "timestamp": "2024-01-15T10:30:00"
+                                                    }
+                                                    """
+                                    )
+                            }
                     )
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(

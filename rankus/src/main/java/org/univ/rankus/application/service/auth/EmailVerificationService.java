@@ -1,5 +1,7 @@
 package org.univ.rankus.application.service.auth;
 
+import org.univ.rankus.application.port.out.UserRepositoryPort;
+import org.univ.rankus.domain.model.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class EmailVerificationService implements EmailVerificationUseCase {
 
     private final EmailVerificationRepositoryPort emailVerificationRepository;
     private final EmailSendPort emailSendPort;
+    private final UserRepositoryPort userRepository;
 
     @Override
     public EmailVerification sendVerificationCode(String email) {
@@ -86,7 +89,13 @@ public class EmailVerificationService implements EmailVerificationUseCase {
             throw e;
         }
 
-        // 3. 인증 완료된 정보 저장
+        // 3. 사용자 계정 활성화
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EmailVerificationException(EmailVerificationErrorCode.USER_NOT_FOUND_FOR_VERIFICATION));
+        user.activate();
+        userRepository.save(user);
+
+        // 4. 인증 완료된 정보 저장
         return emailVerificationRepository.save(emailVerification);
     }
 

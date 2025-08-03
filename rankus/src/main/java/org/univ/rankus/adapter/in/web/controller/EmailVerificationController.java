@@ -46,7 +46,7 @@ public class EmailVerificationController {
 
     @Operation(
             summary = "이메일 인증번호 검증",
-            description = "발송된 6자리 인증번호를 검증하여 이메일 인증을 완료합니다."
+            description = "발송된 6자리 인증번호를 검증하여 이메일 인증을 완료합니다. 인증 성공 시 계정이 활성화되어 로그인이 가능해집니다."
     )
     @PostMapping("/verify")
     public ResponseEntity<ApiResponse<EmailVerificationResponseDto>> verifyCode(

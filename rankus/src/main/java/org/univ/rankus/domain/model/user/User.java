@@ -55,9 +55,14 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, length = 20)
     private EnrollmentStatus enrollmentStatus; // 휴학/재학 상태
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserStatus status; // 사용자 계정 상태
+
     /**
      * 생성자: 필수 필드들 검증 후 세팅
      * - Role은 기본값으로 STUDENT 설정
+     * - Status는 기본값으로 PENDING(이메일 인증 대기) 설정
      * Service 계층에서 Password.fromRaw(...)을 사용해 Password 객체를 생성한 후 넘겨주어야 한다.
      */
     public User(String name, String email, Password password, String studentNumber,
@@ -73,6 +78,14 @@ public class User extends BaseTimeEntity {
         this.grade = validateGrade(grade);
         this.enrollmentStatus = validateEnrollmentStatus(enrollmentStatus);
         this.role = Role.STUDENT;  // 기본값 설정
+        this.status = UserStatus.PENDING; // 기본값 설정
+    }
+
+    /**
+     * 계정을 활성 상태로 변경
+     */
+    public void activate() {
+        this.status = UserStatus.ACTIVE;
     }
 
 

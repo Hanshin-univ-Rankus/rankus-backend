@@ -5,21 +5,21 @@ VALUES (1, 'AI랩', 'AI', '인공지능 랩', 1, null, NOW(), NOW()),
 
 -- 2. users
 INSERT INTO users (id, name, email, password_hash, role, lab_id, student_number, phone_number, grade, enrollment_status,
-                   created_at, updated_at)
+                   status, created_at, updated_at)
 VALUES (1, '학생1', 'user1@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'STUDENT', NULL,
-        '20201001', '010-1234-5678', 3, 'ENROLLED', NOW(), NOW()),
+        '20201001', '010-1234-5678', 3, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
        (2, '랩장1', 'leader1@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'LAB_LEADER',
-        1, '20191002', '010-2345-6789', 4, 'ENROLLED', NOW(), NOW()),
+        1, '20191002', '010-2345-6789', 4, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
        (3, '교수', 'prof@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'PROFESSOR', 2,
-        '19951003', '010-3456-7890', 8, 'ENROLLED', NOW(), NOW()),
+        '19951003', '010-3456-7890', 8, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
        (4, '학생2', 'user2@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'STUDENT', NULL,
-        '20211004', '010-4567-8901', 2, 'ENROLLED', NOW(), NOW()),
+        '20211004', '010-4567-8901', 2, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
        (5, '학생3', 'user3@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'STUDENT', 1,
-        '20201005', '010-5678-9012', 3, 'ON_LEAVE', NOW(), NOW()),
+        '20201005', '010-5678-9012', 3, 'ON_LEAVE', 'ACTIVE', NOW(), NOW()),
        (6, '랩장2', 'leader2@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'LAB_LEADER',
-        2, '20181006', '010-6789-0123', 5, 'ENROLLED', NOW(), NOW()),
+        2, '20181006', '010-6789-0123', 5, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
        (7, '관리자', 'admin@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
-        '20151007', '010-7890-1234', 6, 'ENROLLED', NOW(), NOW());
+        '20151007', '010-7890-1234', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW());
 
 -- 3. lab_images
 INSERT INTO lab_images (id, lab_id, image_url, type)

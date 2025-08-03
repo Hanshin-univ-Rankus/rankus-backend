@@ -4,16 +4,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.univ.rankus.adapter.in.web.dto.request.UserLoginRequestDto;
 import org.univ.rankus.adapter.in.web.dto.request.UserRegisterRequestDto;
 import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
+import org.univ.rankus.application.port.in.command.EmailVerificationUseCase;
 import org.univ.rankus.application.port.out.AuthTokenPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
 import org.univ.rankus.domain.model.user.PasswordEncoder;
 import org.univ.rankus.domain.model.user.User;
+import org.univ.rankus.domain.model.user.UserStatus;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
 import org.univ.rankus.domain.model.user.exception.UserValidationException;
@@ -37,6 +40,9 @@ class AuthServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private EmailVerificationUseCase emailVerificationUseCase;
 
     @InjectMocks
     private AuthService authService;
@@ -116,7 +122,7 @@ class AuthServiceTest {
     class SignUpTests {
 
         @Test
-        @DisplayName("정상 회원가입 시 User를 저장하고 반환한다")
+        @DisplayName("정상 회원가입 시 User를 PENDING 상태로 저장하고 인증 메일을 발송한다")
         void signUpSuccess() {
             // given: 이메일 중복 없음
             String name = "홍길동";
@@ -142,22 +148,18 @@ class AuthServiceTest {
                     .grade(3)
                     .enrollmentStatus(org.univ.rankus.domain.model.user.EnrollmentStatus.ENROLLED)
                     .build();
-            User saved = authService.signUp(request);
+            authService.signUp(request);
 
-            // then: 반환된 User 필드 검증 및 포트 호출 검증
-            assertThat(saved.getName()).isEqualTo(name);
-            assertThat(saved.getEmail()).isEqualTo(email);
-            assertThat(saved.getStudentNumber()).isEqualTo("20201001");
-            assertThat(saved.getPhoneNumber()).isEqualTo("010-1234-5678");
-            assertThat(saved.getGrade()).isEqualTo(3);
-            assertThat(saved.getEnrollmentStatus()).isEqualTo(org.univ.rankus.domain.model.user.EnrollmentStatus.ENROLLED);
-            // Password VO에서 해시 값을 꺼내 비교는 별도 Password 테스트에서 확인
-            assertThat(saved.getPassword()).isNotNull();
+            // then: User 저장 및 이메일 발송 검증
+            ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+            verify(userRepo).save(userCaptor.capture());
+            User savedUser = userCaptor.getValue();
 
-            verify(userRepo).existsByEmail(email);
-            verify(userRepo).existsByStudentNumber("20201001");
-            verify(passwordEncoder).encode(AuthMockUtil.RAW_PASSWORD);
-            verify(userRepo).save(any(User.class));
+            assertThat(savedUser.getName()).isEqualTo(name);
+            assertThat(savedUser.getEmail()).isEqualTo(email);
+            assertThat(savedUser.getStatus()).isEqualTo(UserStatus.PENDING);
+
+            verify(emailVerificationUseCase).sendVerificationCode(email);
         }
 
         @Test
@@ -184,6 +186,7 @@ class AuthServiceTest {
 
             verify(userRepo).existsByEmail(email);
             verify(userRepo, never()).save(any());
+            verify(emailVerificationUseCase, never()).sendVerificationCode(anyString());
         }
     }
 }
