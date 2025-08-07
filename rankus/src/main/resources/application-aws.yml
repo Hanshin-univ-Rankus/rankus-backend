@@ -61,5 +61,5 @@ security:
   jwt:
     secret: ${JWT_SECRET}
     expiration-ms: ${JWT_EXPIRATION_MS:3600000}  # 레거시 호환
-    access-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:60000}    # 15분 (새로운 액세스 토큰)
-    refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:60000} # 7일 (리프레시 토큰)
+    access-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:604800000}    # 15분 (새로운 액세스 토큰) 현재 7일로 임시 처리
+    refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000} # 7일 (리프레시 토큰)
