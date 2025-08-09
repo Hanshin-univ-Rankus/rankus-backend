@@ -13,7 +13,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.univ.rankus.adapter.in.web.dto.request.UserLoginRequestDto;
 import org.univ.rankus.adapter.in.web.dto.request.UserRegisterRequestDto;
+import org.univ.rankus.adapter.in.web.dto.request.TokenRefreshRequestDto;
 import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
+import org.univ.rankus.adapter.in.web.dto.response.AuthTokens;
 import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
 import org.univ.rankus.application.port.out.AuthTokenPort;
@@ -186,6 +188,84 @@ class AuthControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errors").isArray())
                     .andExpect(jsonPath("$.errors[0].field").value("email"));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /api/auth/refresh")
+    class RefreshTests {
+
+        @Test
+        @DisplayName("유효한 리프레시 토큰으로 요청 시, 새로운 토큰 쌍을 발급하고 200 OK를 반환한다")
+        void refreshSuccess() throws Exception {
+            // given
+            String validRefreshToken = "valid-refresh-token";
+            TokenRefreshRequestDto request = DtoFactory.buildTokenRefreshRequest(validRefreshToken);
+            String json = objectMapper.writeValueAsString(request);
+
+            UserResponseDto userDto = DtoFactory.buildUserResponseDto(10L, "테스터", "user@hs.ac.kr");
+            AuthTokens newTokens = AuthTokens.builder()
+                    .accessToken("new-access-token")
+                    .refreshToken("new-refresh-token")
+                    .user(userDto)
+                    .accessTokenExpiresAt(java.time.LocalDateTime.now().plusMinutes(15))
+                    .refreshTokenExpiresAt(java.time.LocalDateTime.now().plusDays(7))
+                    .build();
+
+            given(authTokenPort.refreshAccessToken(validRefreshToken)).willReturn(newTokens);
+
+            // when & then
+            mockMvc.perform(post("/api/auth/refresh")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(json))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.message").value("토큰 갱신 성공"))
+                    .andExpect(jsonPath("$.data.accessToken").value("new-access-token"))
+                    .andExpect(jsonPath("$.data.refreshToken").value("new-refresh-token"))
+                    .andExpect(jsonPath("$.data.user.id").value(10));
+        }
+
+        @Test
+        @DisplayName("만료된 리프레시 토큰으로 요청 시, 401 Unauthorized를 반환한다")
+        void refreshWithExpiredToken() throws Exception {
+            // given
+            String expiredToken = "expired-refresh-token";
+            TokenRefreshRequestDto request = DtoFactory.buildTokenRefreshRequest(expiredToken);
+            String json = objectMapper.writeValueAsString(request);
+
+            given(authTokenPort.refreshAccessToken(expiredToken))
+                    .willThrow(new UserValidationException(UserErrorCode.REFRESH_TOKEN_EXPIRED));
+
+            // when & then
+            mockMvc.perform(post("/api/auth/refresh")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(json))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.REFRESH_TOKEN_EXPIRED.getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.REFRESH_TOKEN_EXPIRED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 리프레시 토큰으로 요청 시, 401 Unauthorized를 반환한다")
+        void refreshWithInvalidToken() throws Exception {
+            // given
+            String invalidToken = "invalid-refresh-token";
+            TokenRefreshRequestDto request = DtoFactory.buildTokenRefreshRequest(invalidToken);
+            String json = objectMapper.writeValueAsString(request);
+
+            given(authTokenPort.refreshAccessToken(invalidToken))
+                    .willThrow(new UserValidationException(UserErrorCode.REFRESH_TOKEN_INVALID));
+
+            // when & then
+            mockMvc.perform(post("/api/auth/refresh")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(json))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.REFRESH_TOKEN_INVALID.getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.REFRESH_TOKEN_INVALID.getMessage()));
         }
     }
 }
