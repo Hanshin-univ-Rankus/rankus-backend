@@ -154,19 +154,17 @@ public class AuthController {
     @Operation(
             summary = "로그인",
             description = """
-                    이메일과 비밀번호로 로그인하여 JWT 토큰을 발급받습니다.
+                    이메일과 비밀번호로 로그인하여 Access Token과 Refresh Token을 발급받습니다.
                                         
                     ## 로그인 절차
                     1. 이메일과 비밀번호 입력
-                    2. **이메일 인증이 완료된 사용자인지 확인**
-                    3. 사용자 인증 및 검증
-                    4. JWT 토큰 생성 및 반환
-                    5. 사용자 정보와 함께 응답
+                    2. 사용자 인증 및 검증
+                    3. Access Token(15분)과 Refresh Token(7일) 생성 및 반환
+                    4. 사용자 정보와 함께 응답
                                         
                     ## 토큰 사용법
-                    - 반환받은 `token`을 요청 헤더에 포함하여 API 호출
-                    - 헤더 형식: `Authorization: Bearer {token}`
-                    - 토큰 만료 시 재로그인 필요
+                    - `accessToken`: API 요청 시 `Authorization: Bearer {accessToken}` 헤더에 사용합니다.
+                    - `refreshToken`: Access Token 만료 시, `/api/auth/refresh` API를 통해 새로운 토큰 쌍을 발급받는 데 사용합니다.
                     """
     )
     @ApiResponses({
@@ -183,7 +181,8 @@ public class AuthController {
                                               "success": true,
                                               "message": "로그인 성공",
                                               "data": {
-                                                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                                                "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                                                "refreshToken": "550e8400-e29b-41d4-a716-446655440000",
                                                 "user": {
                                                   "id": 1,
                                                   "name": "홍길동",
@@ -290,19 +289,18 @@ public class AuthController {
     
 
     @Operation(
-            summary = "액세스 토큰 갱신",
+            summary = "토큰 갱신 (Access & Refresh)",
             description = """
-                    리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다.
+                    리프레시 토큰을 사용하여 새로운 Access Token과 Refresh Token을 모두 발급받습니다. (토큰 순환)
                                         
                     ## 토큰 갱신 절차
-                    1. 만료된 액세스 토큰 감지
-                    2. 저장된 리프레시 토큰으로 요청
-                    3. 리프레시 토큰 유효성 검증
-                    4. 새로운 액세스 토큰 발급
+                    1. Access Token 만료로 API 호출 실패 (401 에러)
+                    2. 클라이언트가 보관중인 Refresh Token으로 이 API를 호출
+                    3. 서버가 Refresh Token을 검증하고, 사용된 토큰은 무효화
+                    4. 새로운 Access Token과 Refresh Token을 모두 반환
                                         
                     ## 주의사항
-                    - 리프레시 토큰도 만료된 경우 재로그인 필요
-                    - 새로운 액세스 토큰은 15분간 유효
+                    - 응답으로 받은 새로운 Refresh Token을 반드시 저장하여 다음 갱신에 사용해야 합니다.
                     """
     )
     @ApiResponses({
@@ -320,7 +318,19 @@ public class AuthController {
                                               "message": "토큰 갱신 성공",
                                               "data": {
                                                 "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                                                "expiresAt": "2024-01-15T10:45:00"
+                                                "refreshToken": "550e8400-e29b-41d4-a716-446655440000",
+                                                "user": {
+                                                  "id": 1,
+                                                  "name": "홍길동",
+                                                  "email": "hong@example.com",
+                                                  "studentNumber": "20210001",
+                                                  "phoneNumber": "010-1234-5678",
+                                                  "grade": 3,
+                                                  "enrollmentStatus": "ENROLLED",
+                                                  "labId": null,
+                                                  "createdAt": "2024-01-15T10:30:00",
+                                                  "updatedAt": "2024-01-15T10:30:00"
+                                                }
                                               },
                                               "timestamp": "2024-01-15T10:30:00"
                                             }
