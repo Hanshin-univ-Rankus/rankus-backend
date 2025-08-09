@@ -23,12 +23,12 @@ public interface AuthTokenPort {
     AuthTokens generateTokens(User user);
 
     /**
-     * 리프레시 토큰으로 새로운 액세스 토큰 발급
+     * 리프레시 토큰으로 새로운 액세스 토큰과 리프레시 토큰을 발급 (토큰 순환)
      *
      * @param refreshToken 리프레시 토큰
-     * @return 새로운 액세스 토큰 문자열
+     * @return 새로운 액세스 토큰과 리프레시 토큰 정보
      */
-    String refreshAccessToken(String refreshToken);
+    AuthTokens refreshAccessToken(String refreshToken);
 
     /**
      * 리프레시 토큰 유효성 검증

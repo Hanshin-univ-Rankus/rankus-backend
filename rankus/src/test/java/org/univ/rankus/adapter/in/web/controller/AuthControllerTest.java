@@ -130,8 +130,8 @@ class AuthControllerTest {
             UserLoginRequestDto request = DtoFactory.buildUserLoginRequest("user@hs.ac.kr", "password");
             String json = objectMapper.writeValueAsString(request);
 
-            UserResponseDto userDto = DtoFactory.buildUserResponseDto(10L, "테스터", "user@hs.ac.kr", Role.STUDENT);
-            AuthResponseDto authDto = DtoFactory.buildAuthResponseDto("jwt-token", userDto);
+            UserResponseDto userDto = DtoFactory.buildUserResponseDto(10L, "테스터", "user@hs.ac.kr");
+            AuthResponseDto authDto = DtoFactory.buildAuthResponseDto("mock-access-token", "mock-refresh-token", userDto);
 
             given(authUseCase.login(any(UserLoginRequestDto.class)))
                     .willReturn(authDto);
@@ -143,7 +143,8 @@ class AuthControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.status").value(200))
                     .andExpect(jsonPath("$.message").value("로그인 성공"))
-                    .andExpect(jsonPath("$.data.token").value("jwt-token"))
+                    .andExpect(jsonPath("$.data.accessToken").value("mock-access-token"))
+                    .andExpect(jsonPath("$.data.refreshToken").value("mock-refresh-token"))
                     .andExpect(jsonPath("$.data.user.id").value(10))
                     .andExpect(jsonPath("$.data.user.name").value("테스터"))
                     .andExpect(jsonPath("$.data.user.email").value("user@hs.ac.kr"));

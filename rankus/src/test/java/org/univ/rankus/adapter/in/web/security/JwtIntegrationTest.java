@@ -91,7 +91,8 @@ class JwtIntegrationTest {
                 .build();
 
         AuthResponseDto authDto = AuthResponseDto.builder()
-                .token(fakeToken)
+                .accessToken(fakeToken)
+                .refreshToken("fake-refresh-token")
                 .user(userDto)
                 .build();
 
@@ -150,7 +151,7 @@ class JwtIntegrationTest {
         // 3) 토큰 추출
         String responseStr = loginResult.getResponse().getContentAsString();
         JsonNode root = objectMapper.readTree(responseStr);
-        String token = root.path("data").path("token").asText();
+        String token = root.path("data").path("accessToken").asText();
 
         // 4) 보호된 엔드포인트 호출: /api/users/me
         MvcResult userMeResult = mockMvc.perform(

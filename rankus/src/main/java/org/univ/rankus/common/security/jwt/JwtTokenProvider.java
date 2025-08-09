@@ -122,23 +122,29 @@ public class JwtTokenProvider implements AuthTokenPort {
     }
 
     @Override
-    public String refreshAccessToken(String refreshTokenId) {
+    public AuthTokens refreshAccessToken(String refreshTokenId) {
+        // 1. 리프레시 토큰 조회 및 검증
         RefreshToken refreshToken = refreshTokenRepository.findByTokenId(refreshTokenId)
                 .orElseThrow(() -> new UserValidationException(UserErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
+        // 2. 토큰 유효성(만료, 비활성화) 검사
         if (!refreshToken.isValid()) {
+            // 비정상적인 토큰이므로 삭제하여 재사용 방지
             refreshTokenRepository.delete(refreshToken);
             if (refreshToken.isExpired()) {
                 throw new UserValidationException(UserErrorCode.REFRESH_TOKEN_EXPIRED);
-            } else {
-                throw new UserValidationException(UserErrorCode.REFRESH_TOKEN_INVALID);
             }
+            // 만료되지 않았지만 비활성화된 토큰 -> 탈취 후 사용 시도일 수 있음
+            throw new UserValidationException(UserErrorCode.REFRESH_TOKEN_INVALID);
         }
 
+        // 3. 사용자 정보 조회
         User user = userRepository.findByEmail(refreshToken.getUserEmail())
                 .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        return generateAccessToken(user);
+        // 4. 새로운 토큰 쌍 생성 (generateTokens가 기존 모든 토큰 비활성화 및 새 토큰 생성을 담당)
+        // 이것이 바로 "Refresh Token Rotation"의 핵심입니다.
+        return generateTokens(user);
     }
 
     @Override

@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.univ.rankus.adapter.in.web.dto.request.UserLoginRequestDto;
 import org.univ.rankus.adapter.in.web.dto.request.UserRegisterRequestDto;
 import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
+import org.univ.rankus.adapter.in.web.dto.response.AuthTokens;
+import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.EmailVerificationUseCase;
 import org.univ.rankus.application.port.out.AuthTokenPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
@@ -54,9 +56,17 @@ class AuthServiceTest {
         @Test
         @DisplayName("정상 로그인 시 토큰을 반환한다")
         void loginSuccess() {
-            // given: 사용자 존재 + 비밀번호 일치 + 토큰 설정
+            // given: 사용자 존재 + 비밀번호 일치
             User user = AuthMockUtil.mockExistingUser(userRepo, passwordEncoder, true);
-            AuthMockUtil.configureToken(authTokenPort, user);
+
+            // given: generateTokens가 mock AuthTokens 객체를 반환하도록 설정
+            AuthTokens mockTokens = mock(AuthTokens.class);
+            UserResponseDto mockUserDto = mock(UserResponseDto.class);
+
+            when(authTokenPort.generateTokens(user)).thenReturn(mockTokens);
+            when(mockTokens.getAccessToken()).thenReturn("mock-access-token");
+            when(mockTokens.getRefreshToken()).thenReturn("mock-refresh-token");
+            when(mockTokens.getUser()).thenReturn(mockUserDto);
 
             // when: 서비스 호출
             UserLoginRequestDto request = UserLoginRequestDto.builder()
@@ -66,12 +76,13 @@ class AuthServiceTest {
             AuthResponseDto response = authService.login(request);
 
             // then: AuthResponseDto 리턴 및 포트 호출 검증
-            assertThat(response.getToken()).isEqualTo(AuthMockUtil.TOKEN);
-            assertThat(response.getUser().getName()).isEqualTo(user.getName());
-            assertThat(response.getUser().getEmail()).isEqualTo(user.getEmail());
+            assertThat(response.getAccessToken()).isEqualTo("mock-access-token");
+            assertThat(response.getRefreshToken()).isEqualTo("mock-refresh-token");
+            assertThat(response.getUser()).isEqualTo(mockUserDto);
+
             verify(userRepo).findByEmail(AuthMockUtil.VALID_EMAIL);
             verify(user).getPassword();
-            verify(authTokenPort).generateToken(user);
+            verify(authTokenPort).generateTokens(user); // generateTokens 호출을 검증
         }
 
         @Test
