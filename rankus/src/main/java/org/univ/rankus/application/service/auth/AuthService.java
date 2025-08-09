@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.univ.rankus.adapter.in.web.dto.request.UserLoginRequestDto;
 import org.univ.rankus.adapter.in.web.dto.request.UserRegisterRequestDto;
 import org.univ.rankus.adapter.in.web.dto.response.AuthResponseDto;
+import org.univ.rankus.adapter.in.web.dto.response.AuthTokens;
 import org.univ.rankus.adapter.in.web.dto.response.UserResponseDto;
 import org.univ.rankus.application.port.in.command.AuthUseCase;
 import org.univ.rankus.application.port.out.AuthTokenPort;
@@ -41,12 +42,10 @@ public class AuthService implements AuthUseCase {
         if (!user.getPassword().matches(request.getPassword(), passwordEncoder)) {
             throw new UserValidationException(UserErrorCode.INVALID_CREDENTIALS);
         }
-        // 3) 토큰 생성
-        String token = authTokenPort.generateToken(user);
-        // 4) 사용자 정보를 DTO로 변환
-        UserResponseDto userDto = UserResponseDto.from(user);
-        // 5) AuthResponseDto로 반환
-        return AuthResponseDto.from(token, userDto);
+        // 3) Access Token, Refresh Token 생성
+        AuthTokens tokens = authTokenPort.generateTokens(user);
+        // 4) AuthResponseDto로 변환하여 반환
+        return AuthResponseDto.from(tokens);
     }
 
     @Override
@@ -77,18 +76,7 @@ public class AuthService implements AuthUseCase {
         return newUser;
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public User authenticate(UserLoginRequestDto request) {
-        // 1) 이메일로 조회 → 없으면 404
-        User user = userRepo.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
-        // 2) 비밀번호 검증 → 틀리면 401
-        if (!user.getPassword().matches(request.getPassword(), passwordEncoder)) {
-            throw new UserValidationException(UserErrorCode.INVALID_CREDENTIALS);
-        }
-        return user;
-    }
+    
 
     @Override
     public void logout(String userEmail, String accessToken) {

@@ -13,13 +13,7 @@ public interface AuthUseCase {
      */
     AuthResponseDto login(UserLoginRequestDto request);
 
-    /**
-     * 사용자 인증 (토큰 생성 없이 사용자 객체만 반환)
-     *
-     * @param request 로그인 요청 정보
-     * @return 인증된 사용자 객체
-     */
-    User authenticate(UserLoginRequestDto request);
+    
 
     /**
      * 회원 가입 처리

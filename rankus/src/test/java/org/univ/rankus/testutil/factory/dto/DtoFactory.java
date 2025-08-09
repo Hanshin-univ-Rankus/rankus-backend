@@ -161,14 +161,16 @@ public final class DtoFactory {
 
     public static AuthResponseDto buildAuthResponseDto() {
         return AuthResponseDto.builder()
-                .token("mock-jwt-token")
+                .accessToken("mock-access-token")
+                .refreshToken("mock-refresh-token")
                 .user(buildUserResponseDto())
                 .build();
     }
 
-    public static AuthResponseDto buildAuthResponseDto(String token, UserResponseDto user) {
+    public static AuthResponseDto buildAuthResponseDto(String accessToken, String refreshToken, UserResponseDto user) {
         return AuthResponseDto.builder()
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .user(user)
                 .build();
     }

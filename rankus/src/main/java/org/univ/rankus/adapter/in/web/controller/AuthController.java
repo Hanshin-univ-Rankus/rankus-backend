@@ -287,70 +287,7 @@ public class AuthController {
         return ResponseEntity.ok().body(body);
     }
 
-    @Operation(
-            summary = "새로운 로그인 (토큰 쌍 발급)",
-            description = """
-                    이메일과 비밀번호로 로그인하여 액세스 토큰과 리프레시 토큰을 함께 발급받습니다.
-                                        
-                    ## 개선된 로그인 절차
-                    1. 이메일과 비밀번호 입력
-                    2. 사용자 인증 및 검증
-                    3. 액세스 토큰(15분) + 리프레시 토큰(7일) 생성
-                    4. 사용자 정보와 함께 응답
-                                        
-                    ## 토큰 사용법
-                    - `accessToken`: API 요청 시 Authorization 헤더에 사용
-                    - `refreshToken`: 액세스 토큰 만료 시 갱신용
-                    - 헤더 형식: `Authorization: Bearer {accessToken}`
-                    """
-    )
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "로그인 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class),
-                            examples = @ExampleObject(
-                                    name = "성공 응답",
-                                    value = """
-                                            {
-                                              "success": true,
-                                              "message": "로그인 성공",
-                                              "data": {
-                                                "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                                                "refreshToken": "550e8400-e29b-41d4-a716-446655440000",
-                                                "accessTokenExpiresAt": "2024-01-15T10:45:00",
-                                                "refreshTokenExpiresAt": "2024-01-22T10:30:00",
-                                                "user": {
-                                                  "id": 1,
-                                                  "name": "홍길동",
-                                                  "email": "hong@example.com",
-                                                  "studentNumber": "20210001",
-                                                  "phoneNumber": "010-1234-5678",
-                                                  "grade": 3,
-                                                  "enrollmentStatus": "ENROLLED",
-                                                  "labId": null
-                                                }
-                                              },
-                                              "timestamp": "2024-01-15T10:30:00"
-                                            }
-                                            """
-                            )
-                    )
-            )
-    })
-    @PostMapping("/login/v2")
-    public ResponseEntity<ApiResponse<AuthTokens>> loginWithTokens(
-            @Valid @RequestBody UserLoginRequestDto dto
-    ) {
-        User user = authUseCase.authenticate(dto);
-        AuthTokens authTokens = authTokenPort.generateTokens(user);
-        ApiResponse<AuthTokens> body = ApiResponse.success(authTokens, "로그인 성공");
-        return ResponseEntity.ok()
-                .cacheControl(CacheControl.noStore())
-                .body(body);
-    }
+    
 
     @Operation(
             summary = "액세스 토큰 갱신",
@@ -412,17 +349,17 @@ public class AuthController {
             )
     })
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<Object>> refreshToken(
+    public ResponseEntity<ApiResponse<AuthResponseDto>> refreshToken(
             @Valid @RequestBody TokenRefreshRequestDto request
     ) {
-        String newAccessToken = authTokenPort.refreshAccessToken(request.getRefreshToken());
+        // 1. 토큰 재발급 (Access + Refresh) - Refresh Token Rotation 적용
+        AuthTokens newTokens = authTokenPort.refreshAccessToken(request.getRefreshToken());
 
-        Object responseData = new Object() {
-            public final String accessToken = newAccessToken;
-            public final java.time.LocalDateTime expiresAt = authTokenPort.getAccessTokenExpiryTime(newAccessToken);
-        };
+        // 2. 응답 DTO 생성 (로그인 응답과 동일한 포맷)
+        AuthResponseDto responseDto = AuthResponseDto.from(newTokens);
 
-        ApiResponse<Object> body = ApiResponse.success(responseData, "토큰 갱신 성공");
+        // 3. API 응답 반환
+        ApiResponse<AuthResponseDto> body = ApiResponse.success(responseDto, "토큰 갱신 성공");
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore())
                 .body(body);
