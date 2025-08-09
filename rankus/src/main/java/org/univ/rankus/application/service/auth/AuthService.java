@@ -33,7 +33,7 @@ public class AuthService implements AuthUseCase {
     private final EmailVerificationUseCase emailVerificationUseCase;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthResponseDto login(UserLoginRequestDto request) {
         // 1) 이메일로 조회 → 없으면 404
         User user = userRepo.findByEmail(request.getEmail())

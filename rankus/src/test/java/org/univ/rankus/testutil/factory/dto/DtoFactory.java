@@ -59,6 +59,10 @@ public final class DtoFactory {
                 .build();
     }
 
+    public static TokenRefreshRequestDto buildTokenRefreshRequest(String refreshToken) {
+        return new TokenRefreshRequestDto(refreshToken);
+    }
+
     // Lab Request DTOs - 존재하지 않는 DTO들 제거
     // LabCreateRequestDto, LabUpdateRequestDto는 실제로 존재하지 않음
 
