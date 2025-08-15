@@ -5,12 +5,18 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.univ.rankus.common.security.SecurityConstants;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
+import org.univ.rankus.common.exception.ErrorResponse;
+import org.univ.rankus.common.exception.GlobalErrorCode;
 
 import java.io.IOException;
 
@@ -26,14 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider tokenProvider;
     // 사용자 정보를 로드하는 서비스
     private final UserDetailsService userDetailsService;
+    // 인증 실패 시 일관된 에러 응답을 위한 EntryPoint (선택)
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     // URL 패턴 매칭을 위한 PathMatcher
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     /**
-     * JwtAuthenticationFilter 생성자
-     *
-     * @param tokenProvider      JWT 토큰 Provider
-     * @param userDetailsService 사용자 정보 서비스
+     * JwtAuthenticationFilter 생성자 (기존 호환용)
      */
     public JwtAuthenticationFilter(
             JwtTokenProvider tokenProvider,
@@ -41,6 +46,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) {
         this.tokenProvider = tokenProvider;
         this.userDetailsService = userDetailsService;
+        this.authenticationEntryPoint = null;
+    }
+
+    /**
+     * JwtAuthenticationFilter 생성자 (EntryPoint 주입)
+     */
+    public JwtAuthenticationFilter(
+            JwtTokenProvider tokenProvider,
+            UserDetailsService userDetailsService,
+            JwtAuthenticationEntryPoint authenticationEntryPoint
+    ) {
+        this.tokenProvider = tokenProvider;
+        this.userDetailsService = userDetailsService;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     /**
@@ -52,9 +71,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain chain
     ) throws ServletException, IOException {
-        // 공개 URL인지 확인
         String requestURI = request.getRequestURI();
-        boolean isPublicUrl = isPublicUrl(requestURI);
+        boolean isPublicUrl = isPublicUrl(requestURI, request.getMethod());
 
         // Authorization 헤더에서 Bearer 토큰 추출
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -62,17 +80,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             // 토큰 유효성 검사
             if (tokenProvider.validateToken(token)) {
-                // 토큰에서 인증 정보 추출 및 SecurityContext에 저장
                 Authentication auth = tokenProvider.getAuthentication(token, userDetailsService);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } else if (!isPublicUrl) {
-                // 토큰이 유효하지 않고 공개 URL이 아닌 경우에만 오류 응답
+                // 보호 URL에서 잘못된 토큰이면 일관된 에러 포맷 반환
                 SecurityContextHolder.clearContext();
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"error\":\"Invalid JWT token\"}");
-                response.getWriter().flush();
-                return; // 필터 체인 중단
+                if (authenticationEntryPoint != null) {
+                    authenticationEntryPoint.commence(
+                            request,
+                            response,
+                            new BadCredentialsException("Invalid JWT token")
+                    );
+                } else {
+                    // EntryPoint 미주입 시에도 ErrorResponse 포맷으로 반환
+                    ErrorResponse error = ErrorResponse.of(
+                            GlobalErrorCode.UNAUTHORIZED,
+                            request.getRequestURI(),
+                            null
+                    );
+                    response.setStatus(GlobalErrorCode.UNAUTHORIZED.getStatus().value());
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    new ObjectMapper().writeValue(response.getWriter(), error);
+                }
+                return;
             }
         }
         // 다음 필터로 요청 전달
@@ -80,12 +110,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 요청 URI가 공개 URL인지 확인합니다.
+     * 요청 URI가 공개 URL인지 확인합니다. (메서드 고려)
      */
-    private boolean isPublicUrl(String requestURI) {
-        for (String publicPattern : SecurityConstants.PUBLIC_URLS) {
-            if (pathMatcher.match(publicPattern, requestURI)) {
+    private boolean isPublicUrl(String requestURI, String method) {
+        // 항상 공개 URL
+        for (String pattern : SecurityConstants.ALWAYS_PUBLIC_URLS) {
+            if (pathMatcher.match(pattern, requestURI)) {
                 return true;
+            }
+        }
+        // GET 전용 공개 URL
+        if (HttpMethod.GET.matches(method)) {
+            for (String pattern : SecurityConstants.PUBLIC_GET_URLS) {
+                if (pathMatcher.match(pattern, requestURI)) {
+                    return true;
+                }
             }
         }
         return false;
