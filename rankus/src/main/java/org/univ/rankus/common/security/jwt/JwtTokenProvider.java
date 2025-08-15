@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,7 @@ import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -91,6 +94,7 @@ public class JwtTokenProvider implements AuthTokenPort {
 
         return Jwts.builder()
                 .setSubject(user.getEmail())
+                .claim("role", user.getRole().name()) // 역할 정보를 클레임에 추가
                 .setId(tokenId) // JTI (JWT ID) 추가
                 .setIssuedAt(now)
                 .setExpiration(expiry)
@@ -198,12 +202,22 @@ public class JwtTokenProvider implements AuthTokenPort {
             String token,
             UserDetailsService userDetailsService
     ) {
-        String email = parseClaims(token).getBody().getSubject();
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        Jws<Claims> claimsJws = parseClaims(token);
+        Claims claims = claimsJws.getBody();
+        String email = claims.getSubject();
+        String roleFromToken = claims.get("role", String.class);
+
+        // UserDetails는 DB에서 계속 조회하여 전체 Principal 정보를 유지합니다.
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email); 
+
+        // 하지만, 권한은 토큰에 명시된 것을 기준으로 새로 생성하여 사용합니다.
+        // 이를 통해 DB 복제 지연(Replication Lag)이 발생해도 토큰에 담긴 권한을 신뢰하여 일관성을 보장합니다.
+        var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + roleFromToken));
+
         return new UsernamePasswordAuthenticationToken(
-                userDetails,
+                userDetails, 
                 null,
-                userDetails.getAuthorities()
+                authorities 
         );
     }
 }
