@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 import org.univ.rankus.common.security.CustomAccessDeniedHandler;
 import org.univ.rankus.common.security.SecurityConstants;
 import org.univ.rankus.common.security.jwt.JwtAuthenticationEntryPoint;
@@ -55,7 +56,8 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(SecurityConstants.PUBLIC_URLS).permitAll()
+                        .requestMatchers(SecurityConstants.ALWAYS_PUBLIC_URLS).permitAll()
+                        .requestMatchers(HttpMethod.GET, SecurityConstants.PUBLIC_GET_URLS).permitAll()
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers
@@ -78,7 +80,8 @@ public class SecurityConfig {
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(
                 tokenProvider,
-                customUserDetailsService
+                customUserDetailsService,
+                authEntryPoint
         );
     }
 
