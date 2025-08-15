@@ -39,11 +39,11 @@ public class SwaggerConfig {
                                 - 📢 **공지사항**: 랩실 공지사항 관리
                                 - 📆 **캘린더**: 일정 및 면접 관리
                                                                 
-                                ## 인증 방법 (Phase 1 보안 강화)
-                                1. `/api/auth/login/v2`로 로그인하여 액세스+리프레시 토큰 획득
-                                2. 요청 헤더에 `Authorization: Bearer {accessToken}` 추가
-                                3. 토큰 만료 시 `/api/auth/refresh`로 자동 갱신
-                                4. 로그아웃 시 `/api/auth/logout`으로 토큰 무효화
+                                ## 인증 방법
+                                1. `/api/auth/login`으로 로그인하여 액세스 토큰(15분)과 리프레시 토큰(7일)을 획득합니다.
+                                2. API 요청 시 헤더에 `Authorization: Bearer {accessToken}`을 추가하여 인증합니다.
+                                3. 액세스 토큰 만료 시(401 에러), `/api/auth/refresh`를 호출하여 새로운 액세스 토큰과 리프레시 토큰을 발급받습니다. (토큰 순환)
+                                4. 로그아웃 시 `/api/auth/logout`을 호출하여 서버에 저장된 토큰을 모두 무효화합니다.
                                 """)
                         .contact(new Contact()
                                 .name("Rankus Team")
