@@ -27,18 +27,19 @@ public class CalendarPermissionHandler {
      * 랩실에 대한 캘린더 권한이 있는지 확인
      */
     public boolean hasPermissionForLab(CustomUserDetails userDetails, Long labId, String permission) {
-        if (userDetails == null || labId == null) {
+        if (userDetails == null || labId == null || permission == null) {
             return false;
         }
 
         Long userId = userDetails.getUserId();
         User user = userQueryUseCase.getUserById(userId);
         Lab lab = labPromotionQueryUseCase.getLabById(labId);
+        String perm = permission.toUpperCase();
 
-        return switch (permission) {
-            case "MANAGE_CALENDAR" -> user.canManageLabNotices(lab); // 기존 랩실 관리 권한 재사용
-            case "VIEW_CALENDAR" -> true; // 모든 인증된 사용자가 조회 가능
-            case "VIEW_APPLICANTS" -> user.canManageLabNotices(lab); // 랩장/매니저, 교수, 관리자만 지원자 정보 조회 가능
+        return switch (perm) {
+            case PermissionConstants.MANAGE_CALENDAR -> user.canManageLabNotices(lab);
+            case PermissionConstants.VIEW_CALENDAR -> true;
+            case PermissionConstants.VIEW_APPLICANTS -> user.canManageLabNotices(lab);
             default -> false;
         };
     }
@@ -47,18 +48,19 @@ public class CalendarPermissionHandler {
      * 특정 캘린더 이벤트에 대한 권한이 있는지 확인
      */
     public boolean hasPermissionForEvent(CustomUserDetails userDetails, Long eventId, String permission) {
-        if (userDetails == null || eventId == null) {
+        if (userDetails == null || eventId == null || permission == null) {
             return false;
         }
 
         Long userId = userDetails.getUserId();
         User user = userQueryUseCase.getUserById(userId);
         CalendarEvent event = calendarEventQueryUseCase.getEventById(eventId);
+        String perm = permission.toUpperCase();
 
-        return switch (permission) {
-            case "MANAGE_CALENDAR" -> user.canManageLabNotices(event.getLab());
-            case "VIEW_CALENDAR" -> true;
-            case "VIEW_APPLICANTS" -> user.canManageLabNotices(event.getLab());
+        return switch (perm) {
+            case PermissionConstants.MANAGE_CALENDAR -> user.canManageLabNotices(event.getLab());
+            case PermissionConstants.VIEW_CALENDAR -> true;
+            case PermissionConstants.VIEW_APPLICANTS -> user.canManageLabNotices(event.getLab());
             default -> false;
         };
     }

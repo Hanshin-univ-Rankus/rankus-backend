@@ -27,17 +27,18 @@ public class InterviewPermissionHandler {
      * 랩실에 대한 면접 관리 권한이 있는지 확인
      */
     public boolean hasPermissionForLab(CustomUserDetails userDetails, Long labId, String permission) {
-        if (userDetails == null || labId == null) {
+        if (userDetails == null || labId == null || permission == null) {
             return false;
         }
 
         Long userId = userDetails.getUserId();
         User user = userQueryUseCase.getUserById(userId);
         Lab lab = labPromotionQueryUseCase.getLabById(labId);
+        String perm = permission.toUpperCase();
 
-        return switch (permission) {
-            case "MANAGE_INTERVIEWS" -> user.canManageLabNotices(lab); // 기존 랩실 관리 권한 재사용
-            case "VIEW_INTERVIEWS" -> true; // 모든 인증된 사용자가 조회 가능
+        return switch (perm) {
+            case PermissionConstants.MANAGE_INTERVIEWS -> user.canManageLabNotices(lab); // 기존 랩실 관리 권한 재사용
+            case PermissionConstants.VIEW_INTERVIEWS -> true; // 모든 인증된 사용자가 조회 가능
             default -> false;
         };
     }
@@ -46,17 +47,18 @@ public class InterviewPermissionHandler {
      * 특정 면접에 대한 권한이 있는지 확인
      */
     public boolean hasPermissionForInterview(CustomUserDetails userDetails, Long interviewId, String permission) {
-        if (userDetails == null || interviewId == null) {
+        if (userDetails == null || interviewId == null || permission == null) {
             return false;
         }
 
         Long userId = userDetails.getUserId();
         User user = userQueryUseCase.getUserById(userId);
         Interview interview = interviewQueryUseCase.getInterviewById(interviewId);
+        String perm = permission.toUpperCase();
 
-        return switch (permission) {
-            case "MANAGE_INTERVIEWS" -> user.canManageLabNotices(interview.getLab());
-            case "VIEW_INTERVIEWS" -> true;
+        return switch (perm) {
+            case PermissionConstants.MANAGE_INTERVIEWS -> user.canManageLabNotices(interview.getLab());
+            case PermissionConstants.VIEW_INTERVIEWS -> true;
             default -> false;
         };
     }

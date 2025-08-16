@@ -27,22 +27,25 @@ public class VotePermissionHandler implements DomainPermissionEvaluator {
 
     @Override
     public boolean hasPermission(Object principalObj, Serializable targetId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long)) {
+        if (!(principalObj instanceof CustomUserDetails) || permission == null) {
+            return false;
+        }
+        if (!(targetId instanceof Long voteId)) {
             return false;
         }
 
         Long userId = ((CustomUserDetails) principalObj).getUserId();
         User user = userQueryUseCase.getUserById(userId);
-        Long voteId = (Long) targetId;
+        String perm = permission.toUpperCase();
 
         Vote vote = voteQueryUseCase.findVoteById(voteId);
 
-        return switch (permission) {
-            case "view", "VIEW" -> user.canViewVotes(vote.getLab());
-            case "participate", "PARTICIPATE" -> vote.canUserParticipate(user);
-            case "manage", "MANAGE" -> vote.canUserManage(user);
-            case "delete", "DELETE" -> vote.canUserManage(user) && vote.canBeDeleted();
-            case "view_results", "VIEW_RESULTS" -> user.canManageVotes(vote.getLab());
+        return switch (perm) {
+            case PermissionConstants.VIEW -> user.canViewVotes(vote.getLab());
+            case PermissionConstants.PARTICIPATE -> vote.canUserParticipate(user);
+            case PermissionConstants.MANAGE -> vote.canUserManage(user);
+            case PermissionConstants.DELETE -> vote.canUserManage(user) && vote.canBeDeleted();
+            case PermissionConstants.VIEW_RESULTS -> user.canManageVotes(vote.getLab());
             default -> false;
         };
     }
@@ -68,17 +71,18 @@ public class VotePermissionHandler implements DomainPermissionEvaluator {
      * @return 권한 여부
      */
     public boolean hasPermissionForLab(Object principalObj, Serializable labId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(labId instanceof Long)) {
+        if (!(principalObj instanceof CustomUserDetails) || !(labId instanceof Long) || permission == null) {
             return false;
         }
 
         Long userId = ((CustomUserDetails) principalObj).getUserId();
         User user = userQueryUseCase.getUserById(userId);
         Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
+        String perm = permission.toUpperCase();
 
-        return switch (permission) {
-            case "VIEW_VOTES" -> user.canViewVotes(lab);
-            case "CREATE_VOTE" -> user.canCreateVotes(lab);
+        return switch (perm) {
+            case PermissionConstants.VIEW_VOTES -> user.canViewVotes(lab);
+            case PermissionConstants.CREATE_VOTE -> user.canCreateVotes(lab);
             default -> false;
         };
     }

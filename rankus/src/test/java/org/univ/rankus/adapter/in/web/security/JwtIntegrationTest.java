@@ -25,7 +25,9 @@ import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.common.security.CustomAccessDeniedHandler;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.common.security.jwt.JwtAuthenticationEntryPoint;
+import org.univ.rankus.common.security.jwt.JwtAuthenticationException;
 import org.univ.rankus.common.security.jwt.JwtAuthenticationFilter;
+import org.univ.rankus.common.security.jwt.JwtErrorCode;
 import org.univ.rankus.common.security.jwt.JwtTokenProvider;
 import org.univ.rankus.common.security.permission.UnifiedPermissionEvaluator;
 import org.univ.rankus.config.CorsConfig;
@@ -113,7 +115,8 @@ class JwtIntegrationTest {
         given(mockUser.getRole()).willReturn(org.univ.rankus.domain.model.user.Role.ADMIN);
 
         // JWT 필터 모킹: 토큰 유효, Authentication 생성
-        given(tokenProvider.validateToken(fakeToken)).willReturn(true);
+        // given(tokenProvider.validateToken(fakeToken)).willReturn(true);
+        org.mockito.Mockito.doNothing().when(tokenProvider).validateToken(fakeToken);
         CustomUserDetails principal = org.mockito.Mockito.mock(CustomUserDetails.class);
         given(principal.getUserId()).willReturn(1L);
         given(principal.getUsername()).willReturn(email);
@@ -180,7 +183,16 @@ class JwtIntegrationTest {
     @DisplayName("잘못된 토큰으로 보호된 엔드포인트에 접근하면 401 Unauthorized")
     void accessWithInvalidToken() throws Exception {
         String invalidToken = "invalid-token";
-        given(tokenProvider.validateToken(invalidToken)).willReturn(false);
+        // given(tokenProvider.validateToken(invalidToken)).willReturn(false);
+        org.mockito.Mockito.doThrow(new JwtAuthenticationException(JwtErrorCode.TOKEN_MALFORMED))
+                .when(tokenProvider).validateToken(invalidToken);
+
+        // EntryPoint가 401을 설정하도록 스텁
+        org.mockito.Mockito.doAnswer(invocation -> {
+            jakarta.servlet.http.HttpServletResponse resp = invocation.getArgument(1);
+            resp.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
+        }).when(authEntryPoint).commence(any(jakarta.servlet.http.HttpServletRequest.class), any(jakarta.servlet.http.HttpServletResponse.class), any(org.springframework.security.core.AuthenticationException.class));
 
         mockMvc.perform(
                         get("/api/users/me")

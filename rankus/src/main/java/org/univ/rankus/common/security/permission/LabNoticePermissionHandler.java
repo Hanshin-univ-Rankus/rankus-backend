@@ -27,7 +27,7 @@ public class LabNoticePermissionHandler implements DomainPermissionEvaluator {
 
     @Override
     public boolean hasPermission(Object principalObj, Serializable targetId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long)) {
+        if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long) || permission == null) {
             return false;
         }
 
@@ -36,12 +36,12 @@ public class LabNoticePermissionHandler implements DomainPermissionEvaluator {
         Long noticeId = (Long) targetId;
 
         LabNotice notice = noticeQueryUseCase.getNoticeById(noticeId);
+        String perm = permission.toUpperCase();
 
-        return switch (permission) {
-            case "view", "VIEW" -> user.canViewLabNotices(notice.getLab());
-            case "create", "CREATE", "update", "UPDATE", "delete", "DELETE" ->
+        return switch (perm) {
+            case PermissionConstants.VIEW -> user.canViewLabNotices(notice.getLab());
+            case PermissionConstants.CREATE, PermissionConstants.UPDATE, PermissionConstants.DELETE, PermissionConstants.MANAGE ->
                     user.canManageLabNotices(notice.getLab());
-            case "manage", "MANAGE" -> user.canManageLabNotices(notice.getLab());
             default -> false;
         };
     }
@@ -64,8 +64,8 @@ public class LabNoticePermissionHandler implements DomainPermissionEvaluator {
         Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
 
         return switch (permission) {
-            case "VIEW_NOTICES" -> user.canViewLabNotices(lab);
-            case "MANAGE_NOTICES" -> user.canManageLabNotices(lab);
+            case PermissionConstants.VIEW_NOTICES -> user.canViewLabNotices(lab);
+            case PermissionConstants.MANAGE_NOTICES -> user.canManageLabNotices(lab);
             default -> false;
         };
     }

@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
+import org.univ.rankus.application.port.in.query.LabPromotionQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.lab.application.LabApplication;
+import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.user.User;
 
 import java.io.Serializable;
@@ -16,6 +18,7 @@ public class LabApplicationPermissionHandler implements DomainPermissionEvaluato
 
     private final LabApplicationQueryUseCase queryUseCase;
     private final UserQueryUseCase userQueryUseCase;
+    private final LabPromotionQueryUseCase labPromotionQueryUseCase;
 
     @Override
     public String targetType() {
@@ -24,21 +27,64 @@ public class LabApplicationPermissionHandler implements DomainPermissionEvaluato
 
     @Override
     public boolean hasPermission(Object principalObj, Serializable targetId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long)) {
+        if (!(principalObj instanceof CustomUserDetails) || permission == null) {
+            return false;
+        }
+        if (!(targetId instanceof Long id)) {
             return false;
         }
 
+        String perm = permission.toUpperCase();
         Long userId = ((CustomUserDetails) principalObj).getUserId();
         User user = userQueryUseCase.getUserById(userId);
-        Long id = (Long) targetId;
 
-        // 모든 권한에 대해 applicationId로 처리
-        LabApplication app = queryUseCase.getApplicationById(id);
+        try {
+            switch (perm) {
+                case PermissionConstants.DELETE:
+                case PermissionConstants.CANCEL: {
+                    LabApplication app = queryUseCase.getApplicationById(id);
+                    return user.isAdmin() || app.isOwnedBy(userId);
+                }
+                case PermissionConstants.APPROVE:
+                case PermissionConstants.REJECT:
+                case PermissionConstants.VIEW: {
+                    LabApplication app = null;
+                    try {
+                        app = queryUseCase.getApplicationById(id);
+                    } catch (RuntimeException notFoundOrInvalid) {
+                        // appId가 아닐 수 있음 → labId로 간주
+                    }
 
-        return switch (permission) {
-            case "cancel", "DELETE" -> user.isAdmin() || app.isOwnedBy(userId);
-            case "approve", "reject", "view" -> user.canManageLabApplications(app.getLab());
-            default -> false;
-        };
+                    if (app != null) {
+                        return user.canManageLabApplications(app.getLab());
+                    }
+
+                    Lab lab = labPromotionQueryUseCase.getLabById(id);
+                    return user.canManageLabApplications(lab);
+                }
+                default:
+                    return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Lab ID를 기반으로 가입 신청 목록/조회 권한을 체크합니다. (컨트롤러에서 직접 호출 가능)
+     */
+    public boolean hasPermissionForLab(Object principalObj, Serializable labId, String permission) {
+        if (!(principalObj instanceof CustomUserDetails) || !(labId instanceof Long) || permission == null) {
+            return false;
+        }
+        String perm = permission.toUpperCase();
+        Long userId = ((CustomUserDetails) principalObj).getUserId();
+        User user = userQueryUseCase.getUserById(userId);
+        Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
+
+        if (PermissionConstants.VIEW.equals(perm)) {
+            return user.canManageLabApplications(lab);
+        }
+        return false;
     }
 }

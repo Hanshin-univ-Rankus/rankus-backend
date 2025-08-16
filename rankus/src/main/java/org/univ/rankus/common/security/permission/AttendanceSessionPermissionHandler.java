@@ -27,21 +27,22 @@ public class AttendanceSessionPermissionHandler implements DomainPermissionEvalu
 
     @Override
     public boolean hasPermission(Object principalObj, Serializable targetId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long)) {
+        if (!(principalObj instanceof CustomUserDetails) || permission == null) {
+            return false;
+        }
+        if (!(targetId instanceof Long sessionId)) {
             return false;
         }
 
         Long userId = ((CustomUserDetails) principalObj).getUserId();
         User user = userQueryUseCase.getUserById(userId);
-        Long sessionId = (Long) targetId;
-
         AttendanceSession session = attendanceSessionQueryUseCase.findSessionById(sessionId, userId);
+        Lab lab = getLabFromSession(session);
+        String perm = permission.toUpperCase();
 
-        return switch (permission) {
-            case "view", "VIEW" -> user.canViewLabAttendance(getLabFromSession(session));
-            case "create", "CREATE", "update", "UPDATE", "delete", "DELETE" ->
-                    user.canManageLabAttendance(getLabFromSession(session));
-            case "manage", "MANAGE" -> user.canManageLabAttendance(getLabFromSession(session));
+        return switch (perm) {
+            case PermissionConstants.VIEW -> user.canViewLabAttendance(lab);
+            case PermissionConstants.CREATE, PermissionConstants.UPDATE, PermissionConstants.DELETE, PermissionConstants.MANAGE -> user.canManageLabAttendance(lab);
             default -> false;
         };
     }
@@ -55,17 +56,18 @@ public class AttendanceSessionPermissionHandler implements DomainPermissionEvalu
      * @return 권한 여부
      */
     public boolean hasPermissionForLab(Object principalObj, Serializable labId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(labId instanceof Long)) {
+        if (!(principalObj instanceof CustomUserDetails) || !(labId instanceof Long) || permission == null) {
             return false;
         }
 
         Long userId = ((CustomUserDetails) principalObj).getUserId();
         User user = userQueryUseCase.getUserById(userId);
         Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
+        String perm = permission.toUpperCase();
 
-        return switch (permission) {
-            case "VIEW_ATTENDANCE" -> user.canViewLabAttendance(lab);
-            case "MANAGE_ATTENDANCE" -> user.canManageLabAttendance(lab);
+        return switch (perm) {
+            case PermissionConstants.VIEW_ATTENDANCE -> user.canViewLabAttendance(lab);
+            case PermissionConstants.MANAGE_ATTENDANCE -> user.canManageLabAttendance(lab);
             default -> false;
         };
     }

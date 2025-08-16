@@ -37,17 +37,18 @@ public class LabDashboardPermissionHandler implements DomainPermissionEvaluator 
      * @return 권한 여부
      */
     public boolean hasPermissionForLab(Object principalObj, Serializable labId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(labId instanceof Long)) {
+        if (!(principalObj instanceof CustomUserDetails) || !(labId instanceof Long) || permission == null) {
             return false;
         }
 
         Long userId = ((CustomUserDetails) principalObj).getUserId();
         User user = userQueryUseCase.getUserById(userId);
         Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
+        String perm = permission.toUpperCase();
 
-        return switch (permission) {
-            case "VIEW", "view" -> user.canViewLabNotices(lab); // 동일한 권한 로직 사용
-            default -> false;
-        };
+        if (PermissionConstants.VIEW.equals(perm)) {
+            return user.canViewLabNotices(lab);
+        }
+        return false;
     }
 }

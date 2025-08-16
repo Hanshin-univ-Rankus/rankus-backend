@@ -25,20 +25,21 @@ public class LabCreationRequestPermissionHandler implements DomainPermissionEval
 
     @Override
     public boolean hasPermission(Object principalObj, Serializable targetId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long)) {
+        if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long) || permission == null) {
             return false;
         }
 
         Long userId = ((CustomUserDetails) principalObj).getUserId();
         User user = userQueryUseCase.getUserById(userId);
         Long requestId = (Long) targetId;
+        String perm = permission.toUpperCase();
 
         LabCreationRequest request = queryUseCase.getLabCreationRequestById(requestId);
 
-        return switch (permission) {
-            case "DELETE" -> request.isOwnedBy(userId) || user.getRole() == Role.ADMIN;
-            case "VIEW" -> request.isOwnedBy(userId) || isAdminOrProfessor(user);
-            case "APPROVE", "REJECT" -> isAdminOrProfessor(user);
+        return switch (perm) {
+            case PermissionConstants.DELETE -> request.isOwnedBy(userId) || user.getRole() == Role.ADMIN;
+            case PermissionConstants.VIEW -> request.isOwnedBy(userId) || isAdminOrProfessor(user);
+            case PermissionConstants.APPROVE, PermissionConstants.REJECT -> isAdminOrProfessor(user);
             default -> false;
         };
     }

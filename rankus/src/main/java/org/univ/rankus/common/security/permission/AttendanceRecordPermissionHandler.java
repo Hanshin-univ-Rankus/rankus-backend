@@ -30,41 +30,33 @@ public class AttendanceRecordPermissionHandler implements DomainPermissionEvalua
 
     @Override
     public boolean hasPermission(Object principalObj, Serializable targetId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long)) {
+        if (!(principalObj instanceof CustomUserDetails) || permission == null) {
+            return false;
+        }
+        if (!(targetId instanceof Long recordId)) {
             return false;
         }
 
         Long userId = ((CustomUserDetails) principalObj).getUserId();
         User user = userQueryUseCase.getUserById(userId);
-        Long recordId = (Long) targetId;
+        String perm = permission.toUpperCase();
 
         AttendanceRecord record = attendanceRecordQueryUseCase.findRecordById(recordId, userId);
         AttendanceSession session = attendanceSessionQueryUseCase.findSessionById(record.getSessionId(), userId);
         Lab lab = labPromotionQueryUseCase.getLabById(session.getLabId());
 
-        return switch (permission) {
-            case "view", "VIEW" -> {
-                // 본인의 기록이거나 랩실 조회 권한이 있는 경우
-                yield record.isOwnedBy(userId) || user.canViewLabAttendance(lab);
-            }
-            case "update", "UPDATE", "delete", "DELETE", "manage", "MANAGE" -> {
-                // 랩실 출석 관리 권한이 있는 경우만
-                yield user.canManageLabAttendance(lab);
-            }
+        return switch (perm) {
+            case PermissionConstants.VIEW -> record.isOwnedBy(userId) || user.canViewLabAttendance(lab);
+            case PermissionConstants.UPDATE, PermissionConstants.DELETE, PermissionConstants.MANAGE -> user.canManageLabAttendance(lab);
             default -> false;
         };
     }
 
     /**
      * 세션 ID를 기반으로 출석 기록 권한을 체크합니다.
-     *
-     * @param principalObj 인증 주체
-     * @param sessionId    세션 ID
-     * @param permission   권한 타입 (VIEW, MANAGE)
-     * @return 권한 여부
      */
     public boolean hasPermissionForSession(Object principalObj, Serializable sessionId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(sessionId instanceof Long)) {
+        if (!(principalObj instanceof CustomUserDetails) || !(sessionId instanceof Long) || permission == null) {
             return false;
         }
 
@@ -72,10 +64,11 @@ public class AttendanceRecordPermissionHandler implements DomainPermissionEvalua
         User user = userQueryUseCase.getUserById(userId);
         AttendanceSession session = attendanceSessionQueryUseCase.findSessionById((Long) sessionId, userId);
         Lab lab = labPromotionQueryUseCase.getLabById(session.getLabId());
+        String perm = permission.toUpperCase();
 
-        return switch (permission) {
-            case "VIEW" -> user.canViewLabAttendance(lab);
-            case "MANAGE" -> user.canManageLabAttendance(lab);
+        return switch (perm) {
+            case PermissionConstants.VIEW -> user.canViewLabAttendance(lab);
+            case PermissionConstants.MANAGE -> user.canManageLabAttendance(lab);
             default -> false;
         };
     }
