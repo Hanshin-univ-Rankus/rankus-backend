@@ -3,12 +3,15 @@ package org.univ.rankus.adapter.in.web.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -42,7 +45,16 @@ public class LabNoticeController {
     private final LabNoticeCommandUseCase labNoticeCommandUseCase;
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "랩실 공지사항 목록 조회", description = "특정 랩실의 공지사항을 페이징하여 조회합니다. 고정 공지 → 최신순으로 정렬됩니다.")
+    @Operation(
+            summary = "랩실 공지사항 목록 조회",
+            description = "특정 랩실의 공지사항을 페이징하여 조회합니다. 고정 공지 → 최신순으로 정렬됩니다. 정렬 파라미터(sort)는 '필드,방향' 형식이며 예: createdAt,desc | pinned,desc",
+            parameters = {
+                    @Parameter(name = "page", description = "0부터 시작하는 페이지 인덱스", example = "0"),
+                    @Parameter(name = "size", description = "페이지 크기(1 이상)", example = "20"),
+                    @Parameter(name = "sort", description = "정렬: '필드,방향' 형식. 예: createdAt,desc | pinned,desc",
+                            array = @ArraySchema(schema = @Schema(type = "string", example = "createdAt,desc")))
+            }
+    )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "공지사항 목록 조회 성공",
@@ -57,7 +69,7 @@ public class LabNoticeController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_NOTICES')")
     public ResponseEntity<ApiResponse<PageResponse<LabNoticeResponseDto>>> getLabNotices(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
-            @PageableDefault(size = 20) Pageable pageable
+            @PageableDefault(size = 20) @ParameterObject Pageable pageable
     ) {
         Page<LabNotice> noticePage = labNoticeQueryUseCase.getNoticesByLabId(labId, pageable);
         PageResponse<LabNoticeResponseDto> pageResponse = PageResponse.of(noticePage, LabNoticeResponseDto::from);
