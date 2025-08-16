@@ -2,6 +2,7 @@ package org.univ.rankus.common.security.permission;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.security.core.GrantedAuthority;
 import org.univ.rankus.application.port.in.query.LabPromotionQueryUseCase;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.application.port.in.query.VoteQueryUseCase;
@@ -75,15 +76,30 @@ public class VotePermissionHandler implements DomainPermissionEvaluator {
             return false;
         }
 
-        Long userId = ((CustomUserDetails) principalObj).getUserId();
-        User user = userQueryUseCase.getUserById(userId);
-        Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
+        CustomUserDetails principal = (CustomUserDetails) principalObj;
+        // 1) 관리자/교수는 즉시 허용 (DB 조회 없이 단축)
+        for (GrantedAuthority auth : principal.getAuthorities()) {
+            String a = auth.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+
+        Long userId = principal.getUserId();
         String perm = permission.toUpperCase();
 
-        return switch (perm) {
-            case PermissionConstants.VIEW_VOTES -> user.canViewVotes(lab);
-            case PermissionConstants.CREATE_VOTE -> user.canCreateVotes(lab);
-            default -> false;
-        };
+        try {
+            User user = userQueryUseCase.getUserById(userId);
+            Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
+
+            return switch (perm) {
+                case PermissionConstants.VIEW_VOTES -> user.canViewVotes(lab);
+                case PermissionConstants.CREATE_VOTE -> user.canCreateVotes(lab);
+                default -> false;
+            };
+        } catch (Exception e) {
+            // 조회 실패 등 예외 발생 시 안전하게 거부
+            return false;
+        }
     }
 }
