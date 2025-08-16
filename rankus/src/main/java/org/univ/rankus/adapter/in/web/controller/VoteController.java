@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -47,7 +48,16 @@ public class VoteController {
     private final VoteCommandUseCase voteCommandUseCase;
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "랩실 투표 목록 조회", description = "특정 랩실의 투표를 페이징하여 조회합니다. 최신순으로 정렬됩니다.")
+    @Operation(
+            summary = "랩실 투표 목록 조회",
+            description = "특정 랩실의 투표를 페이징하여 조회합니다. 최신순으로 정렬됩니다.",
+            parameters = {
+                    @io.swagger.v3.oas.annotations.Parameter(name = "page", description = "0부터 시작하는 페이지 인덱스", example = "0"),
+                    @io.swagger.v3.oas.annotations.Parameter(name = "size", description = "페이지 크기(1 이상)", example = "20"),
+                    @io.swagger.v3.oas.annotations.Parameter(name = "sort", description = "정렬: '필드,방향' 형식. 예: createdAt,desc",
+                            array = @io.swagger.v3.oas.annotations.media.ArraySchema(schema = @io.swagger.v3.oas.annotations.media.Schema(type = "string", example = "createdAt,desc")))
+            }
+    )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "투표 목록 조회 성공",
@@ -62,7 +72,7 @@ public class VoteController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_VOTES')")
     public ResponseEntity<ApiResponse<PageResponse<VoteResponseDto>>> getLabVotes(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
-            @PageableDefault(size = 20) Pageable pageable
+            @PageableDefault(size = 20) @ParameterObject Pageable pageable
     ) {
         Page<Vote> votePage = voteQueryUseCase.findVotesByLabId(labId, pageable);
         PageResponse<VoteResponseDto> pageResponse = PageResponse.of(votePage, VoteResponseDto::from);

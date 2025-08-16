@@ -2,6 +2,7 @@ package org.univ.rankus.adapter.in.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -32,6 +33,7 @@ import org.univ.rankus.application.port.in.command.LabResourceCommandUseCase;
 import org.univ.rankus.application.port.in.query.LabResourceQueryUseCase;
 import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.lab.resource.ResourceCategory;
+import org.springdoc.core.annotations.ParameterObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -52,7 +54,18 @@ public class LabResourceController {
     private final LabResourceCommandUseCase labResourceCommandUseCase;
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "랩실 자료 목록 조회", description = "특정 랩실의 자료를 페이징하여 조회합니다. 카테고리 및 검색어로 필터링 가능합니다.")
+    @Operation(
+            summary = "랩실 자료 목록 조회",
+            description = "특정 랩실의 자료를 페이징하여 조회합니다. 카테고리 및 검색어로 필터링 가능합니다.",
+            parameters = {
+                    @Parameter(name = "category", description = "자료 카테고리 (LECTURE_NOTE, ASSIGNMENT, RESEARCH, REFERENCE, DOCUMENT, SOFTWARE, OTHER)", example = "REFERENCE"),
+                    @Parameter(name = "search", description = "자료명/설명 검색어", example = "딥러닝"),
+                    @Parameter(name = "page", description = "0부터 시작하는 페이지 인덱스", example = "0"),
+                    @Parameter(name = "size", description = "페이지 크기(1 이상)", example = "20"),
+                    @Parameter(name = "sort", description = "정렬: '필드,방향' 형식. 예: createdAt,desc",
+                            array = @ArraySchema(schema = @Schema(type = "string", example = "createdAt,desc")))
+            }
+    )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "자료 목록 조회 성공",
@@ -69,7 +82,7 @@ public class LabResourceController {
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @RequestParam(required = false) @Parameter(description = "자료 카테고리") ResourceCategory category,
             @RequestParam(required = false) @Parameter(description = "검색어") String search,
-            @PageableDefault(size = 20) Pageable pageable,
+            @PageableDefault(size = 20) @ParameterObject Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
         Page<LabResourceResponseDto> resourcePage = labResourceQueryUseCase.getLabResources(
@@ -231,12 +244,21 @@ public class LabResourceController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "사용자별 업로드 자료 조회", description = "특정 사용자가 업로드한 자료 목록을 조회합니다.")
+    @Operation(
+            summary = "사용자별 업로드 자료 조회",
+            description = "현재 사용자가 업로드한 자료 목록을 페이징하여 조회합니다.",
+            parameters = {
+                    @Parameter(name = "page", description = "0부터 시작하는 페이지 인덱스", example = "0"),
+                    @Parameter(name = "size", description = "페이지 크기(1 이상)", example = "20"),
+                    @Parameter(name = "sort", description = "정렬: '필드,방향' 형식. 예: createdAt,desc",
+                            array = @ArraySchema(schema = @Schema(type = "string", example = "createdAt,desc")))
+            }
+    )
     @GetMapping("/my-uploads")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<PageResponse<LabResourceResponseDto>>> getMyUploads(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
-            @PageableDefault(size = 20) Pageable pageable,
+            @PageableDefault(size = 20) @ParameterObject Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
         Page<LabResourceResponseDto> resourcePage = labResourceQueryUseCase.getResourcesByUploader(

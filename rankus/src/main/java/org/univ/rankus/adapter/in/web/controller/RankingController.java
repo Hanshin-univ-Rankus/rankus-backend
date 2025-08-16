@@ -18,6 +18,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springdoc.core.annotations.ParameterObject;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import org.univ.rankus.adapter.in.web.dto.response.ApiResponse;
 import org.univ.rankus.adapter.in.web.dto.response.PageResponse;
 import org.univ.rankus.adapter.in.web.dto.response.RankingResponseDto;
@@ -38,25 +40,13 @@ public class RankingController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(
             summary = "전체 랩실 랭킹 조회",
-            description = """
-                    모든 랩실의 랭킹을 점수순으로 페이징하여 조회합니다.
-                                        
-                    ## 기능 설명
-                    - 전체 랩실의 종합 점수 기반 순위 제공
-                    - 점수 구성: 프로젝트, 논문, 대회, 특별활동 등
-                    - 실시간 랭킹 업데이트
-                    - 페이지 단위로 효율적인 데이터 로딩
-                                        
-                    ## 정렬 기준
-                    1. 총 점수 내림차순
-                    2. 최근 활동일 기준 (동점시)
-                    3. 랩실 생성일 기준 (최종)
-                                        
-                    ## 활용 용도
-                    - 랩실간 경쟁 현황 파악
-                    - 우수 랩실 발굴 및 벤치마킹
-                    - 랩실 홍보 효과 측정
-                    """
+            description = "모든 랩실의 랭킹을 점수순으로 페이징하여 조회합니다.",
+            parameters = {
+                    @Parameter(name = "page", description = "0부터 시작하는 페이지 인덱스", example = "0"),
+                    @Parameter(name = "size", description = "페이지 크기(1 이상)", example = "20"),
+                    @Parameter(name = "sort", description = "정렬: '필드,방향' 형식. 예: totalScore,desc",
+                            array = @ArraySchema(schema = @Schema(type = "string", example = "totalScore,desc")))
+            }
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -143,7 +133,7 @@ public class RankingController {
                     description = "페이지 정보 (page: 페이지 번호, size: 페이지 크기, sort: 정렬 기준)",
                     example = "page=0&size=20&sort=totalScore,desc"
             )
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 20) @ParameterObject Pageable pageable) {
 
         Page<RankingQueryUseCase.LabRankingResult> rankings = rankingQueryUseCase.getLabRankings(pageable);
 

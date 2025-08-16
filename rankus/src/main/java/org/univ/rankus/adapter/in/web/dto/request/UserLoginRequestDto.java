@@ -20,7 +20,7 @@ public class UserLoginRequestDto {
 
     @Schema(
             description = "이메일 주소",
-            example = "hong@example.com",
+            example = "admin@example.com",
             format = "email",
             requiredMode = Schema.RequiredMode.REQUIRED
     )
@@ -30,7 +30,7 @@ public class UserLoginRequestDto {
 
     @Schema(
             description = "비밀번호",
-            example = "password123!",
+            example = "password",
             format = "password",
             requiredMode = Schema.RequiredMode.REQUIRED
     )

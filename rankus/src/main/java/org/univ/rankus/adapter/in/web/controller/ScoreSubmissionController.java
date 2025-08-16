@@ -31,6 +31,9 @@ import org.univ.rankus.domain.model.ranking.ScoreCategory;
 import org.univ.rankus.domain.model.ranking.ScoreSubmission;
 import org.univ.rankus.domain.model.ranking.SubmissionStatus;
 import org.univ.rankus.domain.model.ranking.policy.DuplicateCheckPolicy;
+import org.springdoc.core.annotations.ParameterObject;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 
 import java.time.LocalDate;
 
@@ -111,7 +114,16 @@ public class ScoreSubmissionController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "내 점수 신청 목록 조회", description = "현재 사용자의 점수 신청 목록을 페이징하여 조회합니다.")
+    @Operation(
+            summary = "내 점수 신청 목록 조회",
+            description = "현재 사용자의 점수 신청 목록을 페이징하여 조회합니다.",
+            parameters = {
+                    @Parameter(name = "page", description = "0부터 시작하는 페이지 인덱스", example = "0"),
+                    @Parameter(name = "size", description = "페이지 크기(1 이상)", example = "20"),
+                    @Parameter(name = "sort", description = "정렬: '필드,방향' 형식. 예: createdAt,desc",
+                            array = @ArraySchema(schema = @Schema(type = "string", example = "createdAt,desc")))
+            }
+    )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "점수 신청 목록 조회 성공",
@@ -122,7 +134,7 @@ public class ScoreSubmissionController {
     @GetMapping("/my")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<PageResponse<ScoreSubmissionResponseDto>>> getMyScoreSubmissions(
-            @PageableDefault(size = 20) Pageable pageable,
+            @PageableDefault(size = 20) @ParameterObject Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         Page<ScoreSubmission> submissions = scoreSubmissionQueryUseCase
@@ -132,7 +144,17 @@ public class ScoreSubmissionController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "랩실 점수 신청 목록 조회", description = "특정 랩실의 점수 신청 목록을 페이징하여 조회합니다.")
+    @Operation(
+            summary = "랩실 점수 신청 목록 조회",
+            description = "특정 랩실의 점수 신청 목록을 페이징하여 조회합니다.",
+            parameters = {
+                    @Parameter(name = "status", description = "필터링할 상태 (예: PENDING, APPROVED, REJECTED)", example = "PENDING"),
+                    @Parameter(name = "page", description = "0부터 시작하는 페이지 인덱스", example = "0"),
+                    @Parameter(name = "size", description = "페이지 크기(1 이상)", example = "20"),
+                    @Parameter(name = "sort", description = "정렬: '필드,방향' 형식. 예: createdAt,desc",
+                            array = @ArraySchema(schema = @Schema(type = "string", example = "createdAt,desc")))
+            }
+    )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "랩실 점수 신청 목록 조회 성공",
@@ -145,7 +167,7 @@ public class ScoreSubmissionController {
     public ResponseEntity<ApiResponse<PageResponse<ScoreSubmissionResponseDto>>> getLabScoreSubmissions(
             @PathVariable @Positive Long labId,
             @RequestParam(required = false) SubmissionStatus status,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 20) @ParameterObject Pageable pageable) {
 
         Page<ScoreSubmission> submissions = (status != null)
                 ? scoreSubmissionQueryUseCase.findSubmissionsByLabIdAndStatus(labId, status, pageable)
@@ -155,7 +177,16 @@ public class ScoreSubmissionController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "승인 대기 점수 신청 목록 조회", description = "승인자가 처리할 수 있는 PENDING 상태의 점수 신청 목록을 조회합니다.")
+    @Operation(
+            summary = "승인 대기 점수 신청 목록 조회",
+            description = "승인자가 처리할 수 있는 PENDING 상태의 점수 신청 목록을 조회합니다.",
+            parameters = {
+                    @Parameter(name = "page", description = "0부터 시작하는 페이지 인덱스", example = "0"),
+                    @Parameter(name = "size", description = "페이지 크기(1 이상)", example = "20"),
+                    @Parameter(name = "sort", description = "정렬: '필드,방향' 형식. 예: createdAt,desc",
+                            array = @ArraySchema(schema = @Schema(type = "string", example = "createdAt,desc")))
+            }
+    )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "승인 대기 점수 신청 목록 조회 성공",
@@ -166,7 +197,7 @@ public class ScoreSubmissionController {
     @GetMapping("/pending")
     @PreAuthorize("hasRole('LAB_MANAGER') or hasRole('LAB_LEADER') or hasRole('PROFESSOR') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<PageResponse<ScoreSubmissionResponseDto>>> getPendingScoreSubmissions(
-            @PageableDefault(size = 20) Pageable pageable,
+            @PageableDefault(size = 20) @ParameterObject Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         Page<ScoreSubmission> submissions = scoreSubmissionQueryUseCase
