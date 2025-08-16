@@ -25,12 +25,13 @@ public class LabNoticeRepositoryAdapter implements LabNoticeRepositoryPort {
 
     @Override
     public Optional<LabNotice> findById(Long id) {
-        return springDataLabNoticeRepository.findById(id);
+        return springDataLabNoticeRepository.findByIdWithJoins(id);
     }
 
     @Override
     public List<LabNotice> findByLabId(Long labId) {
-        return springDataLabNoticeRepository.findByLabId(labId);
+        // 정렬 일관성을 위해 pinned desc, createdAt desc로 조회합니다 (fetch join 포함)
+        return springDataLabNoticeRepository.findByLabIdOrderByIsPinnedDescCreatedAtDesc(labId);
     }
 
     @Override
@@ -40,7 +41,7 @@ public class LabNoticeRepositoryAdapter implements LabNoticeRepositoryPort {
 
     @Override
     public List<LabNotice> findByLabIdAndType(Long labId, NoticeType type) {
-        return springDataLabNoticeRepository.findByLabIdAndType(labId, type);
+        return springDataLabNoticeRepository.findByLabIdAndTypeWithJoins(labId, type);
     }
 
     @Override
