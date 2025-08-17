@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -62,7 +61,7 @@ public class LabApplicationController {
                     - 면접 시간은 미래 시점이어야 함
                     """
     )
-    @RequestBody(
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "랩실 지원 신청 정보",
             required = true,
             content = @Content(
@@ -171,7 +170,7 @@ public class LabApplicationController {
             @Parameter(description = "지원할 랩실의 ID", required = true, example = "1")
             @PathVariable @Positive Long labId,
             @AuthenticationPrincipal CustomUserDetails principal,
-            @RequestBody @Valid LabApplicationRequestDto dto
+            @org.springframework.web.bind.annotation.RequestBody @Valid LabApplicationRequestDto dto
     ) {
         LabApplication created = commandUseCase.applyToLab(
                 labId,
@@ -338,7 +337,7 @@ public class LabApplicationController {
     public ResponseEntity<ApiResponse<LabApplicationResponseDto>> applyToLabWithSlot(
             @PathVariable @Positive Long labId,
             @AuthenticationPrincipal CustomUserDetails principal,
-            @RequestBody @Valid LabApplicationSlotRequestDto dto
+            @org.springframework.web.bind.annotation.RequestBody @Valid LabApplicationSlotRequestDto dto
     ) {
         LabApplication created = commandUseCase.applyToLabWithSlot(
                 labId,
