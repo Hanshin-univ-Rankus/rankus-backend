@@ -30,17 +30,17 @@ VALUES (1, 1, 'https://example.com/lab1_img1.png', 'REPRESENTATIVE'),
 -- 4. interviews (면접 일정)
 INSERT INTO interviews (id, lab_id, start_date, end_date, duration_minutes, max_applicants_per_slot, status, created_at,
                         updated_at)
-VALUES (1, 1, '2025-07-15', '2025-07-16', 30, 2, 'ACTIVE', NOW(), NOW()),
-       (2, 2, '2025-07-20', '2025-07-21', 45, 1, 'ACTIVE', NOW(), NOW());
+VALUES (1, 1, '2025-07-15', '2025-11-16', 30, 2, 'ACTIVE', NOW(), NOW()),
+       (2, 2, '2025-07-20', '2025-11-21', 45, 1, 'ACTIVE', NOW(), NOW());
 
 -- 5. interview_slots (면접 슬롯)
 INSERT INTO interview_slots (id, interview_id, start_time, end_time, max_applicants, current_applicants, status,
                              version, created_at, updated_at)
-VALUES (1, 1, '2025-07-15 09:00:00', '2025-07-15 09:30:00', 2, 1, 'AVAILABLE', 0, NOW(), NOW()),
-       (2, 1, '2025-07-15 10:00:00', '2025-07-15 10:30:00', 2, 0, 'AVAILABLE', 0, NOW(), NOW()),
-       (3, 1, '2025-07-15 14:00:00', '2025-07-15 14:30:00', 2, 2, 'FULL', 0, NOW(), NOW()),
-       (4, 2, '2025-07-20 13:00:00', '2025-07-20 13:45:00', 1, 0, 'AVAILABLE', 0, NOW(), NOW()),
-       (5, 2, '2025-07-20 15:00:00', '2025-07-20 15:45:00', 1, 1, 'FULL', 0, NOW(), NOW());
+VALUES (1, 1, '2025-10-15 09:00:00', '2025-10-15 09:30:00', 2, 1, 'AVAILABLE', 0, NOW(), NOW()),
+       (2, 1, '2025-10-15 10:00:00', '2025-10-15 10:30:00', 2, 0, 'AVAILABLE', 0, NOW(), NOW()),
+       (3, 1, '2025-10-15 14:00:00', '2025-10-15 14:30:00', 2, 2, 'FULL', 0, NOW(), NOW()),
+       (4, 2, '2025-10-20 13:00:00', '2025-10-20 13:45:00', 1, 0, 'AVAILABLE', 0, NOW(), NOW()),
+       (5, 2, '2025-10-20 15:00:00', '2025-10-20 15:45:00', 1, 1, 'FULL', 0, NOW(), NOW());
 
 -- 6. lab_applications (새로운 스키마에 맞춘 지원서)
 INSERT INTO lab_applications (id, lab_id, user_id, interview_slot_id, status, created_at, updated_at)
