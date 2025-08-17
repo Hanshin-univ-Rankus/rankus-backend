@@ -296,6 +296,22 @@ public class LabApplicationController {
     // ====== 새로운 슬롯 기반 지원 API ======
 
     @Operation(summary = "랩실 가입 신청 (슬롯 기반)", description = "면접 슬롯을 선택하여 랩실에 가입 신청을 합니다.")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "슬롯 기반 가입 신청 요청",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = LabApplicationSlotRequestDto.class),
+                    examples = @ExampleObject(
+                            name = "슬롯 기반 신청 예시",
+                            value = """
+                                    {
+                                      "slotId": 1
+                                    }
+                                    """
+                    )
+            )
+    )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "201", description = "가입 신청 성공",
