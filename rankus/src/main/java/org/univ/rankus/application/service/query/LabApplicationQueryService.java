@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.univ.rankus.application.port.in.query.LabApplicationQueryUseCase;
 import org.univ.rankus.application.port.out.LabApplicationRepositoryPort;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
+import org.univ.rankus.domain.model.lab.application.ApplicationStatus;
 import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.lab.exception.LabApplicationErrorCode;
 import org.univ.rankus.domain.model.lab.exception.LabApplicationNotFoundException;
@@ -35,5 +36,23 @@ public class LabApplicationQueryService implements LabApplicationQueryUseCase {
                 .orElseThrow(() ->
                         new LabApplicationNotFoundException(LabApplicationErrorCode.APPLICATION_NOT_FOUND)
                 );
+    }
+
+    @Override
+    public List<LabApplication> listMyApplications(Long userId, Long labIdNullable, ApplicationStatus statusNullable) {
+        if (labIdNullable != null) {
+            labRepositoryPort.findById(labIdNullable)
+                    .orElseThrow(() -> new LabNotFoundException(LabErrorCode.LAB_NOT_FOUND));
+        }
+        if (labIdNullable != null && statusNullable != null) {
+            return labApplicationRepositoryPort.findAllByUserIdAndLabIdAndStatus(userId, labIdNullable, statusNullable);
+        }
+        if (labIdNullable != null) {
+            return labApplicationRepositoryPort.findAllByUserIdAndLabId(userId, labIdNullable);
+        }
+        if (statusNullable != null) {
+            return labApplicationRepositoryPort.findAllByUserIdAndStatus(userId, statusNullable);
+        }
+        return labApplicationRepositoryPort.findAllByUserId(userId);
     }
 }

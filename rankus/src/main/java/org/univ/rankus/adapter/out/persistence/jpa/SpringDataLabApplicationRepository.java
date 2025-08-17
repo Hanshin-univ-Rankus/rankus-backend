@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.user.User;
+import org.univ.rankus.domain.model.lab.application.ApplicationStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,4 +34,13 @@ public interface SpringDataLabApplicationRepository extends JpaRepository<LabApp
     Optional<LabApplication> findByIdAndLabId(Long id, Long labId);
 
     boolean existsByLabIdAndUserId(Long labId, Long userId);
+
+    // ===== 내 신청 모아보기 =====
+    List<LabApplication> findAllByUserId(Long userId);
+
+    List<LabApplication> findAllByUserIdAndLabId(Long userId, Long labId);
+
+    List<LabApplication> findAllByUserIdAndStatus(Long userId, ApplicationStatus status);
+
+    List<LabApplication> findAllByUserIdAndLabIdAndStatus(Long userId, Long labId, ApplicationStatus status);
 }

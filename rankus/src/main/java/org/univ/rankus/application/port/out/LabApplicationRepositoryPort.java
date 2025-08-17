@@ -2,6 +2,7 @@ package org.univ.rankus.application.port.out;
 
 import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.user.User;
+import org.univ.rankus.domain.model.lab.application.ApplicationStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,4 +54,41 @@ public interface LabApplicationRepositoryPort {
     void delete(LabApplication application);
 
     boolean existsByLabIdAndUserId(Long labId, Long userId);
+
+    // ===== 내 신청 모아보기 =====
+    /**
+     * 특정 유저 ID에 속한 모든 LabApplication을 조회합니다.
+     *
+     * @param userId 조회할 유저 ID
+     * @return 해당 유저에 속한 LabApplication 리스트 (빈 리스트 가능)
+     */
+    List<LabApplication> findAllByUserId(Long userId);
+
+    /**
+     * 특정 유저 ID와 특정 랩실 ID에 속한 LabApplication을 조회합니다.
+     *
+     * @param userId 조회할 유저 ID
+     * @param labId  조회할 랩실 ID
+     * @return 해당 유저와 랩실에 속한 LabApplication 리스트 (빈 리스트 가능)
+     */
+    List<LabApplication> findAllByUserIdAndLabId(Long userId, Long labId);
+
+    /**
+     * 특정 유저 ID와 상태에 따라 LabApplication을 조회합니다.
+     *
+     * @param userId 조회할 유저 ID
+     * @param status 조회할 LabApplication 상태
+     * @return 해당 유저 ID와 상태에 속한 LabApplication 리스트 (빈 리스트 가능)
+     */
+    List<LabApplication> findAllByUserIdAndStatus(Long userId, ApplicationStatus status);
+
+    /**
+     * 특정 유저 ID, 랩실 ID 및 상태에 따라 LabApplication을 조회합니다.
+     *
+     * @param userId 조회할 유저 ID
+     * @param labId  조회할 랩실 ID
+     * @param status 조회할 LabApplication 상태
+     * @return 해당 유저 ID, 랩실 ID 및 상태에 속한 LabApplication 리스트 (빈 리스트 가능)
+     */
+    List<LabApplication> findAllByUserIdAndLabIdAndStatus(Long userId, Long labId, ApplicationStatus status);
 }

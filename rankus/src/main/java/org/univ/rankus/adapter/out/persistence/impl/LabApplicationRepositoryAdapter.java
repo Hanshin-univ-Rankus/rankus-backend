@@ -6,6 +6,7 @@ import org.univ.rankus.adapter.out.persistence.jpa.SpringDataLabApplicationRepos
 import org.univ.rankus.application.port.out.LabApplicationRepositoryPort;
 import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.user.User;
+import org.univ.rankus.domain.model.lab.application.ApplicationStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,5 +49,26 @@ public class LabApplicationRepositoryAdapter implements LabApplicationRepository
     @Override
     public boolean existsByLabIdAndUserId(Long labId, Long userId) {
         return springDataLabApplicationRepository.existsByLabIdAndUserId(labId, userId);
+    }
+
+    // ===== 내 신청 모아보기 위임 =====
+    @Override
+    public List<LabApplication> findAllByUserId(Long userId) {
+        return springDataLabApplicationRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    public List<LabApplication> findAllByUserIdAndLabId(Long userId, Long labId) {
+        return springDataLabApplicationRepository.findAllByUserIdAndLabId(userId, labId);
+    }
+
+    @Override
+    public List<LabApplication> findAllByUserIdAndStatus(Long userId, ApplicationStatus status) {
+        return springDataLabApplicationRepository.findAllByUserIdAndStatus(userId, status);
+    }
+
+    @Override
+    public List<LabApplication> findAllByUserIdAndLabIdAndStatus(Long userId, Long labId, ApplicationStatus status) {
+        return springDataLabApplicationRepository.findAllByUserIdAndLabIdAndStatus(userId, labId, status);
     }
 }
