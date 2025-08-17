@@ -13,8 +13,4 @@ public record LabApplicationSlotRequestDto(
         @JsonProperty("slotId")
         Long slotId
 ) {
-    @JsonCreator
-    public LabApplicationSlotRequestDto {
-        // canonical constructor for Jackson
-    }
 }

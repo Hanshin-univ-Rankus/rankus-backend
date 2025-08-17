@@ -19,7 +19,25 @@ VALUES (1, '학생1', 'user1@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUu
        (6, '랩장2', 'leader2@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'LAB_LEADER',
         2, '20181006', '010-6789-0123', 5, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
        (7, '관리자', 'admin@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
-        '20151007', '010-7890-1234', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW());
+        '20151007', '010-7890-1234', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
+        (8, '관리자2', 'admin2@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
+        '20151008', '010-7890-2345', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
+       (9, '관리자3', 'admin3@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
+        '20151009', '010-7890-3456', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
+       (10, '관리자1', 'admin1@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
+        '201510010', '010-7890-4567', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
+       (11, '관리자4', 'admin4@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
+        '20151011', '010-7890-4321', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
+       (12, '관리자5', 'admin5@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
+        '20151012', '010-7890-5432', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
+       (13, '관리자6', 'admin6@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
+        '20151013', '010-7890-6342', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
+       (14, '관리7', 'admin7@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
+        '20151117', '010-7890-1235', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
+       (15, '관리8', 'admin8@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
+        '20151107', '010-1234-1234', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
+       (16, '관리자9', 'admin9@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
+        '20111007', '010-4562-1234', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW());
 
 -- 3. lab_images
 INSERT INTO lab_images (id, lab_id, image_url, type)
