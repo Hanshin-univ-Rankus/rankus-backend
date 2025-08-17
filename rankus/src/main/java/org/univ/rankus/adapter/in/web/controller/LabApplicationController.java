@@ -327,7 +327,7 @@ public class LabApplicationController {
         LabApplication created = commandUseCase.applyToLabWithSlot(
                 labId,
                 principal.getUserId(),
-                dto.getSlotId()
+                dto.slotId()
         );
         LabApplicationResponseDto respDto = LabApplicationResponseDto.from(created);
         ApiResponse<LabApplicationResponseDto> body = ApiResponse.created(respDto, "가입 신청 성공");
