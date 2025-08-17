@@ -75,6 +75,26 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          
+          # ✅ 새로 추가: app 디렉토리 보장 + 오래된 백업/로그 정리 (최근 5개만 보관)
+      - name: Ensure app dir & cleanup old backups/log
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_HOST }} << EOF
+          set -e
+          APP_DIR="/home/${{ env.EC2_USER }}/app"
+          mkdir -p "\$APP_DIR"
+          cd "\$APP_DIR"
+
+          # 백업 JAR 정리: 최신 5개만 남기고 삭제
+          if ls app.jar-backup-*.jar >/dev/null 2>&1; then
+            ls -t app.jar-backup-*.jar | tail -n +6 | xargs -r rm -f
+          fi
+
+          # 로그 슬림화: 최근 5000라인만 유지
+          if [ -f deploy.log ]; then
+            tail -n 5000 deploy.log > deploy.log.tmp && mv deploy.log.tmp deploy.log
+          fi
+          EOF
 
       - name: Copy JAR to EC2 (as app-new.jar)
         run: |
