@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,7 +63,7 @@ public class AttendanceSessionController {
                     4. 세션 종료 및 출석 결과 확인
                     """
     )
-    @RequestBody(
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "출석 세션 생성 정보",
             required = true,
             content = @Content(
@@ -233,7 +232,7 @@ public class AttendanceSessionController {
     @PostMapping("/{sessionId}/cancel")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
             "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
-    @Deprecated // Phase 3: Use PATCH /{sessionId}/status instead
+    @Deprecated // Phase 3: Use PATCH /{sessionId}/status 대신
     public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> cancelSession(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,

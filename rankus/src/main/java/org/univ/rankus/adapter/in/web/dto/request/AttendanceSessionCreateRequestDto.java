@@ -3,17 +3,15 @@ package org.univ.rankus.adapter.in.web.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * 출석 세션 생성 요청 DTO
  */
 @Getter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,8 +24,8 @@ public class AttendanceSessionCreateRequestDto {
             maxLength = 100,
             requiredMode = Schema.RequiredMode.REQUIRED
     )
-    @NotNull(message = "제목은 필수입니다")
-    @Size(min = 1, max = 100, message = "제목은 1자 이상 100자 이하여야 합니다")
+    @NotBlank(message = "제목은 필수입니다")
+    @Size(max = 100, message = "제목은 100자 이하여야 합니다")
     private String title;
 
     @Schema(
