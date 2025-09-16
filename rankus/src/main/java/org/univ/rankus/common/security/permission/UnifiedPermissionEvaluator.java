@@ -44,6 +44,6 @@ public class UnifiedPermissionEvaluator implements PermissionEvaluator {
         if (evaluator == null) {
             return false;
         }
-        return evaluator.hasPermission(auth.getPrincipal(), targetId, (String) permissionObj);
+        return evaluator.hasPermission(auth, targetId, (String) permissionObj);
     }
 }

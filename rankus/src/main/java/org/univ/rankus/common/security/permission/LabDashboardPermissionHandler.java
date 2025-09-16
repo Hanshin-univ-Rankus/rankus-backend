@@ -1,6 +1,8 @@
 package org.univ.rankus.common.security.permission;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.univ.rankus.application.port.in.query.LabPromotionQueryUseCase;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
@@ -23,8 +25,18 @@ public class LabDashboardPermissionHandler implements DomainPermissionEvaluator 
     }
 
     @Override
-    public boolean hasPermission(Object principalObj, Serializable targetId, String permission) {
-        return hasPermissionForLab(principalObj, targetId, permission);
+    public boolean hasPermission(Authentication auth, Serializable targetId, String permission) {
+        if (auth == null) {
+            return false;
+        }
+        // ADMIN/PROFESSOR는 토큰 권한으로 바로 허용
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+        return hasPermissionForLab(auth.getPrincipal(), targetId, permission);
     }
 
     /**

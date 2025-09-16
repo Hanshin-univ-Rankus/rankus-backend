@@ -1,8 +1,9 @@
 package org.univ.rankus.common.security.permission;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Component;
 import org.univ.rankus.application.port.in.query.LabPromotionQueryUseCase;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
 import org.univ.rankus.application.port.in.query.VoteQueryUseCase;
@@ -27,14 +28,24 @@ public class VotePermissionHandler implements DomainPermissionEvaluator {
     }
 
     @Override
-    public boolean hasPermission(Object principalObj, Serializable targetId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || permission == null) {
-            return false;
-        }
-        if (!(targetId instanceof Long voteId)) {
+    public boolean hasPermission(Authentication auth, Serializable targetId, String permission) {
+        if (auth == null || permission == null || !(targetId instanceof Long voteId)) {
             return false;
         }
 
+        // 1) 토큰 권한 기반 ADMIN/PROFESSOR 우선 허용
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+
+        // 2) 사용자/도메인 기반 판정
+        Object principalObj = auth.getPrincipal();
+        if (!(principalObj instanceof CustomUserDetails)) {
+            return false;
+        }
         Long userId = ((CustomUserDetails) principalObj).getUserId();
         User user = userQueryUseCase.getUserById(userId);
         String perm = permission.toUpperCase();

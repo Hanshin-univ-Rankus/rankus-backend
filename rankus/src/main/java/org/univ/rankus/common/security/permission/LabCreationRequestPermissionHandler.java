@@ -1,6 +1,8 @@
 package org.univ.rankus.common.security.permission;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.univ.rankus.application.port.in.query.LabCreationRequestQueryUseCase;
 import org.univ.rankus.application.port.in.query.UserQueryUseCase;
@@ -24,8 +26,19 @@ public class LabCreationRequestPermissionHandler implements DomainPermissionEval
     }
 
     @Override
-    public boolean hasPermission(Object principalObj, Serializable targetId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(targetId instanceof Long) || permission == null) {
+    public boolean hasPermission(Authentication auth, Serializable targetId, String permission) {
+        if (auth == null || !(targetId instanceof Long) || permission == null) {
+            return false;
+        }
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+
+        Object principalObj = auth.getPrincipal();
+        if (!(principalObj instanceof CustomUserDetails)) {
             return false;
         }
 

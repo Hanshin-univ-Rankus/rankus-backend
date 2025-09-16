@@ -62,6 +62,14 @@ public interface AuthTokenPort {
     String extractEmailFromToken(String token);
 
     /**
+     * 토큰에서 JTI(토큰 ID) 추출
+     *
+     * @param token JWT 토큰
+     * @return 토큰 ID (JTI)
+     */
+    String extractTokenId(String token);
+
+    /**
      * 토큰 블랙리스트 등록
      *
      * @param tokenId   토큰 ID (JTI)

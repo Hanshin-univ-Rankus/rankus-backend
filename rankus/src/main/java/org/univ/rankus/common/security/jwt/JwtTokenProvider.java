@@ -222,6 +222,15 @@ public class JwtTokenProvider implements AuthTokenPort {
     }
 
     @Override
+    public String extractTokenId(String token) {
+        try {
+            return parseClaims(token).getBody().getId();
+        } catch (JwtException e) {
+            throw new UserValidationException(UserErrorCode.TOKEN_INVALID);
+        }
+    }
+
+    @Override
     public void blacklistToken(String tokenId, LocalDateTime expiresAt) {
         BlacklistedToken blacklistedToken = BlacklistedToken.create(tokenId, expiresAt, "LOGOUT");
         blacklistedTokenRepository.save(blacklistedToken);

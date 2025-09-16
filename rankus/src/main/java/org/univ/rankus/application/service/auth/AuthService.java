@@ -85,7 +85,7 @@ public class AuthService implements AuthUseCase {
             java.time.LocalDateTime expiryTime = authTokenPort.getAccessTokenExpiryTime(accessToken);
 
             // JWT에서 토큰 ID 추출 (JTI)
-            String tokenId = extractTokenIdFromAccessToken(accessToken);
+            String tokenId = authTokenPort.extractTokenId(accessToken);
             if (tokenId != null) {
                 authTokenPort.blacklistToken(tokenId, expiryTime);
             }
@@ -96,14 +96,6 @@ public class AuthService implements AuthUseCase {
         } catch (Exception e) {
             // 토큰 파싱 실패 등의 경우에도 리프레시 토큰은 비활성화
             refreshTokenRepo.deactivateAllByUserEmail(userEmail);
-        }
-    }
-
-    private String extractTokenIdFromAccessToken(String accessToken) {
-        try {
-            return authTokenPort.extractEmailFromToken(accessToken); // 임시로 이메일 사용
-        } catch (Exception e) {
-            return null;
         }
     }
 }
