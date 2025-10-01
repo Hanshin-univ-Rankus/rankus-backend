@@ -21,6 +21,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Validate QR secret length
+        run: |
+          if [ -z "${{ secrets.QR_SECRET_KEY }}" ]; then echo "❌ QR_SECRET_KEY secret missing"; exit 1; fi
+          len=$(printf "%s" "${{ secrets.QR_SECRET_KEY }}" | wc -c)
+          if [ "$len" -ne 32 ]; then echo "❌ QR_SECRET_KEY length invalid: $len (expected 32)"; exit 1; fi
+          echo "✅ QR_SECRET_KEY length OK (32)"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -110,21 +117,16 @@ jobs:
             ${{ env.EC2_USER }}@${{ env.EC2_HOST }} << EOF
           set -e
 
-          # 작업 디렉토리로 이동
           cd /home/${{ env.EC2_USER }}/app
 
-          # 1) 기존 애플리케이션 종료 (에러 무시)
           pkill -f "java -jar ${{ env.JAR_NAME }}" || true
 
-          # 2) 기존 JAR 백업
           if [ -f ${{ env.JAR_NAME }} ]; then
             mv ${{ env.JAR_NAME }} "${{ env.JAR_NAME }}-backup-$(date +'%Y%m%d%H%M%S').jar"
           fi
 
-          # 3) 새 JAR 교체
           mv app-new.jar ${{ env.JAR_NAME }}
 
-          # 4) 환경 변수 설정
           export SPRING_DATASOURCE_URL="${{ secrets.SPRING_DATASOURCE_URL }}"
           export SPRING_DATASOURCE_USERNAME="${{ secrets.SPRING_DATASOURCE_USERNAME }}"
           export SPRING_DATASOURCE_PASSWORD="${{ secrets.SPRING_DATASOURCE_PASSWORD }}"
@@ -133,8 +135,13 @@ jobs:
           export MAILJET_SECRET_KEY="${{ secrets.MAILJET_SECRET_KEY }}"
           export MAILJET_FROM_EMAIL="${{ secrets.MAILJET_FROM_EMAIL }}"
           export MAILJET_FROM_NAME="${{ secrets.MAILJET_FROM_NAME }}"
+          export QR_SECRET_KEY="${{ secrets.QR_SECRET_KEY }}"
 
-          # 5) 애플리케이션 실행 (백그라운드)
+          # Pre-flight 길이 검증 (안전)
+          len=$(printf "%s" "$QR_SECRET_KEY" | wc -c)
+          if [ "$len" -ne 32 ]; then
+            echo "❌ Runtime QR_SECRET_KEY length invalid: $len"; exit 1; fi
+
           nohup java -jar ${{ env.JAR_NAME }} --spring.profiles.active=aws \
             >> deploy.log 2>&1 &
 
