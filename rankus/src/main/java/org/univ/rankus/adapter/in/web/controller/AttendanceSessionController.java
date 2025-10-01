@@ -27,6 +27,7 @@ import org.univ.rankus.common.security.customUser.CustomUserDetails;
 import org.univ.rankus.domain.model.attendance.AttendanceRecord;
 import org.univ.rankus.domain.model.attendance.AttendanceSession;
 import org.univ.rankus.domain.model.attendance.QRToken;
+import org.univ.rankus.domain.model.attendance.SecureQRToken;
 
 import java.util.List;
 
@@ -331,6 +332,7 @@ public class AttendanceSessionController {
             )
     })
     @PostMapping("/{sessionId}/qr")
+    @Deprecated // Secure QR 사용 권장: /{sessionId}/qr/secure
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
             "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
     public ResponseEntity<ApiResponse<QRTokenResponseDto>> generateQRCode(
@@ -344,6 +346,22 @@ public class AttendanceSessionController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "보안 QR 코드 생성", description = "출석 체크용 Secure QR 토큰을 생성합니다. 이 토큰은 암호화되어 있으며 프론트 URL과 함께 반환됩니다.")
+    @PostMapping("/{sessionId}/qr/secure")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
+            "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
+    public ResponseEntity<ApiResponse<SecureQRTokenResponseDto>> generateSecureQRCode(
+            @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
+            @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        SecureQRToken token = attendanceSessionCommandUseCase.generateSecureQRCode(labId, sessionId, userDetails.getUserId());
+        // 프론트 기본 URL (추후 properties 로 이동 가능)
+        String baseUrl = "https://rankus.vercel.app/attend?qt=";
+        return ResponseEntity.ok(ApiResponse.success(SecureQRTokenResponseDto.from(token, baseUrl + token.getEncryptedToken()), "보안 QR 코드가 생성되었습니다"));
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "출석 체크", description = """
             QR 코드를 스캔하여 출석을 체크합니다.
                         
@@ -352,6 +370,7 @@ public class AttendanceSessionController {
             - 다른 랩의 세션에 접근할 수 없음
             """)
     @PostMapping("/check")
+    @Deprecated // 글로벌 엔드포인트 POST /api/attendance/check 사용 권장
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<AttendanceRecordResponseDto>> checkAttendance(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
@@ -522,4 +541,3 @@ public class AttendanceSessionController {
         return ResponseEntity.ok(ApiResponse.success(AttendanceSessionResponseDto.from(session), message));
     }
 }
-

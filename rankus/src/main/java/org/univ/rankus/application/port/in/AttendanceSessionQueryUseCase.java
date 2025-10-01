@@ -21,6 +21,12 @@ public interface AttendanceSessionQueryUseCase {
     AttendanceSession findSessionById(Long sessionId, Long userId);
 
     /**
+     * 권한 검증 없이 세션 기본 정보만 공개 조회 (QR resolve 용)
+     * 민감 정보 제외한 상태 판별 목적.
+     */
+    AttendanceSession findSessionByIdPublic(Long sessionId);
+
+    /**
      * 랩실의 활성 출석 세션 목록 조회
      *
      * @param labId  랩실 ID

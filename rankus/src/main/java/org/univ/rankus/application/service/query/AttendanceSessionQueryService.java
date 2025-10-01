@@ -49,6 +49,13 @@ public class AttendanceSessionQueryService implements AttendanceSessionQueryUseC
     }
 
     @Override
+    public AttendanceSession findSessionByIdPublic(Long sessionId) {
+        // 권한 검증 없이 존재/상태만 확인 (QR resolve 용)
+        return attendanceSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new AttendanceValidationException(AttendanceErrorCode.SESSION_NOT_FOUND));
+    }
+
+    @Override
     public List<AttendanceSession> findActiveSessionsByLabId(Long labId, Long userId) {
         // 1. 권한 검증
         User user = findUserById(userId);

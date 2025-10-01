@@ -113,3 +113,10 @@ file:
     extract-metadata: false
     calculate-file-hash: false
     hash-algorithm: SHA-256
+
+rankus:
+  qr:
+    # 로컬 개발 전용 32바이트 고정 키 (운영에서는 application-aws.yml + 환경변수 사용)
+    # 길이 확인: echo -n 'LocalDevQRSecretKey_2025__32__OK' | wc -c  => 32
+    secret-key: ${QR_SECRET_KEY:LocalDevQRSecretKey_2025__32__OK}
+    legacy-enabled: true  # 로컬에서 레거시 QR 토큰 허용 (마이그레이션 테스트 용도)

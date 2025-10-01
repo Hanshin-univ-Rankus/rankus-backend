@@ -8,6 +8,7 @@ import org.univ.rankus.application.port.out.AttendanceRecordRepositoryPort;
 import org.univ.rankus.application.port.out.AttendanceSessionRepositoryPort;
 import org.univ.rankus.application.port.out.LabRepositoryPort;
 import org.univ.rankus.application.port.out.UserRepositoryPort;
+import org.univ.rankus.application.service.qr.QRTokenCryptoService;
 import org.univ.rankus.domain.model.attendance.AttendanceRecord;
 import org.univ.rankus.domain.model.attendance.AttendanceSession;
 import org.univ.rankus.domain.model.attendance.QRToken;
@@ -37,6 +38,7 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
     private final AttendanceRecordRepositoryPort attendanceRecordRepository;
     private final UserRepositoryPort userRepository;
     private final LabRepositoryPort labRepository;
+    private final QRTokenCryptoService qrTokenCryptoService;
 
     @Override
     public AttendanceSession createSession(Long labId, String title, Integer qrValidityMinutes, Long createdBy) {
@@ -151,10 +153,8 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
 
         validateCanManageAttendance(user, lab);
 
-        // 2. 보안 QR 코드 생성
-        // TODO: 실제 환경에서는 설정에서 secretKey를 가져와야 함
-        String secretKey = "MySecretKey1234567890123456789012"; // 32바이트
-        return session.generateSecureQRToken(secretKey);
+        // 2. 보안 QR 코드 생성 (서비스 이용)
+        return qrTokenCryptoService.generateSecure(session);
     }
 
     @Override
@@ -163,38 +163,25 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
         Long sessionId;
         LocalDateTime currentTime = LocalDateTime.now();
 
-        // 우선 보안 토큰으로 시도, 실패시 레거시 토큰으로 폴백
         try {
-            // 보안 강화된 토큰 처리
-            String secretKey = "MySecretKey1234567890123456789012"; // 32바이트
-            SecureQRToken.QRTokenPayload payload = SecureQRToken.decrypt(qrToken, secretKey);
-
-            // 토큰 만료 검증
+            // 보안 강화된 토큰 처리 (서비스 통해 복호화)
+            SecureQRToken.QRTokenPayload payload = qrTokenCryptoService.decrypt(qrToken);
             if (currentTime.isAfter(payload.getParsedExpiresAt())) {
                 throw new AttendancePermissionException(AttendanceErrorCode.QR_TOKEN_EXPIRED);
             }
-
-            // 경로 일관성 검증
             validatePathConsistency(labId, payload.getLabId());
             sessionId = payload.getSessionId();
-
         } catch (Exception e) {
-            // 보안 토큰 복호화 실패, 레거시 토큰으로 시도
+            // 레거시 토큰 폴백
             try {
                 QRToken legacyToken = QRToken.fromString(qrToken);
-
-                // 레거시 토큰 만료 검증
                 if (legacyToken.isExpired()) {
                     throw new AttendancePermissionException(AttendanceErrorCode.QR_TOKEN_EXPIRED);
                 }
-
                 sessionId = legacyToken.getSessionId();
-
             } catch (AttendanceValidationException validationException) {
-                // 레거시 토큰 검증 실패 - 원본 예외 유지
                 throw validationException;
             } catch (Exception legacyException) {
-                // 기타 예외는 일반적인 토큰 무효 처리
                 throw new AttendancePermissionException(AttendanceErrorCode.QR_TOKEN_INVALID);
             }
         }
@@ -206,19 +193,14 @@ public class AttendanceSessionCommandService implements AttendanceSessionCommand
         User user = findUserById(userId);
         Lab lab = findLabById(session.getLabId());
 
-        // 3. 출석 권한 검증 (랩실 멤버인지 확인)
         validateCanCheckAttendance(user, lab);
 
-        // 4. 중복 출석 체크
         boolean alreadyChecked = attendanceRecordRepository.existsBySessionIdAndUserId(session.getSessionId(), userId);
         if (alreadyChecked) {
             throw new AttendancePermissionException(AttendanceErrorCode.ALREADY_CHECKED_IN);
         }
 
-        // 5. 출석 체크 (도메인 로직)
         AttendanceRecord record = session.checkAttendance(userId, currentTime);
-
-        // 6. 저장 및 반환
         return attendanceRecordRepository.save(record);
     }
 

@@ -647,43 +647,178 @@ Content-Type: application/json
 - **명확한 의미론**: POST(생성) vs PATCH(상태변경)의 의미론적 구분
 - **백워드 호환성**: 기존 POST 엔드포인트와 병행 운영 가능
 
-## 📁 File Upload API
+## 🔐 Secure QR 기반 출석 플로우 (NEW)
+> Phase 3 - Secure QR 도입 및 글로벌 출석 체크 흐름
 
-### 파일 업로드
+### 개요
+기존 단순 문자열 QR(labId-sessionId-timestamp) 방식에서 AES-GCM 암호화 기반 Secure QR 토큰으로 확장되었습니다.
+
+### 전체 흐름
+1. 관리자/교수/권한자 세션 생성 → Secure QR 생성 API 호출
+2. 서버가 암호화된 토큰(encryptedToken)과 출석 URL(attendanceUrl = https://rankus.vercel.app/attend?qt=TOKEN) 반환
+3. 프론트에서 URL을 QR 이미지로 렌더링
+4. 학생이 모바일로 스캔 → 웹 /attend?qt=TOKEN 페이지 진입
+5. 프론트: GET /api/attendance/qr/resolve 로 토큰 메타/유효성 사전 검증
+6. 로그인 미완료 시 로그인 → 완료 후 원래 페이지 복귀
+7. 유효(valid=true)이면 POST /api/attendance/check 로 출석 처리
+8. 처리 결과 UI 표시
+
+### 장점
+- 토큰 위변조 및 예측 방지 (AES-256-GCM + nonce)
+- 만료/비활성 세션 사전 안내 (resolve 단계)
+- 글로벌 엔드포인트 통일 (labId 경로 의존 제거)
+
+### 1) Secure QR 생성
 ```http
-POST /api/files/upload
+POST /api/labs/{labId}/attendance/sessions/{sessionId}/qr/secure
 Authorization: Bearer {token}
-Content-Type: multipart/form-data
-
-file: (파일 데이터)
 ```
-
-**응답 예시**:
+**응답 예시**
 ```json
 {
   "success": true,
-  "message": "파일 업로드 성공",
+  "message": "보안 QR 코드가 생성되었습니다",
   "data": {
-    "fileId": 1,
-    "fileName": "evidence.pdf",
-    "fileSize": 1024000,
-    "fileUrl": "/uploads/evidence.pdf",
-    "mimeType": "application/pdf"
+    "encryptedToken": "AbCdEfGh...",
+    "sessionId": 42,
+    "generatedAt": "2025-10-02T12:55:10",
+    "expiresAt": "2025-10-02T13:00:10",
+    "isExpired": false,
+    "attendanceUrl": "https://rankus.vercel.app/attend?qt=AbCdEfGh..."
   }
 }
 ```
 
-### 파일 다운로드
+### 2) 토큰 해석 (공개, 인증 불필요)
 ```http
-GET /api/files/{fileId}/download
-Authorization: Bearer {token}
+GET /api/attendance/qr/resolve?token=AbCdEfGh...
+```
+**성공(유효) 응답 예시**
+```json
+{
+  "success": true,
+  "message": "QR 토큰 해석 완료",
+  "data": {
+    "originalToken": "AbCdEfGh...",
+    "type": "SECURE",
+    "valid": true,
+    "reason": "OK",
+    "labId": 3,
+    "sessionId": 42,
+    "sessionTitle": "주간 세미나",
+    "sessionStatus": "ACTIVE",
+    "generatedAt": "2025-10-02T12:55:10",
+    "expiresAt": "2025-10-02T13:00:10"
+  }
+}
+```
+**만료된 경우**
+```json
+{
+  "success": true,
+  "message": "QR 토큰 해석 완료",
+  "data": {
+    "originalToken": "AbCdEfGh...",
+    "type": "SECURE",
+    "valid": false,
+    "reason": "EXPIRED",
+    "message": "QR이 만료되었습니다",
+    "sessionId": 42,
+    "expiresAt": "2025-10-02T13:00:10"
+  }
+}
+```
+**비활성(종료/취소) 세션**
+```json
+{
+  "success": true,
+  "message": "QR 토큰 해석 완료",
+  "data": {
+    "originalToken": "AbCdEfGh...",
+    "type": "SECURE",
+    "valid": false,
+    "reason": "SESSION_INACTIVE",
+    "message": "활성화된 출석 세션이 아닙니다",
+    "sessionStatus": "COMPLETED",
+    "sessionId": 42
+  }
+}
+```
+**잘못된 토큰**
+```json
+{
+  "success": true,
+  "message": "QR 토큰 해석 완료",
+  "data": {
+    "originalToken": "xxx",
+    "valid": false,
+    "reason": "INVALID",
+    "message": "유효하지 않은 QR 코드입니다"
+  }
+}
 ```
 
-### 중복 파일 확인
+### 3) 글로벌 출석 체크 (인증 필요)
 ```http
-GET /api/files/check-duplicate?fileName=evidence.pdf&fileSize=1024000
+POST /api/attendance/check
 Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "token": "AbCdEfGh..."
+}
 ```
+**응답 예시**
+```json
+{
+  "success": true,
+  "message": "출석 체크가 완료되었습니다",
+  "data": {
+    "recordId": 310,
+    "sessionId": 42,
+    "userId": 77,
+    "checkedAt": "2025-10-02T12:57:31"
+  }
+}
+```
+**이미 출석한 경우** (예시)
+```json
+{
+  "success": false,
+  "message": "이미 출석 체크되었습니다",
+  "data": null
+}
+```
+
+### 4) 에러 Reason 코드 (resolve 응답 data.reason)
+| Reason | 의미 | 처리 가이드 |
+|--------|------|-------------|
+| OK | 유효 | 바로 출석 시도 |
+| INVALID | 파싱/암호해독 실패 | 새 QR 요청 안내 |
+| EXPIRED | 만료 | 세션 관리자에게 새 QR 요청 |
+| SESSION_INACTIVE | 세션 종료/취소 | 결과 화면 표시 후 재시도 불가 |
+| SESSION_NOT_FOUND | 세션 없음 | 잘못된/구버전 QR 가능성 안내 |
+
+### 5) 레거시 엔드포인트 Deprecation
+| 기존 | 상태 | 대체 |
+|------|------|------|
+| POST /api/labs/{labId}/attendance/sessions/{sessionId}/qr | Deprecated | POST /api/labs/{labId}/attendance/sessions/{sessionId}/qr/secure |
+| POST /api/labs/{labId}/attendance/sessions/check | Deprecated | POST /api/attendance/check |
+
+> 레거시는 일시적 병행 운영 후 제거 예정. 프론트 신규 구현은 반드시 Secure & 글로벌 API 사용.
+
+### 6) 프론트 구현 체크리스트
+- URL 파라미터 qt 읽기 → resolve 호출
+- valid=false 시 reason별 메시지 매핑
+- valid=true & 로그인됨 → global check 호출
+- 출석 성공 후: 세션 제목/시간 표시 & 상태 갱신
+
+### 7) 보안 권장사항
+- secret-key 환경변수로 주입 (QR_SECRET_KEY)
+- 토큰 유효시간 10분 이하 유지
+- 필요 시 Rate Limit: /api/attendance/qr/resolve IP 별 분당 제한
+
+---
 
 ## ⚠️ 에러 코드 참조
 
