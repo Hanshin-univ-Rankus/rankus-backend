@@ -1,5 +1,7 @@
 package org.univ.rankus.domain.model.attendance;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -193,24 +195,13 @@ public class SecureQRToken {
 
         public static QRTokenPayload fromJson(String json) {
             try {
-                // 간단한 JSON 파싱 (실제 프로젝트에서는 Jackson 등 사용 권장)
-                String cleanJson = json.replace("{", "").replace("}", "").replace("\"", "");
-                String[] pairs = cleanJson.split(",");
-
-                Long labId = null, sessionId = null;
-                String generatedAt = null, expiresAt = null, nonce = null;
-
-                for (String pair : pairs) {
-                    String[] kv = pair.split(":");
-                    switch (kv[0]) {
-                        case "labId" -> labId = Long.parseLong(kv[1]);
-                        case "sessionId" -> sessionId = Long.parseLong(kv[1]);
-                        case "generatedAt" -> generatedAt = kv[1];
-                        case "expiresAt" -> expiresAt = kv[1];
-                        case "nonce" -> nonce = kv[1];
-                    }
-                }
-
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode node = mapper.readTree(json);
+                Long labId = node.get("labId").asLong();
+                Long sessionId = node.get("sessionId").asLong();
+                String generatedAt = node.get("generatedAt").asText();
+                String expiresAt = node.get("expiresAt").asText();
+                String nonce = node.get("nonce").asText();
                 return new QRTokenPayload(labId, sessionId, generatedAt, expiresAt, nonce);
             } catch (Exception e) {
                 throw new AttendanceValidationException(AttendanceErrorCode.QR_TOKEN_CORRUPTED);
