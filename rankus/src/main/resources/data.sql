@@ -1,7 +1,9 @@
 -- 1. labs
 INSERT INTO labs (id, name, category, description, ranking, professor_name, created_at, updated_at)
 VALUES (1, 'AI랩', 'AI', '인공지능 랩', 1, null, NOW(), NOW()),
-       (2, 'DB랩', 'DB', '데이터베이스 랩', 2, null, NOW(), NOW());
+       (2, 'DB랩', 'DB', '데이터베이스 랩', 2, null, NOW(), NOW()),
+       (3, 'AISC랩', 'AI', '인공지능 랩', 3, null, NOW(), NOW()),
+       (4, 'DBNET랩', 'DB', '데이터베이스 랩', 4, null, NOW(), NOW());
 
 -- 2. users
 INSERT INTO users (id, name, email, password_hash, role, lab_id, student_number, phone_number, grade, enrollment_status,
