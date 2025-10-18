@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -156,7 +155,7 @@ public class VoteController {
                     - 생성자는 언제든 투표 종료/취소 가능
                     """
     )
-    @RequestBody(
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "투표 생성 정보",
             required = true,
             content = @Content(
@@ -371,3 +370,4 @@ public class VoteController {
         return ResponseEntity.ok(ApiResponse.success(hasParticipated, "참여 여부 확인 성공"));
     }
 }
+
