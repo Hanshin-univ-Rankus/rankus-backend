@@ -157,7 +157,7 @@ public class AttendanceSessionController {
     })
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_ATTENDANCE')")
+            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_ATTENDANCE')")
     public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> createSession(
             @Parameter(description = "출석 세션을 생성할 랩실의 ID", required = true, example = "1")
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
@@ -390,7 +390,7 @@ public class AttendanceSessionController {
     @Operation(summary = "출석 세션 조회", description = "특정 출석 세션을 조회합니다.")
     @GetMapping("/{sessionId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_ATTENDANCE')")
+            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_ATTENDANCE')")
     public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> getSession(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
@@ -405,7 +405,7 @@ public class AttendanceSessionController {
     @Operation(summary = "활성 출석 세션 목록 조회", description = "랩실의 활성 상태 출석 세션 목록을 조회합니다.")
     @GetMapping("/active")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_ATTENDANCE')")
+            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_ATTENDANCE')")
     public ResponseEntity<ApiResponse<List<AttendanceSessionResponseDto>>> getActiveSessions(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @AuthenticationPrincipal CustomUserDetails userDetails
@@ -422,7 +422,7 @@ public class AttendanceSessionController {
     @Operation(summary = "출석 세션 목록 조회", description = "랩실의 모든 출석 세션 목록을 페이징하여 조회합니다.")
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_ATTENDANCE')")
+            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_ATTENDANCE')")
     public ResponseEntity<ApiResponse<List<AttendanceSessionResponseDto>>> getSessions(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @RequestParam(defaultValue = "0") int page,
@@ -441,7 +441,7 @@ public class AttendanceSessionController {
     @Operation(summary = "출석 세션 통계 조회", description = "특정 출석 세션의 출석 통계를 조회합니다.")
     @GetMapping("/{sessionId}/statistics")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_ATTENDANCE')")
+            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_ATTENDANCE')")
     public ResponseEntity<ApiResponse<AttendanceStatisticsResponseDto>> getSessionStatistics(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,

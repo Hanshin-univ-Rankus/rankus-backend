@@ -66,7 +66,7 @@ public class InterviewController {
             )
     })
     @PostMapping
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<InterviewResponseDto>> createInterview(
             @PathVariable @Positive Long labId,
             @Valid @RequestBody InterviewCreateRequestDto request,
@@ -112,7 +112,7 @@ public class InterviewController {
 
     @Operation(summary = "면접 활성화", description = "면접을 활성화하여 지원을 받을 수 있도록 합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/activate")
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     @Deprecated // Phase 3: Use PATCH /{interviewId}/status instead
     public ResponseEntity<ApiResponse<InterviewResponseDto>> activateInterview(
             @PathVariable @Positive Long labId,
@@ -127,7 +127,7 @@ public class InterviewController {
 
     @Operation(summary = "면접 비활성화", description = "면접을 비활성화하여 지원을 중단합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/deactivate")
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     @Deprecated // Phase 3: Use PATCH /{interviewId}/status instead
     public ResponseEntity<ApiResponse<InterviewResponseDto>> deactivateInterview(
             @PathVariable @Positive Long labId,
@@ -142,7 +142,7 @@ public class InterviewController {
 
     @Operation(summary = "면접 종료", description = "면접을 종료합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/close")
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     @Deprecated // Phase 3: Use PATCH /{interviewId}/status instead
     public ResponseEntity<ApiResponse<InterviewResponseDto>> closeInterview(
             @PathVariable @Positive Long labId,
@@ -157,7 +157,7 @@ public class InterviewController {
 
     @Operation(summary = "면접 수정", description = "면접 설정을 수정합니다. (랩장/매니저 권한 필요)")
     @PutMapping("/{interviewId}")
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<InterviewResponseDto>> updateInterview(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long interviewId,
@@ -178,7 +178,7 @@ public class InterviewController {
 
     @Operation(summary = "면접 삭제", description = "면접을 삭제합니다. (랩장/매니저 권한 필요)")
     @DeleteMapping("/{interviewId}")
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<Void>> deleteInterview(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long interviewId,
@@ -192,7 +192,7 @@ public class InterviewController {
 
     @Operation(summary = "면접 슬롯 생성", description = "면접에 새로운 시간 슬롯을 생성합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/slots")
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<InterviewSlotResponseDto>> createInterviewSlot(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long interviewId,
@@ -215,7 +215,7 @@ public class InterviewController {
 
     @Operation(summary = "면접 슬롯 일괄 생성", description = "면접에 여러 시간 슬롯을 한 번에 생성합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/slots/batch")
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<List<InterviewSlotResponseDto>>> createMultipleInterviewSlots(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long interviewId,
@@ -263,7 +263,7 @@ public class InterviewController {
     @Operation(summary = "면접 슬롯 취소", description = "면접 슬롯을 취소합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/slots/{slotId}/cancel")
     @Deprecated // Phase 3: Use PATCH /{interviewId}/slots/{slotId}/status instead
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<InterviewSlotResponseDto>> cancelInterviewSlot(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long interviewId,
@@ -279,7 +279,7 @@ public class InterviewController {
     @Operation(summary = "면접 슬롯 재활성화", description = "취소된 면접 슬롯을 재활성화합니다. (랩장/매니저 권한 필요)")
     @PostMapping("/{interviewId}/slots/{slotId}/reactivate")
     @Deprecated // Phase 3: Use PATCH /{interviewId}/slots/{slotId}/status instead
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<InterviewSlotResponseDto>> reactivateInterviewSlot(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long interviewId,
@@ -294,7 +294,7 @@ public class InterviewController {
 
     @Operation(summary = "면접 슬롯 삭제", description = "면접 슬롯을 삭제합니다. (랩장/매니저 권한 필요)")
     @DeleteMapping("/{interviewId}/slots/{slotId}")
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<Void>> deleteInterviewSlot(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long interviewId,
@@ -329,7 +329,7 @@ public class InterviewController {
                             examples = @ExampleObject(value = "{\"success\": false, \"message\": \"면접을 찾을 수 없습니다\", \"data\": null}")))
     })
     @PatchMapping("/{interviewId}/status")
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<InterviewResponseDto>> changeInterviewStatus(
             @Parameter(description = "랩실 ID", example = "1") @PathVariable @Positive Long labId,
             @Parameter(description = "면접 ID", example = "1") @PathVariable @Positive Long interviewId,
@@ -374,7 +374,7 @@ public class InterviewController {
                             examples = @ExampleObject(value = "{\"success\": false, \"message\": \"면접 슬롯을 찾을 수 없습니다\", \"data\": null}")))
     })
     @PatchMapping("/{interviewId}/slots/{slotId}/status")
-    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_INTERVIEWS')")
+    @PreAuthorize("@interviewPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_INTERVIEWS')")
     public ResponseEntity<ApiResponse<InterviewSlotResponseDto>> changeSlotStatus(
             @Parameter(description = "랩실 ID", example = "1") @PathVariable @Positive Long labId,
             @Parameter(description = "면접 ID", example = "1") @PathVariable @Positive Long interviewId,

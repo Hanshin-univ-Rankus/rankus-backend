@@ -63,13 +63,26 @@ public class LabNoticePermissionHandler implements DomainPermissionEvaluator {
     /**
      * Lab ID를 기반으로 랩실 공지사항 권한을 체크합니다.
      *
-     * @param principalObj 인증 주체
+     * @param auth         인증 객체
      * @param labId        랩실 ID
      * @param permission   권한 타입 (VIEW_NOTICES, MANAGE_NOTICES)
      * @return 권한 여부
      */
-    public boolean hasPermissionForLab(Object principalObj, Serializable labId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(labId instanceof Long)) {
+    public boolean hasPermissionForLab(Authentication auth, Serializable labId, String permission) {
+        if (auth == null || !(labId instanceof Long) || permission == null) {
+            return false;
+        }
+
+        // 1) 관리자/교수는 즉시 허용
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+
+        Object principalObj = auth.getPrincipal();
+        if (!(principalObj instanceof CustomUserDetails)) {
             return false;
         }
 

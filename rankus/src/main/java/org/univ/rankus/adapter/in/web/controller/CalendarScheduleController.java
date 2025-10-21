@@ -57,7 +57,7 @@ public class CalendarScheduleController {
             )
     })
     @GetMapping
-    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_CALENDAR')")
+    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_CALENDAR')")
     public ResponseEntity<ApiResponse<List<CalendarEventResponseDto>>> getSchedules(
             @PathVariable @Positive Long labId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -83,7 +83,7 @@ public class CalendarScheduleController {
             )
     })
     @GetMapping("/{eventId}")
-    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_CALENDAR')")
+    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_CALENDAR')")
     public ResponseEntity<ApiResponse<CalendarEventResponseDto>> getSchedule(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long eventId,
@@ -112,7 +112,7 @@ public class CalendarScheduleController {
             )
     })
     @PostMapping
-    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_CALENDAR')")
+    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_CALENDAR')")
     public ResponseEntity<ApiResponse<CalendarEventResponseDto>> createSchedule(
             @PathVariable @Positive Long labId,
             @Valid @RequestBody CalendarEventCreateRequestDto request,
@@ -148,7 +148,7 @@ public class CalendarScheduleController {
             )
     })
     @PutMapping("/{eventId}")
-    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_CALENDAR')")
+    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_CALENDAR')")
     public ResponseEntity<ApiResponse<CalendarEventResponseDto>> updateSchedule(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long eventId,
@@ -179,7 +179,7 @@ public class CalendarScheduleController {
             )
     })
     @DeleteMapping("/{eventId}")
-    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_CALENDAR')")
+    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_CALENDAR')")
     public ResponseEntity<Void> deleteSchedule(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long eventId,

@@ -1,6 +1,8 @@
 package org.univ.rankus.common.security.permission;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.univ.rankus.application.port.in.query.InterviewQueryUseCase;
 import org.univ.rankus.application.port.in.query.LabPromotionQueryUseCase;
@@ -26,8 +28,21 @@ public class InterviewPermissionHandler {
     /**
      * 랩실에 대한 면접 관리 권한이 있는지 확인
      */
-    public boolean hasPermissionForLab(CustomUserDetails userDetails, Long labId, String permission) {
-        if (userDetails == null || labId == null || permission == null) {
+    public boolean hasPermissionForLab(Authentication auth, Long labId, String permission) {
+        if (auth == null || labId == null || permission == null) {
+            return false;
+        }
+
+        // 1) 관리자/교수는 즉시 허용
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+
+        Object principalObj = auth.getPrincipal();
+        if (!(principalObj instanceof CustomUserDetails userDetails)) {
             return false;
         }
 
@@ -46,8 +61,21 @@ public class InterviewPermissionHandler {
     /**
      * 특정 면접에 대한 권한이 있는지 확인
      */
-    public boolean hasPermissionForInterview(CustomUserDetails userDetails, Long interviewId, String permission) {
-        if (userDetails == null || interviewId == null || permission == null) {
+    public boolean hasPermissionForInterview(Authentication auth, Long interviewId, String permission) {
+        if (auth == null || interviewId == null || permission == null) {
+            return false;
+        }
+
+        // 1) 관리자/교수는 즉시 허용
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+
+        Object principalObj = auth.getPrincipal();
+        if (!(principalObj instanceof CustomUserDetails userDetails)) {
             return false;
         }
 

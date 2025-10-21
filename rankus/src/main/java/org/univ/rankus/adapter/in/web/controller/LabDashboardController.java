@@ -169,7 +169,7 @@ public class LabDashboardController {
             )
     })
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labDashboardPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labDashboardPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW')")
     public ResponseEntity<ApiResponse<LabDashboardResponseDto>> getDashboard(
             @Parameter(description = "조회할 랩실의 ID", required = true, example = "1")
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId

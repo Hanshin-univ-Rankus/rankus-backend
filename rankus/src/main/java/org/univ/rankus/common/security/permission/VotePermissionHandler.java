@@ -65,38 +65,42 @@ public class VotePermissionHandler implements DomainPermissionEvaluator {
     /**
      * Vote ID를 기반으로 투표 권한을 체크합니다.
      *
-     * @param principalObj 인증 주체
+     * @param auth         인증 객체
      * @param voteId       투표 ID
      * @param permission   권한 타입 (VIEW, PARTICIPATE, MANAGE, DELETE, VIEW_RESULTS)
      * @return 권한 여부
      */
-    public boolean hasPermissionForVote(Object principalObj, Serializable voteId, String permission) {
-        return hasPermission(principalObj, voteId, permission);
+    public boolean hasPermissionForVote(Authentication auth, Serializable voteId, String permission) {
+        return hasPermission(auth, voteId, permission);
     }
 
     /**
      * Lab ID를 기반으로 투표 권한을 체크합니다.
      *
-     * @param principalObj 인증 주체
+     * @param auth         인증 객체
      * @param labId        랩실 ID
      * @param permission   권한 타입 (VIEW_VOTES, CREATE_VOTE)
      * @return 권한 여부
      */
-    public boolean hasPermissionForLab(Object principalObj, Serializable labId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(labId instanceof Long) || permission == null) {
+    public boolean hasPermissionForLab(Authentication auth, Serializable labId, String permission) {
+        if (auth == null || !(labId instanceof Long) || permission == null) {
             return false;
         }
 
-        CustomUserDetails principal = (CustomUserDetails) principalObj;
         // 1) 관리자/교수는 즉시 허용 (DB 조회 없이 단축)
-        for (GrantedAuthority auth : principal.getAuthorities()) {
-            String a = auth.getAuthority();
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
             if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
                 return true;
             }
         }
 
-        Long userId = principal.getUserId();
+        Object principalObj = auth.getPrincipal();
+        if (!(principalObj instanceof CustomUserDetails)) {
+            return false;
+        }
+
+        Long userId = ((CustomUserDetails) principalObj).getUserId();
         String perm = permission.toUpperCase();
 
         try {

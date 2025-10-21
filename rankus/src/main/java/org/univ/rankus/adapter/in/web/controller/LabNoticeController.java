@@ -66,7 +66,7 @@ public class LabNoticeController {
             )
     })
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_NOTICES')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_NOTICES')")
     public ResponseEntity<ApiResponse<PageResponse<LabNoticeResponseDto>>> getLabNotices(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PageableDefault(size = 20) @ParameterObject Pageable pageable
@@ -80,7 +80,7 @@ public class LabNoticeController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 공지사항 전체 목록 조회", description = "특정 랩실의 모든 공지사항을 조회합니다.")
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_NOTICES')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_NOTICES')")
     public ResponseEntity<ApiResponse<List<LabNoticeResponseDto>>> getAllLabNotices(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId
     ) {
@@ -93,7 +93,7 @@ public class LabNoticeController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "특정 타입 공지사항 조회", description = "특정 랩실의 특정 타입(일반/긴급) 공지사항을 조회합니다.")
     @GetMapping("/type/{type}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_NOTICES')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_NOTICES')")
     public ResponseEntity<ApiResponse<List<LabNoticeResponseDto>>> getNoticesByType(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable NoticeType type
@@ -108,7 +108,7 @@ public class LabNoticeController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "고정 공지사항 조회", description = "특정 랩실의 고정된 공지사항만 조회합니다.")
     @GetMapping("/pinned")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_NOTICES')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_NOTICES')")
     public ResponseEntity<ApiResponse<List<LabNoticeResponseDto>>> getPinnedNotices(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId
     ) {
@@ -145,7 +145,7 @@ public class LabNoticeController {
             )
     })
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'MANAGE_NOTICES')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labNoticePermissionHandler.hasPermissionForLab(authentication, #labId, 'MANAGE_NOTICES')")
     public ResponseEntity<ApiResponse<LabNoticeResponseDto>> createNotice(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @Valid @RequestBody LabNoticeCreateRequestDto request,

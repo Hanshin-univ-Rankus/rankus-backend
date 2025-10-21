@@ -65,8 +65,21 @@ public class AttendanceRecordPermissionHandler implements DomainPermissionEvalua
     /**
      * 세션 ID를 기반으로 출석 기록 권한을 체크합니다.
      */
-    public boolean hasPermissionForSession(Object principalObj, Serializable sessionId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(sessionId instanceof Long) || permission == null) {
+    public boolean hasPermissionForSession(Authentication auth, Serializable sessionId, String permission) {
+        if (auth == null || !(sessionId instanceof Long) || permission == null) {
+            return false;
+        }
+
+        // 1) 관리자/교수는 즉시 허용
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+
+        Object principalObj = auth.getPrincipal();
+        if (!(principalObj instanceof CustomUserDetails)) {
             return false;
         }
 

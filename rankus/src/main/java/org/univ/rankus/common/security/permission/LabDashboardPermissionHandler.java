@@ -36,20 +36,33 @@ public class LabDashboardPermissionHandler implements DomainPermissionEvaluator 
                 return true;
             }
         }
-        return hasPermissionForLab(auth.getPrincipal(), targetId, permission);
+        return hasPermissionForLab(auth, targetId, permission);
     }
 
     /**
      * Lab ID를 기반으로 랩실 대시보드 접근 권한을 체크합니다.
      * 랩실 멤버(LAB_MEMBER 이상) + ADMIN, PROFESSOR만 접근 가능
      *
-     * @param principalObj 인증 주체
+     * @param auth         인증 객체
      * @param labId        랩실 ID
      * @param permission   권한 타입 (VIEW)
      * @return 권한 여부
      */
-    public boolean hasPermissionForLab(Object principalObj, Serializable labId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(labId instanceof Long) || permission == null) {
+    public boolean hasPermissionForLab(Authentication auth, Serializable labId, String permission) {
+        if (auth == null || !(labId instanceof Long) || permission == null) {
+            return false;
+        }
+
+        // 1) 관리자/교수는 즉시 허용
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+
+        Object principalObj = auth.getPrincipal();
+        if (!(principalObj instanceof CustomUserDetails)) {
             return false;
         }
 

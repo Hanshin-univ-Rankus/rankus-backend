@@ -84,10 +84,24 @@ public class LabApplicationPermissionHandler implements DomainPermissionEvaluato
     /**
      * Lab ID를 기반으로 가입 신청 목록/조회 권한을 체크합니다. (컨트롤러에서 직접 호출 가능)
      */
-    public boolean hasPermissionForLab(Object principalObj, Serializable labId, String permission) {
-        if (!(principalObj instanceof CustomUserDetails) || !(labId instanceof Long) || permission == null) {
+    public boolean hasPermissionForLab(Authentication auth, Serializable labId, String permission) {
+        if (auth == null || !(labId instanceof Long) || permission == null) {
             return false;
         }
+
+        // 1) 관리자/교수는 즉시 허용
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+
+        Object principalObj = auth.getPrincipal();
+        if (!(principalObj instanceof CustomUserDetails)) {
+            return false;
+        }
+
         String perm = permission.toUpperCase();
         Long userId = ((CustomUserDetails) principalObj).getUserId();
         User user = userQueryUseCase.getUserById(userId);

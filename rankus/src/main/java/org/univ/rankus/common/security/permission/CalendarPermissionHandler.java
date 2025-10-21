@@ -1,6 +1,8 @@
 package org.univ.rankus.common.security.permission;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.univ.rankus.application.port.in.query.CalendarEventQueryUseCase;
 import org.univ.rankus.application.port.in.query.LabPromotionQueryUseCase;
@@ -26,8 +28,21 @@ public class CalendarPermissionHandler {
     /**
      * 랩실에 대한 캘린더 권한이 있는지 확인
      */
-    public boolean hasPermissionForLab(CustomUserDetails userDetails, Long labId, String permission) {
-        if (userDetails == null || labId == null || permission == null) {
+    public boolean hasPermissionForLab(Authentication auth, Long labId, String permission) {
+        if (auth == null || labId == null || permission == null) {
+            return false;
+        }
+
+        // 1) 관리자/교수는 즉시 허용
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+
+        Object principalObj = auth.getPrincipal();
+        if (!(principalObj instanceof CustomUserDetails userDetails)) {
             return false;
         }
 
@@ -47,8 +62,21 @@ public class CalendarPermissionHandler {
     /**
      * 특정 캘린더 이벤트에 대한 권한이 있는지 확인
      */
-    public boolean hasPermissionForEvent(CustomUserDetails userDetails, Long eventId, String permission) {
-        if (userDetails == null || eventId == null || permission == null) {
+    public boolean hasPermissionForEvent(Authentication auth, Long eventId, String permission) {
+        if (auth == null || eventId == null || permission == null) {
+            return false;
+        }
+
+        // 1) 관리자/교수는 즉시 허용
+        for (GrantedAuthority ga : auth.getAuthorities()) {
+            String a = ga.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                return true;
+            }
+        }
+
+        Object principalObj = auth.getPrincipal();
+        if (!(principalObj instanceof CustomUserDetails userDetails)) {
             return false;
         }
 
@@ -79,20 +107,5 @@ public class CalendarPermissionHandler {
 
         // 사용자가 해당 랩의 멤버인지 확인
         return user.getLab() != null && user.getLab().getId().equals(labId);
-    }
-
-    /**
-     * 사용자가 특정 랩을 관리할 수 있는지 확인
-     */
-    public boolean canManageLab(CustomUserDetails userDetails, Long labId) {
-        if (userDetails == null || labId == null) {
-            return false;
-        }
-
-        Long userId = userDetails.getUserId();
-        User user = userQueryUseCase.getUserById(userId);
-        Lab lab = labPromotionQueryUseCase.getLabById(labId);
-
-        return user.canManageLabNotices(lab);
     }
 }

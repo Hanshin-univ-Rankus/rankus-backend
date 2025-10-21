@@ -68,7 +68,7 @@ public class VoteController {
             )
     })
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_VOTES')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_VOTES')")
     public ResponseEntity<ApiResponse<PageResponse<VoteResponseDto>>> getLabVotes(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PageableDefault(size = 20) @ParameterObject Pageable pageable
@@ -82,7 +82,7 @@ public class VoteController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 투표 전체 목록 조회", description = "특정 랩실의 모든 투표를 조회합니다.")
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_VOTES')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_VOTES')")
     public ResponseEntity<ApiResponse<List<VoteResponseDto>>> getAllLabVotes(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId
     ) {
@@ -95,7 +95,7 @@ public class VoteController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "활성 투표 목록 조회", description = "특정 랩실의 활성 상태 투표만 조회합니다.")
     @GetMapping("/active")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_VOTES')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_VOTES')")
     public ResponseEntity<ApiResponse<List<VoteResponseDto>>> getActiveVotes(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId
     ) {
@@ -108,7 +108,7 @@ public class VoteController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "상태별 투표 조회", description = "특정 랩실의 특정 상태 투표를 조회합니다.")
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_VOTES')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_VOTES')")
     public ResponseEntity<ApiResponse<List<VoteResponseDto>>> getVotesByStatus(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable VoteStatus status
@@ -122,7 +122,7 @@ public class VoteController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "투표 상세 조회", description = "투표 ID로 투표 상세 정보를 조회합니다.")
     @GetMapping("/{voteId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication.principal, #voteId, 'VIEW')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication, #voteId, 'VIEW')")
     public ResponseEntity<ApiResponse<VoteResponseDto>> getVote(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "투표 ID는 양수여야 합니다") Long voteId
@@ -261,7 +261,7 @@ public class VoteController {
             )
     })
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'CREATE_VOTE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForLab(authentication, #labId, 'CREATE_VOTE')")
     public ResponseEntity<ApiResponse<VoteResponseDto>> createVote(
             @Parameter(description = "투표를 생성할 랩실의 ID", required = true, example = "1")
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
@@ -285,7 +285,7 @@ public class VoteController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "투표 참여", description = "투표에 참여합니다.")
     @PostMapping("/{voteId}/participate")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication.principal, #voteId, 'PARTICIPATE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication, #voteId, 'PARTICIPATE')")
     public ResponseEntity<ApiResponse<VoteParticipationResponseDto>> participateInVote(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "투표 ID는 양수여야 합니다") Long voteId,
@@ -306,7 +306,7 @@ public class VoteController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "투표 종료", description = "투표를 종료합니다.")
     @PatchMapping("/{voteId}/close")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication.principal, #voteId, 'MANAGE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication, #voteId, 'MANAGE')")
     public ResponseEntity<ApiResponse<VoteResponseDto>> closeVote(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "투표 ID는 양수여야 합니다") Long voteId
@@ -320,7 +320,7 @@ public class VoteController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "투표 취소", description = "투표를 취소합니다.")
     @PatchMapping("/{voteId}/cancel")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication.principal, #voteId, 'MANAGE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication, #voteId, 'MANAGE')")
     public ResponseEntity<ApiResponse<VoteResponseDto>> cancelVote(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "투표 ID는 양수여야 합니다") Long voteId
@@ -334,7 +334,7 @@ public class VoteController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "투표 삭제", description = "투표를 삭제합니다. (참여자가 없을 때만 가능)")
     @DeleteMapping("/{voteId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication.principal, #voteId, 'DELETE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication, #voteId, 'DELETE')")
     public ResponseEntity<ApiResponse<Void>> deleteVote(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "투표 ID는 양수여야 합니다") Long voteId
@@ -346,7 +346,7 @@ public class VoteController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "투표 참여 기록 조회", description = "특정 투표의 참여 기록을 조회합니다.")
     @GetMapping("/{voteId}/participations")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication.principal, #voteId, 'VIEW_RESULTS')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication, #voteId, 'VIEW_RESULTS')")
     public ResponseEntity<ApiResponse<List<VoteParticipationResponseDto>>> getVoteParticipations(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "투표 ID는 양수여야 합니다") Long voteId
@@ -360,7 +360,7 @@ public class VoteController {
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "내 투표 참여 여부 확인", description = "현재 사용자가 특정 투표에 참여했는지 확인합니다.")
     @GetMapping("/{voteId}/my-participation")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication.principal, #voteId, 'VIEW')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication, #voteId, 'VIEW')")
     public ResponseEntity<ApiResponse<Boolean>> checkMyParticipation(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "투표 ID는 양수여야 합니다") Long voteId,
@@ -370,4 +370,3 @@ public class VoteController {
         return ResponseEntity.ok(ApiResponse.success(hasParticipated, "참여 여부 확인 성공"));
     }
 }
-

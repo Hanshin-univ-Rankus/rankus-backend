@@ -238,19 +238,21 @@ class LabApplicationCommandServiceTest {
     class ApproveTests {
 
         @Test
-        @DisplayName("정상 승인 시 APPROVED 상태로 변경된다")
+        @DisplayName("정상 승인 시 APPROVED 상태로 변경되고 유저가 랩에 가입된다")
         void approveSuccess() {
             // given
             Long appId = 100L;
             LabApplication app = givenExistingApplication(appId);
+            User user = app.getUser();
+            Lab lab = app.getLab();
 
             // when
             service.approveApplication(appId);
 
             // then
             verify(labApplicationRepositoryPort).findById(appId);
-            // 실제 서비스에서는 도메인 객체의 approve() 메서드만 호출하고 save()는 호출하지 않음
-            // verify(labApplicationRepositoryPort).save(app); // 이 줄 제거
+            verify(userRepositoryPort).save(user); // 유저 저장 확인
+            assertThat(user.getLab()).isEqualTo(lab); // 유저가 랩에 가입되었는지 확인
         }
 
         @Test

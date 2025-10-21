@@ -64,7 +64,7 @@ public class AttendanceRecordController {
     @Operation(summary = "세션 출석 기록 목록 조회", description = "특정 세션의 모든 출석 기록을 조회합니다.")
     @GetMapping("/sessions/{sessionId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceRecordPermissionHandler.hasPermissionForSession(authentication.principal, #sessionId, 'VIEW')")
+            "@attendanceRecordPermissionHandler.hasPermissionForSession(authentication, #sessionId, 'VIEW')")
     public ResponseEntity<ApiResponse<List<AttendanceRecordResponseDto>>> getRecordsBySession(
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
             @AuthenticationPrincipal CustomUserDetails userDetails
@@ -123,7 +123,7 @@ public class AttendanceRecordController {
     @Operation(summary = "랩실 출석 기록 목록 조회", description = "특정 랩실의 모든 출석 기록을 페이징하여 조회합니다.")
     @GetMapping("/labs/{labId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_ATTENDANCE')")
+            "@attendanceSessionPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_ATTENDANCE')")
     public ResponseEntity<ApiResponse<List<AttendanceRecordResponseDto>>> getRecordsByLab(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @RequestParam(defaultValue = "0") int page,
@@ -163,7 +163,7 @@ public class AttendanceRecordController {
     @Operation(summary = "출석 상태를 결석으로 변경", description = "출석 기록의 상태를 결석으로 변경합니다.")
     @PutMapping("/{recordId}/absent")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceRecordPermissionHandler.hasPermission(authentication.principal, #recordId, 'MANAGE')")
+            "@attendanceRecordPermissionHandler.hasPermission(authentication, #recordId, 'MANAGE')")
     public ResponseEntity<ApiResponse<AttendanceRecordResponseDto>> markAsAbsent(
             @PathVariable @Positive(message = "기록 ID는 양수여야 합니다") Long recordId,
             @Valid @RequestBody AttendanceStatusUpdateRequestDto request,
@@ -180,7 +180,7 @@ public class AttendanceRecordController {
     @Operation(summary = "출석 상태를 지각으로 변경", description = "출석 기록의 상태를 지각으로 변경합니다.")
     @PutMapping("/{recordId}/late")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceRecordPermissionHandler.hasPermission(authentication.principal, #recordId, 'MANAGE')")
+            "@attendanceRecordPermissionHandler.hasPermission(authentication, #recordId, 'MANAGE')")
     public ResponseEntity<ApiResponse<AttendanceRecordResponseDto>> markAsLate(
             @PathVariable @Positive(message = "기록 ID는 양수여야 합니다") Long recordId,
             @Valid @RequestBody AttendanceStatusUpdateRequestDto request,
@@ -197,7 +197,7 @@ public class AttendanceRecordController {
     @Operation(summary = "출석 상태를 출석으로 변경", description = "출석 기록의 상태를 출석으로 변경합니다.")
     @PutMapping("/{recordId}/present")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceRecordPermissionHandler.hasPermission(authentication.principal, #recordId, 'MANAGE')")
+            "@attendanceRecordPermissionHandler.hasPermission(authentication, #recordId, 'MANAGE')")
     public ResponseEntity<ApiResponse<AttendanceRecordResponseDto>> markAsPresent(
             @PathVariable @Positive(message = "기록 ID는 양수여야 합니다") Long recordId,
             @Valid @RequestBody AttendanceStatusUpdateRequestDto request,
@@ -214,7 +214,7 @@ public class AttendanceRecordController {
     @Operation(summary = "출석 상태 직접 변경", description = "출석 기록의 상태를 직접 변경합니다.")
     @PutMapping("/{recordId}/status")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceRecordPermissionHandler.hasPermission(authentication.principal, #recordId, 'MANAGE')")
+            "@attendanceRecordPermissionHandler.hasPermission(authentication, #recordId, 'MANAGE')")
     public ResponseEntity<ApiResponse<AttendanceRecordResponseDto>> updateAttendanceStatus(
             @PathVariable @Positive(message = "기록 ID는 양수여야 합니다") Long recordId,
             @Valid @RequestBody AttendanceStatusUpdateRequestDto request,
