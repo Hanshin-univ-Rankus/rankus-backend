@@ -52,7 +52,7 @@ public class CalendarInterviewController {
             )
     })
     @GetMapping
-    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_CALENDAR')")
+    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_CALENDAR')")
     public ResponseEntity<ApiResponse<List<CalendarEventResponseDto>>> getInterviewSchedules(
             @PathVariable @Positive Long labId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -82,7 +82,7 @@ public class CalendarInterviewController {
             )
     })
     @GetMapping("/{eventId}")
-    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_CALENDAR')")
+    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_CALENDAR')")
     public ResponseEntity<ApiResponse<CalendarEventResponseDto>> getInterviewSchedule(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long eventId,
@@ -111,7 +111,7 @@ public class CalendarInterviewController {
             )
     })
     @GetMapping("/by-interview/{interviewId}")
-    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW_CALENDAR')")
+    @PreAuthorize("@calendarPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW_CALENDAR')")
     public ResponseEntity<ApiResponse<CalendarEventResponseDto>> getInterviewScheduleByInterviewId(
             @PathVariable @Positive Long labId,
             @PathVariable @Positive Long interviewId,

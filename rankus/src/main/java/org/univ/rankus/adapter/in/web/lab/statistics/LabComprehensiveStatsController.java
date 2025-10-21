@@ -44,7 +44,7 @@ public class LabComprehensiveStatsController {
 
     @Operation(summary = "특정 랩실 상세 통계", description = "특정 랩실의 상세 통계를 조회합니다.")
     @GetMapping("/{labId}/detailed-stats")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
     public ResponseEntity<ApiResponse<LabComprehensiveStatsResponse.LabStats>> getLabDetailedStats(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             Authentication authentication) {

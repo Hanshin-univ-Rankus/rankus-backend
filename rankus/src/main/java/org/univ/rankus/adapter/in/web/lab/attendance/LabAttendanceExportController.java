@@ -30,7 +30,7 @@ public class LabAttendanceExportController {
 
     @Operation(summary = "랩실 출석 데이터 Excel 다운로드", description = "랩실의 모든 출석 데이터를 Excel 파일로 다운로드합니다.")
     @GetMapping("/export")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
     public ResponseEntity<byte[]> exportLabAttendance(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             Authentication authentication) {
@@ -50,7 +50,7 @@ public class LabAttendanceExportController {
 
     @Operation(summary = "랩실 출석 통계 Excel 다운로드", description = "특정 기간의 랩실 출석 통계를 Excel 파일로 다운로드합니다.")
     @GetMapping("/export/statistics")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
     public ResponseEntity<byte[]> exportLabAttendanceStatistics(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             @Parameter(description = "시작 날짜") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
@@ -72,7 +72,7 @@ public class LabAttendanceExportController {
 
     @Operation(summary = "멤버 출석 기록 Excel 다운로드", description = "특정 멤버의 출석 기록을 Excel 파일로 다운로드합니다.")
     @GetMapping("/export/member/{memberId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
     public ResponseEntity<byte[]> exportMemberAttendanceHistory(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             @Parameter(description = "멤버 ID") @PathVariable Long memberId,
@@ -93,7 +93,7 @@ public class LabAttendanceExportController {
 
     @Operation(summary = "출석 증명서 Excel 생성", description = "특정 멤버의 출석 증명서를 Excel 파일로 생성합니다.")
     @GetMapping("/export/certificate/{memberId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
     public ResponseEntity<byte[]> generateAttendanceCertificate(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             @Parameter(description = "멤버 ID") @PathVariable Long memberId,

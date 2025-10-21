@@ -31,7 +31,7 @@ public class LabAttendanceManagementController {
 
     @Operation(summary = "랩실 출석 관리 통합 뷰", description = "특정 랩실의 출석 관리 통합 뷰를 조회합니다.")
     @GetMapping("/management")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
     public ResponseEntity<ApiResponse<LabAttendanceManagementResponse>> getLabAttendanceManagement(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             Authentication authentication) {
@@ -47,7 +47,7 @@ public class LabAttendanceManagementController {
 
     @Operation(summary = "출석 일괄 수정", description = "여러 출석 기록을 한 번에 수정합니다.")
     @PutMapping("/bulk-update")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canManageLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canManageLabMembers(#labId, authentication)")
     public ResponseEntity<ApiResponse<BulkAttendanceUpdateResponse>> bulkUpdateAttendance(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             @Valid @RequestBody BulkAttendanceUpdateRequest request,

@@ -26,7 +26,7 @@ public class LabMemberRoleController {
 
     @Operation(summary = "랩매니저 권한 부여", description = "랩원을 랩매니저로 승급시킵니다.")
     @PostMapping("/promote-manager")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canManageLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canManageLabMembers(#labId, authentication)")
     public ResponseEntity<Void> promoteToManager(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             @Valid @RequestBody RoleManagementRequest request,
@@ -42,7 +42,7 @@ public class LabMemberRoleController {
 
     @Operation(summary = "랩매니저 권한 회수", description = "랩매니저를 랩원으로 강등시킵니다.")
     @PostMapping("/demote-manager")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canManageLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canManageLabMembers(#labId, authentication)")
     public ResponseEntity<Void> demoteToMember(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             @Valid @RequestBody RoleManagementRequest request,

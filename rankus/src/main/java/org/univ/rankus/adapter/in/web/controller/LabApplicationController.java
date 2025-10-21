@@ -216,7 +216,7 @@ public class LabApplicationController {
             )
     })
     @GetMapping
-    @PreAuthorize("@labApplicationPermissionHandler.hasPermissionForLab(authentication.principal, #labId, 'VIEW')")
+    @PreAuthorize("@labApplicationPermissionHandler.hasPermissionForLab(authentication, #labId, 'VIEW')")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ApiResponse<List<LabApplicationResponseDto>>> listApplications(
             @PathVariable @Positive Long labId

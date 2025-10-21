@@ -34,7 +34,7 @@ public class LabMemberController {
 
     @Operation(summary = "랩실 멤버 목록 조회", description = "특정 랩실의 모든 멤버를 조회합니다.")
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
     public ResponseEntity<ApiResponse<List<LabMemberResponse>>> getLabMembers(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             Authentication authentication) {
@@ -56,7 +56,7 @@ public class LabMemberController {
 
     @Operation(summary = "랩실 멤버 상세 조회", description = "특정 랩실의 멤버 상세 정보를 조회합니다.")
     @GetMapping("/{memberId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
     public ResponseEntity<ApiResponse<LabMemberResponse>> getLabMember(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             @Parameter(description = "멤버 ID") @PathVariable Long memberId,
@@ -77,7 +77,7 @@ public class LabMemberController {
 
     @Operation(summary = "랩실 멤버 상세 프로필 조회", description = "특정 랩실의 멤버 상세 프로필과 활동 통계를 조회합니다.")
     @GetMapping("/{memberId}/detail")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
     public ResponseEntity<ApiResponse<LabMemberDetailResponse>> getLabMemberDetail(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             @Parameter(description = "멤버 ID") @PathVariable Long memberId,

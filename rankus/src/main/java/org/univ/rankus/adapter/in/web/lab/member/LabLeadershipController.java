@@ -26,7 +26,7 @@ public class LabLeadershipController {
 
     @Operation(summary = "랩장 위임", description = "현재 랩장이 다른 멤버에게 랩장 권한을 위임합니다.")
     @PostMapping("/transfer-leadership")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canTransferLabLeadership(#labId, authentication.principal.userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canTransferLabLeadership(#labId, authentication)")
     public ResponseEntity<Void> transferLeadership(
             @Parameter(description = "랩실 ID") @PathVariable Long labId,
             @Valid @RequestBody TransferLeadershipRequest request,
