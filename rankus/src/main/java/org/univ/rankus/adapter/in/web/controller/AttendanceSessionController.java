@@ -210,7 +210,7 @@ public class AttendanceSessionController {
     })
     @PostMapping("/{sessionId}/end")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
+            "@attendanceSessionPermissionHandler.hasPermission(authentication, #sessionId, 'MANAGE')")
     @Deprecated // Phase 3: Use PATCH /{sessionId}/status instead
     public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> endSession(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
@@ -232,7 +232,7 @@ public class AttendanceSessionController {
             """)
     @PostMapping("/{sessionId}/cancel")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
+            "@attendanceSessionPermissionHandler.hasPermission(authentication, #sessionId, 'MANAGE')")
     @Deprecated // Phase 3: Use PATCH /{sessionId}/status 대신
     public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> cancelSession(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
@@ -254,7 +254,7 @@ public class AttendanceSessionController {
             """)
     @PutMapping("/{sessionId}/title")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
+            "@attendanceSessionPermissionHandler.hasPermission(authentication, #sessionId, 'MANAGE')")
     public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> updateSessionTitle(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
@@ -281,7 +281,7 @@ public class AttendanceSessionController {
             """)
     @PutMapping("/{sessionId}/qr-validity")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
+            "@attendanceSessionPermissionHandler.hasPermission(authentication, #sessionId, 'MANAGE')")
     public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> updateQRValidityMinutes(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
@@ -334,7 +334,7 @@ public class AttendanceSessionController {
     @PostMapping("/{sessionId}/qr")
     @Deprecated // Secure QR 사용 권장: /{sessionId}/qr/secure
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
+            "@attendanceSessionPermissionHandler.hasPermission(authentication, #sessionId, 'MANAGE')")
     public ResponseEntity<ApiResponse<QRTokenResponseDto>> generateQRCode(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
@@ -349,7 +349,7 @@ public class AttendanceSessionController {
     @Operation(summary = "보안 QR 코드 생성", description = "출석 체크용 Secure QR 토큰을 생성합니다. 이 토큰은 암호화되어 있으며 프론트 URL과 함께 반환됩니다.")
     @PostMapping("/{sessionId}/qr/secure")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
+            "@attendanceSessionPermissionHandler.hasPermission(authentication, #sessionId, 'MANAGE')")
     public ResponseEntity<ApiResponse<SecureQRTokenResponseDto>> generateSecureQRCode(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,
@@ -511,7 +511,7 @@ public class AttendanceSessionController {
     })
     @PatchMapping("/{sessionId}/status")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or " +
-            "@attendanceSessionPermissionHandler.hasPermission(authentication.principal, #sessionId, 'MANAGE')")
+            "@attendanceSessionPermissionHandler.hasPermission(authentication, #sessionId, 'MANAGE')")
     public ResponseEntity<ApiResponse<AttendanceSessionResponseDto>> changeSessionStatus(
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
             @PathVariable @Positive(message = "세션 ID는 양수여야 합니다") Long sessionId,

@@ -46,20 +46,25 @@ public class VotePermissionHandler implements DomainPermissionEvaluator {
         if (!(principalObj instanceof CustomUserDetails)) {
             return false;
         }
-        Long userId = ((CustomUserDetails) principalObj).getUserId();
-        User user = userQueryUseCase.getUserById(userId);
-        String perm = permission.toUpperCase();
 
-        Vote vote = voteQueryUseCase.findVoteById(voteId);
+        try {
+            Long userId = ((CustomUserDetails) principalObj).getUserId();
+            User user = userQueryUseCase.getUserById(userId);
+            String perm = permission.toUpperCase();
 
-        return switch (perm) {
-            case PermissionConstants.VIEW -> user.canViewVotes(vote.getLab());
-            case PermissionConstants.PARTICIPATE -> vote.canUserParticipate(user);
-            case PermissionConstants.MANAGE -> vote.canUserManage(user);
-            case PermissionConstants.DELETE -> vote.canUserManage(user) && vote.canBeDeleted();
-            case PermissionConstants.VIEW_RESULTS -> user.canManageVotes(vote.getLab());
-            default -> false;
-        };
+            Vote vote = voteQueryUseCase.findVoteById(voteId);
+
+            return switch (perm) {
+                case PermissionConstants.VIEW -> user.canViewVotes(vote.getLab());
+                case PermissionConstants.PARTICIPATE -> vote.canUserParticipate(user);
+                case PermissionConstants.MANAGE -> vote.canUserManage(user);
+                case PermissionConstants.DELETE -> vote.canUserManage(user) && vote.canBeDeleted();
+                case PermissionConstants.VIEW_RESULTS -> user.canManageVotes(vote.getLab());
+                default -> false;
+            };
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

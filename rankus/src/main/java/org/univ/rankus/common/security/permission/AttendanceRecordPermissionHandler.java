@@ -47,19 +47,23 @@ public class AttendanceRecordPermissionHandler implements DomainPermissionEvalua
             return false;
         }
 
-        Long userId = ((CustomUserDetails) principalObj).getUserId();
-        User user = userQueryUseCase.getUserById(userId);
-        String perm = permission.toUpperCase();
+        try {
+            Long userId = ((CustomUserDetails) principalObj).getUserId();
+            User user = userQueryUseCase.getUserById(userId);
+            String perm = permission.toUpperCase();
 
-        AttendanceRecord record = attendanceRecordQueryUseCase.findRecordById(recordId, userId);
-        AttendanceSession session = attendanceSessionQueryUseCase.findSessionById(record.getSessionId(), userId);
-        Lab lab = labPromotionQueryUseCase.getLabById(session.getLabId());
+            AttendanceRecord record = attendanceRecordQueryUseCase.findRecordById(recordId, userId);
+            AttendanceSession session = attendanceSessionQueryUseCase.findSessionById(record.getSessionId(), userId);
+            Lab lab = labPromotionQueryUseCase.getLabById(session.getLabId());
 
-        return switch (perm) {
-            case PermissionConstants.VIEW -> record.isOwnedBy(userId) || user.canViewLabAttendance(lab);
-            case PermissionConstants.UPDATE, PermissionConstants.DELETE, PermissionConstants.MANAGE -> user.canManageLabAttendance(lab);
-            default -> false;
-        };
+            return switch (perm) {
+                case PermissionConstants.VIEW -> record.isOwnedBy(userId) || user.canViewLabAttendance(lab);
+                case PermissionConstants.UPDATE, PermissionConstants.DELETE, PermissionConstants.MANAGE -> user.canManageLabAttendance(lab);
+                default -> false;
+            };
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
