@@ -46,16 +46,20 @@ public class InterviewPermissionHandler {
             return false;
         }
 
-        Long userId = userDetails.getUserId();
-        User user = userQueryUseCase.getUserById(userId);
-        Lab lab = labPromotionQueryUseCase.getLabById(labId);
-        String perm = permission.toUpperCase();
+        try {
+            Long userId = userDetails.getUserId();
+            User user = userQueryUseCase.getUserById(userId);
+            Lab lab = labPromotionQueryUseCase.getLabById(labId);
+            String perm = permission.toUpperCase();
 
-        return switch (perm) {
-            case PermissionConstants.MANAGE_INTERVIEWS -> user.canManageLabNotices(lab); // 기존 랩실 관리 권한 재사용
-            case PermissionConstants.VIEW_INTERVIEWS -> true; // 모든 인증된 사용자가 조회 가능
-            default -> false;
-        };
+            return switch (perm) {
+                case PermissionConstants.MANAGE_INTERVIEWS -> user.canManageLabNotices(lab);
+                case PermissionConstants.VIEW_INTERVIEWS -> user.canViewLabNotices(lab);  // ✅ 수정: 랩실 멤버만 조회 가능
+                default -> false;
+            };
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
@@ -79,15 +83,19 @@ public class InterviewPermissionHandler {
             return false;
         }
 
-        Long userId = userDetails.getUserId();
-        User user = userQueryUseCase.getUserById(userId);
-        Interview interview = interviewQueryUseCase.getInterviewById(interviewId);
-        String perm = permission.toUpperCase();
+        try {
+            Long userId = userDetails.getUserId();
+            User user = userQueryUseCase.getUserById(userId);
+            Interview interview = interviewQueryUseCase.getInterviewById(interviewId);
+            String perm = permission.toUpperCase();
 
-        return switch (perm) {
-            case PermissionConstants.MANAGE_INTERVIEWS -> user.canManageLabNotices(interview.getLab());
-            case PermissionConstants.VIEW_INTERVIEWS -> true;
-            default -> false;
-        };
+            return switch (perm) {
+                case PermissionConstants.MANAGE_INTERVIEWS -> user.canManageLabNotices(interview.getLab());
+                case PermissionConstants.VIEW_INTERVIEWS -> user.canViewLabNotices(interview.getLab());  // ✅ 수정
+                default -> false;
+            };
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

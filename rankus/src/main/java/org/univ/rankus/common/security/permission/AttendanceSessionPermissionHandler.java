@@ -83,16 +83,20 @@ public class AttendanceSessionPermissionHandler implements DomainPermissionEvalu
             return false;
         }
 
-        Long userId = ((CustomUserDetails) principalObj).getUserId();
-        User user = userQueryUseCase.getUserById(userId);
-        Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
-        String perm = permission.toUpperCase();
+        try {
+            Long userId = ((CustomUserDetails) principalObj).getUserId();
+            User user = userQueryUseCase.getUserById(userId);
+            Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
+            String perm = permission.toUpperCase();
 
-        return switch (perm) {
-            case PermissionConstants.VIEW_ATTENDANCE -> user.canViewLabAttendance(lab);
-            case PermissionConstants.MANAGE_ATTENDANCE -> user.canManageLabAttendance(lab);
-            default -> false;
-        };
+            return switch (perm) {
+                case PermissionConstants.VIEW_ATTENDANCE -> user.canViewLabAttendance(lab);
+                case PermissionConstants.MANAGE_ATTENDANCE -> user.canManageLabAttendance(lab);
+                default -> false;
+            };
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private Lab getLabFromSession(AttendanceSession session) {

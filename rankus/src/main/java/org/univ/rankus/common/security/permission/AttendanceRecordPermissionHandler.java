@@ -83,16 +83,20 @@ public class AttendanceRecordPermissionHandler implements DomainPermissionEvalua
             return false;
         }
 
-        Long userId = ((CustomUserDetails) principalObj).getUserId();
-        User user = userQueryUseCase.getUserById(userId);
-        AttendanceSession session = attendanceSessionQueryUseCase.findSessionById((Long) sessionId, userId);
-        Lab lab = labPromotionQueryUseCase.getLabById(session.getLabId());
-        String perm = permission.toUpperCase();
+        try {
+            Long userId = ((CustomUserDetails) principalObj).getUserId();
+            User user = userQueryUseCase.getUserById(userId);
+            AttendanceSession session = attendanceSessionQueryUseCase.findSessionById((Long) sessionId, userId);
+            Lab lab = labPromotionQueryUseCase.getLabById(session.getLabId());
+            String perm = permission.toUpperCase();
 
-        return switch (perm) {
-            case PermissionConstants.VIEW -> user.canViewLabAttendance(lab);
-            case PermissionConstants.MANAGE -> user.canManageLabAttendance(lab);
-            default -> false;
-        };
+            return switch (perm) {
+                case PermissionConstants.VIEW -> user.canViewLabAttendance(lab);
+                case PermissionConstants.MANAGE -> user.canManageLabAttendance(lab);
+                default -> false;
+            };
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

@@ -86,14 +86,18 @@ public class LabNoticePermissionHandler implements DomainPermissionEvaluator {
             return false;
         }
 
-        Long userId = ((CustomUserDetails) principalObj).getUserId();
-        User user = userQueryUseCase.getUserById(userId);
-        Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
+        try {
+            Long userId = ((CustomUserDetails) principalObj).getUserId();
+            User user = userQueryUseCase.getUserById(userId);
+            Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
 
-        return switch (permission) {
-            case PermissionConstants.VIEW_NOTICES -> user.canViewLabNotices(lab);
-            case PermissionConstants.MANAGE_NOTICES -> user.canManageLabNotices(lab);
-            default -> false;
-        };
+            return switch (permission) {
+                case PermissionConstants.VIEW_NOTICES -> user.canViewLabNotices(lab);
+                case PermissionConstants.MANAGE_NOTICES -> user.canManageLabNotices(lab);
+                default -> false;
+            };
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
