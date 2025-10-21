@@ -94,6 +94,12 @@ public class LabApplicationCommandService implements LabApplicationCommandUseCas
                         new LabApplicationNotFoundException(LabApplicationErrorCode.APPLICATION_NOT_FOUND)
                 );
         app.approve();  // 도메인 내부에서 상태 변경 및 검증
+
+        // ✅ 신청서 승인 시 유저를 랩에 가입시킴
+        User user = app.getUser();
+        Lab lab = app.getLab();
+        user.assignLab(lab);
+        userRepositoryPort.save(user);  // 변경사항 저장
     }
 
     @Override
