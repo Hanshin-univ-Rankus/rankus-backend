@@ -20,6 +20,7 @@ import org.univ.rankus.domain.model.lab.application.LabApplication;
 import org.univ.rankus.domain.model.lab.core.Lab;
 import org.univ.rankus.domain.model.lab.exception.*;
 import org.univ.rankus.domain.model.user.User;
+import org.univ.rankus.domain.model.user.Role;
 import org.univ.rankus.domain.model.user.exception.UserErrorCode;
 import org.univ.rankus.domain.model.user.exception.UserNotFoundException;
 
@@ -95,10 +96,11 @@ public class LabApplicationCommandService implements LabApplicationCommandUseCas
                 );
         app.approve();  // 도메인 내부에서 상태 변경 및 검증
 
-        // ✅ 신청서 승인 시 유저를 랩에 가입시킴
+        // ✅ 신청서 승인 시 유저를 랩에 가입시키고 역할을 LAB_MEMBER로 변경
         User user = app.getUser();
         Lab lab = app.getLab();
         user.assignLab(lab);
+        user.changeRole(Role.LAB_MEMBER);  // ✅ 추가: 역할을 LAB_MEMBER로 변경
         userRepositoryPort.save(user);  // 변경사항 저장
     }
 

@@ -1,6 +1,7 @@
 package org.univ.rankus.common.security.permission;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import org.univ.rankus.domain.model.user.User;
 
 import java.io.Serializable;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class LabNoticePermissionHandler implements DomainPermissionEvaluator {
@@ -70,6 +72,8 @@ public class LabNoticePermissionHandler implements DomainPermissionEvaluator {
      */
     public boolean hasPermissionForLab(Authentication auth, Serializable labId, String permission) {
         if (auth == null || !(labId instanceof Long) || permission == null) {
+            log.warn("Invalid parameters for permission check: auth={}, labId={}, permission={}",
+                auth != null, labId, permission);
             return false;
         }
 
@@ -77,26 +81,39 @@ public class LabNoticePermissionHandler implements DomainPermissionEvaluator {
         for (GrantedAuthority ga : auth.getAuthorities()) {
             String a = ga.getAuthority();
             if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                log.debug("Admin/Professor access granted for labId={}", labId);
                 return true;
             }
         }
 
         Object principalObj = auth.getPrincipal();
         if (!(principalObj instanceof CustomUserDetails)) {
+            log.warn("Principal is not CustomUserDetails: {}", principalObj.getClass().getName());
             return false;
         }
 
         try {
             Long userId = ((CustomUserDetails) principalObj).getUserId();
+            log.debug("Checking permission for userId={}, labId={}, permission={}", userId, labId, permission);
+
             User user = userQueryUseCase.getUserById(userId);
             Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
 
-            return switch (permission) {
+            boolean hasPermission = switch (permission) {
                 case PermissionConstants.VIEW_NOTICES -> user.canViewLabNotices(lab);
                 case PermissionConstants.MANAGE_NOTICES -> user.canManageLabNotices(lab);
-                default -> false;
+                default -> {
+                    log.warn("Unknown permission type: {}", permission);
+                    yield false;
+                }
             };
+
+            log.debug("Permission check result: userId={}, labId={}, permission={}, result={}, userRole={}, userLabId={}",
+                userId, labId, permission, hasPermission, user.getRole(), user.getLab() != null ? user.getLab().getId() : null);
+
+            return hasPermission;
         } catch (Exception e) {
+            log.error("Error checking permission for labId={}, permission={}: {}", labId, permission, e.getMessage(), e);
             return false;
         }
     }

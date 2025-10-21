@@ -1,6 +1,7 @@
 package org.univ.rankus.common.security.permission;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import org.univ.rankus.domain.model.user.User;
 
 import java.io.Serializable;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AttendanceSessionPermissionHandler implements DomainPermissionEvaluator {
@@ -71,6 +73,8 @@ public class AttendanceSessionPermissionHandler implements DomainPermissionEvalu
      */
     public boolean hasPermissionForLab(Authentication auth, Serializable labId, String permission) {
         if (auth == null || !(labId instanceof Long) || permission == null) {
+            log.warn("Invalid parameters for attendance permission check: auth={}, labId={}, permission={}",
+                auth != null, labId, permission);
             return false;
         }
 
@@ -78,27 +82,40 @@ public class AttendanceSessionPermissionHandler implements DomainPermissionEvalu
         for (GrantedAuthority ga : auth.getAuthorities()) {
             String a = ga.getAuthority();
             if ("ROLE_ADMIN".equals(a) || "ROLE_PROFESSOR".equals(a)) {
+                log.debug("Admin/Professor attendance access granted for labId={}", labId);
                 return true;
             }
         }
 
         Object principalObj = auth.getPrincipal();
         if (!(principalObj instanceof CustomUserDetails)) {
+            log.warn("Principal is not CustomUserDetails for attendance check: {}", principalObj.getClass().getName());
             return false;
         }
 
         try {
             Long userId = ((CustomUserDetails) principalObj).getUserId();
+            log.debug("Checking attendance permission for userId={}, labId={}, permission={}", userId, labId, permission);
+
             User user = userQueryUseCase.getUserById(userId);
             Lab lab = labPromotionQueryUseCase.getLabById((Long) labId);
             String perm = permission.toUpperCase();
 
-            return switch (perm) {
+            boolean hasPermission = switch (perm) {
                 case PermissionConstants.VIEW_ATTENDANCE -> user.canViewLabAttendance(lab);
                 case PermissionConstants.MANAGE_ATTENDANCE -> user.canManageLabAttendance(lab);
-                default -> false;
+                default -> {
+                    log.warn("Unknown attendance permission type: {}", permission);
+                    yield false;
+                }
             };
+
+            log.debug("Attendance permission check result: userId={}, labId={}, permission={}, result={}, userRole={}, userLabId={}",
+                userId, labId, permission, hasPermission, user.getRole(), user.getLab() != null ? user.getLab().getId() : null);
+
+            return hasPermission;
         } catch (Exception e) {
+            log.error("Error checking attendance permission for labId={}, permission={}: {}", labId, permission, e.getMessage(), e);
             return false;
         }
     }
