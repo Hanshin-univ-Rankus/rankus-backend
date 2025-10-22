@@ -84,3 +84,19 @@ rankus:
     secret-key: ${QR_SECRET_KEY:?QR Secret(32 bytes) must be provided in environment}
     # (옵션) 레거시 단순 QR 토큰 허용 여부 - 점진적 비활성화 계획 시 false 로 변경
     # legacy-enabled: true
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    display-request-duration: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+    default-models-expand-depth: 1
+    default-model-expand-depth: 1
+    try-it-out-enabled: true
+  packages-to-scan: org.univ.rankus.adapter.in.web
+  paths-to-match: /api/**
