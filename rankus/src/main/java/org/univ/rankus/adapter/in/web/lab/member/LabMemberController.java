@@ -2,6 +2,7 @@ package org.univ.rankus.adapter.in.web.lab.member;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,7 @@ public class LabMemberController {
 
     private final GetLabMembersQuery getLabMembersQuery;
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 멤버 목록 조회", description = "특정 랩실의 모든 멤버를 조회합니다.")
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
@@ -54,6 +56,7 @@ public class LabMemberController {
         return ResponseEntity.ok(ApiResponse.success(responses, "랩실 멤버 목록을 성공적으로 조회했습니다."));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 멤버 상세 조회", description = "특정 랩실의 멤버 상세 정보를 조회합니다.")
     @GetMapping("/{memberId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
@@ -75,6 +78,7 @@ public class LabMemberController {
         return ResponseEntity.ok(ApiResponse.success(response, "랩실 멤버 정보를 성공적으로 조회했습니다."));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "랩실 멤버 상세 프로필 조회", description = "특정 랩실의 멤버 상세 프로필과 활동 통계를 조회합니다.")
     @GetMapping("/{memberId}/detail")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @labMemberPermissionEvaluator.canViewLabMembers(#labId, authentication)")
