@@ -116,9 +116,12 @@ public class VoteCommandService implements VoteCommandUseCase {
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        // 3) 선택지 조회
+        // 3) 선택지 조회 및 검증
         VoteOption selectedOption = voteOptionRepositoryPort.findById(selectedOptionId)
                 .orElseThrow(() -> new VoteNotFoundException(VoteErrorCode.VOTE_OPTION_NOT_FOUND));
+
+        // 선택한 옵션이 해당 투표에 속하는지 검증
+        selectedOption.validateBelongsToVote(voteId);
 
         // 4) 권한 검증
         if (!vote.canUserParticipate(user)) {

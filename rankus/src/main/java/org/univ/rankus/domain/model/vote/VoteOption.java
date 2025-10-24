@@ -94,4 +94,20 @@ public class VoteOption extends BaseTimeEntity {
             this.voteCount--;
         }
     }
+
+    /**
+     * 이 옵션이 특정 투표에 속하는지 확인
+     */
+    public boolean belongsToVote(Long voteId) {
+        return this.vote != null && this.vote.getId().equals(voteId);
+    }
+
+    /**
+     * 이 옵션이 특정 투표에 속하는지 검증
+     */
+    public void validateBelongsToVote(Long voteId) {
+        if (!belongsToVote(voteId)) {
+            throw new VoteValidationException(VoteErrorCode.VOTE_OPTION_NOT_FOUND);
+        }
+    }
 }

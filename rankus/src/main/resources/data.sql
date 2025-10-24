@@ -20,7 +20,7 @@ VALUES (1, '학생1', 'user1@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUu
         '20201005', '010-5678-9012', 3, 'ON_LEAVE', 'ACTIVE', NOW(), NOW()),
        (6, '랩장2', 'leader2@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'LAB_LEADER',
         2, '20181006', '010-6789-0123', 5, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
-       (7, '관리자', 'admin@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
+       (7, '관리자', 'admin@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', 1,
         '20151007', '010-7890-1234', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
         (8, '관리자2', 'admin2@example.com', '$2a$10$7dAhkArjo9wKCC.ndBZ/lOUYslJUualWzJiBk6yxAMiWaX0InFWAy', 'ADMIN', NULL,
         '20151008', '010-7890-2345', 6, 'ENROLLED', 'ACTIVE', NOW(), NOW()),
