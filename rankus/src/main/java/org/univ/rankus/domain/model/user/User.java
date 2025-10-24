@@ -234,7 +234,7 @@ public class User extends BaseTimeEntity {
 
     /**
      * 특정 랩실의 지원서 관리 권한을 확인
-     * ADMIN은 모든 랩실의 지원서 관리 가능
+     * ADMIN은 모든 랩실 관리 가능
      * LAB_LEADER, PROFESSOR 역할이 해당 랩실에 소속된 경우 권한 부여
      */
     public boolean canManageLabApplications(Lab lab) {
@@ -328,7 +328,7 @@ public class User extends BaseTimeEntity {
 
     /**
      * 특정 랩실의 투표 생성 권한을 확인
-     * 랩 소속 LAB_MANAGER, LAB_LEADER + 모든 PROFESSOR, ADMIN
+     * 랩 소속 LAB_MEMBER 이상 + 모든 PROFESSOR, ADMIN
      */
     public boolean canCreateVotes(Lab lab) {
         // ADMIN과 PROFESSOR는 모든 랩실의 투표 생성 가능
@@ -336,9 +336,9 @@ public class User extends BaseTimeEntity {
             return true;
         }
 
-        // 랩실 소속 LAB_MANAGER, LAB_LEADER는 해당 랩실 투표 생성 가능
+        // 랩실 소속 LAB_MEMBER 이상은 해당 랩실 투표 생성 가능
         return this.lab != null && this.lab.equals(lab)
-                && (this.role == Role.LAB_MANAGER || this.role == Role.LAB_LEADER);
+                && (this.role == Role.LAB_MEMBER || this.role == Role.LAB_MANAGER || this.role == Role.LAB_LEADER);
     }
 
     /**
