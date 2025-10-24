@@ -18,5 +18,10 @@ public class VoteParticipateRequestDto {
     @Schema(description = "선택한 투표 옵션 ID", example = "1")
     @NotNull(message = "선택한 옵션 ID는 필수입니다")
     @Positive(message = "선택한 옵션 ID는 양수여야 합니다")
-    private Long selectedOptionId;
+    private Long optionId;
+
+    // 기존 메서드명 호환성 유지를 위한 getter
+    public Long getSelectedOptionId() {
+        return optionId;
+    }
 }
