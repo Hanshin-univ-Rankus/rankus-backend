@@ -282,15 +282,52 @@ public class VoteController {
                 .body(ApiResponse.created(responseDto, "투표 생성 성공"));
     }
 
-    @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "투표 참여", description = "투표에 참여합니다.")
+    @SecurityRequirement(name = "bearerAuth") @Operation(
+            summary = "투표 참여",
+            description = "투표에 참여합니다. 선택한 옵션 ID를 요청 본문에 포함해야 합니다."
+    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "투표 참여 정보",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = VoteParticipateRequestDto.class),
+                    examples = @ExampleObject(
+                            name = "투표 참여 예시",
+                            value = "{\n  \"selectedOptionId\": 1\n}",
+                            description = "선택한 옵션 ID를 포함한 요청"
+                    )
+            )
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "201",
+                    description = "투표 참여 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = VoteParticipationResponseDto.class)
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청 (입력값 검증 실패)",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "투표 또는 옵션을 찾을 수 없음",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
     @PostMapping("/{voteId}/participate")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or @votePermissionHandler.hasPermissionForVote(authentication, #voteId, 'PARTICIPATE')")
     public ResponseEntity<ApiResponse<VoteParticipationResponseDto>> participateInVote(
+            @Parameter(description = "랩실 ID", required = true, example = "1")
             @PathVariable @Positive(message = "랩실 ID는 양수여야 합니다") Long labId,
+            @Parameter(description = "투표 ID", required = true, example = "1")
             @PathVariable @Positive(message = "투표 ID는 양수여야 합니다") Long voteId,
             @Valid @RequestBody VoteParticipateRequestDto requestDto,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         VoteParticipation participation = voteCommandUseCase.participateInVote(
                 voteId,

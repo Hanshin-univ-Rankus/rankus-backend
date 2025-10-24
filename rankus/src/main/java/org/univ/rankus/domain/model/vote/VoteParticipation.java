@@ -41,7 +41,7 @@ public class VoteParticipation extends BaseTimeEntity {
     public VoteParticipation(Vote vote, User user, VoteOption selectedOption) {
         this.vote = validateVote(vote);
         this.user = validateUser(user);
-        this.selectedOption = validateSelectedOption(selectedOption);
+        this.selectedOption = validateSelectedOption(vote, selectedOption);
 
         // 비즈니스 로직: 투표 참여 시 선택지 투표 수 증가
         this.selectedOption.incrementVoteCount();
@@ -70,10 +70,19 @@ public class VoteParticipation extends BaseTimeEntity {
     /**
      * 선택 옵션 유효성 검증
      */
-    private VoteOption validateSelectedOption(VoteOption selectedOption) {
+    private VoteOption validateSelectedOption(Vote vote, VoteOption selectedOption) {
         if (selectedOption == null) {
             throw new VoteValidationException(VoteErrorCode.VOTE_OPTION_NOT_FOUND);
         }
+
+        // 선택한 옵션이 해당 투표에 속하는지 확인 (ID 기반 비교)
+        boolean isValidOption = vote.getOptions().stream()
+                .anyMatch(option -> option.getId().equals(selectedOption.getId()));
+
+        if (!isValidOption) {
+            throw new VoteValidationException(VoteErrorCode.VOTE_OPTION_NOT_FOUND);
+        }
+
         return selectedOption;
     }
 
