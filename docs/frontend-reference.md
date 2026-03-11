@@ -666,7 +666,7 @@ interface VoteOption {
 
 // 2. 투표 참여
 interface VoteParticipateRequest {
-  selectedOptionId: number;
+  optionId: number;
 }
 ```
 
@@ -960,7 +960,6 @@ function mergeCalendarEvents(data: CalendarEventResponse): CalendarEvent[] {
 
 #### 캘린더 라이브러리 활용
 ```typescript
-// FullCalendar.js 사용 예시
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -1549,24 +1548,6 @@ enum ScoreCategory {
   RESEARCH = "RESEARCH",           // 연구 활동
   MENTORING = "MENTORING",         // 멘토링
   OTHER = "OTHER"                  // 기타
-}
-```
-
-#### 점수 제출 시스템
-```typescript
-interface ScoreSubmissionRequest {
-  title: string;                   // 활동 제목
-  description?: string;            // 활동 설명
-  category: ScoreCategory;         // 활동 카테고리
-  score: number;                   // 점수 (1-100)
-  visibilityLevel: VisibilityLevel; // 공개 범위
-  evidenceUrl?: string;            // 증빙 자료 URL
-}
-
-enum VisibilityLevel {
-  PUBLIC = "PUBLIC",               // 전체 공개
-  LAB_ONLY = "LAB_ONLY",          // 랩실 내부만
-  PRIVATE = "PRIVATE"             // 비공개
 }
 ```
 
@@ -2159,7 +2140,7 @@ Content-Type: application/json
     "voteId": 8,
     "userId": 1,
     "userName": "홍길동",
-    "selectedOptionId": 26,
+    "optionId": 26,
     "selectedOptionText": "수요일 오후 7시",
     "participatedAt": "2024-01-20T14:20:00Z"
   },
@@ -2552,7 +2533,7 @@ function handleApiError(error: ApiError, context?: string) {
       break;
       
     default:
-      // 일반적인 에러
+      // 일반 에러
       showNotification(error.message || '알 수 없는 오류가 발생했습니다', 'error');
   }
 }
@@ -2966,154 +2947,3 @@ async function downloadExcelData(labId: number, type: 'attendance' | 'scores' | 
 }
 ```
 
----
-
-## API 엔드포인트 참조
-
-### 🔗 주요 API 그룹
-
-#### 인증 관련
-- `POST /api/auth/signup` - 회원가입
-- `POST /api/auth/login` - 로그인
-- `GET /api/users/me` - 내 정보 조회
-
-#### 랩실 관련
-- `GET /api/labs` - 랩실 목록
-- `GET /api/labs/{labId}` - 랩실 상세
-- `POST /api/labs/{labId}/applications` - 랩실 지원
-
-#### 면접 관련
-- `POST /api/labs/{labId}/interviews` - 면접 생성
-- `GET /api/labs/{labId}/interviews/{interviewId}/slots/available` - 예약 가능한 슬롯
-
-#### 출석 관련
-- `POST /api/labs/{labId}/attendance/sessions` - 출석 세션 생성
-- `POST /api/labs/{labId}/attendance/sessions/{sessionId}/qr` - QR 생성
-- `POST /api/labs/{labId}/attendance/sessions/check` - 출석 체크
-
-#### 투표 관련
-- `POST /api/labs/{labId}/votes` - 투표 생성
-- `POST /api/labs/{labId}/votes/{voteId}/participate` - 투표 참여
-
-#### 캘린더 관련
-- `GET /api/labs/{labId}/calendar/schedules` - 일반 일정 조회
-- `POST /api/labs/{labId}/calendar/schedules` - 일반 일정 생성
-
-### 📝 API 응답 형식
-
-모든 API는 통일된 응답 형식을 사용합니다:
-
-```typescript
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  message: string;
-  timestamp: string;
-}
-
-// 성공 응답 예시
-{
-  "success": true,
-  "data": { /* 실제 데이터 */ },
-  "message": "요청이 성공적으로 처리되었습니다",
-  "timestamp": "2024-01-15T10:30:00Z"
-}
-
-// 에러 응답 예시
-{
-  "success": false,
-  "message": "권한이 없습니다",
-  "timestamp": "2024-01-15T10:30:00Z"
-}
-```
-
----
-
-## 프론트엔드-백엔드 협업 가이드
-
-### 🤝 협업 시 주의사항
-
-#### 1. 인증 토큰 관리
-- JWT 토큰을 `Authorization: Bearer {token}` 헤더로 전송
-- 토큰 만료 시 자동 로그아웃 처리
-- 새로고침 시 토큰 유효성 확인
-
-#### 2. 에러 처리 표준화
-```typescript
-interface ErrorResponse {
-  success: false;
-  message: string;
-  errorCode?: string;
-  details?: any;
-}
-
-// 공통 에러 처리
-function handleApiError(error: ErrorResponse) {
-  switch (error.errorCode) {
-    case 'UNAUTHORIZED':
-      // 로그아웃 처리
-      break;
-    case 'FORBIDDEN':
-      // 권한 없음 메시지
-      break;
-    case 'VALIDATION_FAILED':
-      // 입력값 검증 실패
-      break;
-    default:
-      // 일반 에러 메시지
-  }
-}
-```
-
-#### 3. 실시간 업데이트 고려사항
-- QR 코드 만료 시간 추적
-- 투표 결과 실시간 반영
-- 출석 현황 업데이트
-- 면접 슬롯 예약 상황 변화
-
-#### 4. 성능 최적화
-- 페이징 처리 (랭킹, 투표 목록 등)
-- 이미지 lazy loading
-- API 응답 캐싱 (랩실 정보 등)
-- 무한 스크롤 구현
-
-### 🛠️ 개발 환경 설정
-
-#### 개발 서버 실행
-```bash
-# 데이터베이스 실행
-docker-compose up -d
-
-# 백엔드 서버 실행 (포트 8080)
-cd rankus && ./gradlew bootRun
-
-# API 문서 확인
-# http://localhost:8080/swagger-ui.html
-```
-
-#### 프론트엔드 환경 변수 예시
-```typescript
-// .env.development
-REACT_APP_API_BASE_URL=http://localhost:8080/api
-REACT_APP_WS_URL=ws://localhost:8080/ws
-
-// .env.production  
-REACT_APP_API_BASE_URL=https://api.rankus.com/api
-REACT_APP_WS_URL=wss://api.rankus.com/ws
-```
-
-### 📱 모바일 고려사항
-
-#### QR 코드 스캔
-- 카메라 권한 요청
-- 모바일 브라우저별 QR 스캔 라이브러리 호환성
-- 스캔 성공/실패 피드백
-
-#### 반응형 디자인
-- 캘린더 뷰의 모바일 최적화
-- 투표 결과 차트의 터치 인터랙션
-- 긴 목록의 모바일 네비게이션
-
----
-
-이 문서는 Rankus 프로젝트의 프론트엔드 개발을 위한 종합 가이드입니다. 추가 질문이나 구체적인 구현 방법이 필요한 경우, 각 기능별 API 문서를 참조하거나 백엔드 팀과 협의하시기 바랍니다.
