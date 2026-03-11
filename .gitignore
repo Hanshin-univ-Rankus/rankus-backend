@@ -78,6 +78,7 @@ thumb/
 sketch/
 
 # 환경설정
+.env
 rankus/.env
 .env.*.local
 .env.local
