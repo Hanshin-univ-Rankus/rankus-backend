@@ -1,116 +1,120 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<mxfile host="app.diagrams.net" type="device">
-  <diagram id="rankus-system" name="Rankus | 면접 신청의 시스템 경계" alt="Rankus | 면접 신청의 시스템 경계 · 팀 React 프런트엔드와 Spring Boot 팀 소스 · 실제 요청과 시연 응답을 구분">
-    <mxGraphModel page="1" pageScale="1" pageWidth="1320" pageHeight="583" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" math="0" shadow="0" background="#FFFFFF">
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" version="32.7.4">
+  <diagram id="Rankus  /  시스템" name="Rankus  /  시스템">
+    <mxGraphModel page="1" pageWidth="760" pageHeight="376" grid="1" gridSize="10" connect="1" arrows="1" fold="1" background="#FFFFFF">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="canvas" parent="1" vertex="1" value="" style="fillColor=#FFFFFF;strokeColor=none;movable=0;resizable=0;editable=0;selectable=0;html=0;">
-          <mxGeometry x="0" y="0" width="1320" height="583" as="geometry" />
+        <mxCell id="bounds" value="" style="shape=rectangle;fillColor=#FFFFFF;strokeColor=none;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="760" height="376" as="geometry" />
         </mxCell>
-        <mxCell id="title" parent="1" vertex="1" value="Rankus | 면접 신청의 시스템 경계" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#15283D;fontSize=35;fontStyle=1;fontFamily=Arial;">
-          <mxGeometry x="43" y="24" width="1235" height="45" as="geometry" />
+        <mxCell id="decor1" value="Rankus  /  시스템" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=13;fontColor=#14679D;fontStyle=1;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="24" y="17" width="712" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" parent="1" vertex="1" value="팀 React 웹에서 면접 신청을 제출하면 서버가 신청 규칙을 적용" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#485D72;fontSize=21;fontStyle=0;fontFamily=Arial;">
-          <mxGeometry x="45" y="74" width="1230" height="39" as="geometry" />
+        <mxCell id="decor2" value="면접 신청 규칙은 서버가 검사한다" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=27;fontColor=#172D44;fontStyle=1;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="24" y="41" width="712" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="server" parent="1" vertex="1" value="팀 Spring Boot   ·   코드 경로" style="rounded=1;arcSize=7;html=0;whiteSpace=wrap;fillColor=#F8FBFD;fillOpacity=85;strokeColor=#C8DAE5;dashed=1;dashPattern=7 5;strokeWidth=1.2;align=left;verticalAlign=top;spacingLeft=14;spacingTop=9;fontSize=16;fontStyle=1;fontColor=#435D72;fontFamily=Arial;">
-          <mxGeometry x="330" y="132" width="928" height="224" as="geometry" />
+        <mxCell id="app" value="" style="rounded=1;arcSize=6;strokeWidth=1.4;strokeColor=#9CBFB3;fillColor=#F1F9F5;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="21" y="105" width="203" height="165" as="geometry" />
         </mxCell>
-        <mxCell id="react" parent="1" vertex="1" value="" style="rounded=0;fillColor=none;strokeColor=none;whiteSpace=wrap;html=0;">
-          <mxGeometry x="54" y="219" width="183" height="85" as="geometry" />
+        <mxCell id="decor3" value="팀 React 웹" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=18;fontColor=#087D68;fontStyle=1;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="33" y="112" width="179" height="28" as="geometry" />
         </mxCell>
-        <mxCell id="react_tile" parent="react" vertex="1" value="" style="rounded=1;arcSize=16;fillColor=#FFFFFF;strokeColor=#A7BBD8;strokeWidth=1.2;html=0;">
-          <mxGeometry x="2" y="22" width="40" height="40" as="geometry" />
+        <mxCell id="server" value="" style="rounded=1;arcSize=6;strokeWidth=1.4;strokeColor=#A7C4D7;fillColor=#F2F8FC;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="255" y="105" width="484" height="260" as="geometry" />
         </mxCell>
-        <mxCell id="react_icon" parent="react" vertex="1" value="" style="shape=image;imageAspect=1;image=data:image/svg+xml,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiMyMTRGODciCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHJlY3Qgd2lkdGg9IjIwIiBoZWlnaHQ9IjE0IiB4PSIyIiB5PSIzIiByeD0iMiIgLz4KICA8bGluZSB4MT0iOCIgeDI9IjE2IiB5MT0iMjEiIHkyPSIyMSIgLz4KICA8bGluZSB4MT0iMTIiIHgyPSIxMiIgeTE9IjE3IiB5Mj0iMjEiIC8+Cjwvc3ZnPgo=;">
-          <mxGeometry x="10" y="30" width="24" height="24" as="geometry" />
+        <mxCell id="decor4" value="팀 Spring Boot · 구현 경로" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=18;fontColor=#14679D;fontStyle=1;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="267" y="112" width="460" height="28" as="geometry" />
         </mxCell>
-        <mxCell id="react_label" parent="react" vertex="1" value="React 신청 화면" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=16;fontColor=#214F87;fontStyle=1;fontFamily=Arial;">
-          <mxGeometry x="49" y="15" width="129" height="29" as="geometry" />
+        <mxCell id="react" value="" style="rounded=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#D4DFE7;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="34" y="159" width="175" height="76" as="geometry" />
         </mxCell>
-        <mxCell id="react_desc" parent="react" vertex="1" value="연구실·날짜·슬롯 선택" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=12;fontColor=#425E70;fontStyle=0;fontFamily=Arial;">
-          <mxGeometry x="49" y="43" width="129" height="39" as="geometry" />
+        <mxCell id="decor5" value="" style="ellipse;fillColor=#E0F2EB;strokeColor=none;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="44" y="175.5" width="43" height="43" as="geometry" />
         </mxCell>
-        <mxCell id="controller" parent="1" vertex="1" value="" style="rounded=0;fillColor=none;strokeColor=none;whiteSpace=wrap;html=0;">
-          <mxGeometry x="361" y="219" width="207" height="85" as="geometry" />
+        <mxCell id="decor6" value="" style="shape=image;imageAspect=1;aspect=fixed;image=data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23087D68%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%228%22%20width%3D%2238%22%20height%3D%2230%22%20rx%3D%224%22%2F%3E%3Cpath%20d%3D%22M5%2017h38m-30-4h1m4%200h1m4%200h1%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="49.16" y="180.66" width="32.68" height="32.68" as="geometry" />
         </mxCell>
-        <mxCell id="controller_tile" parent="controller" vertex="1" value="" style="rounded=1;arcSize=16;fillColor=#FFFFFF;strokeColor=#A7BBD8;strokeWidth=1.2;html=0;">
-          <mxGeometry x="2" y="22" width="40" height="40" as="geometry" />
+        <mxCell id="decor7" value="면접 신청 화면" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=17;fontColor=#172D44;fontStyle=1;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="96" y="168" width="109" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="controller_icon" parent="controller" vertex="1" value="" style="shape=image;imageAspect=1;image=data:image/svg+xml,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiMyMTRGODciCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHJlY3Qgd2lkdGg9IjIwIiBoZWlnaHQ9IjgiIHg9IjIiIHk9IjIiIHJ4PSIyIiByeT0iMiIgLz4KICA8cmVjdCB3aWR0aD0iMjAiIGhlaWdodD0iOCIgeD0iMiIgeT0iMTQiIHJ4PSIyIiByeT0iMiIgLz4KICA8bGluZSB4MT0iNiIgeDI9IjYuMDEiIHkxPSI2IiB5Mj0iNiIgLz4KICA8bGluZSB4MT0iNiIgeDI9IjYuMDEiIHkxPSIxOCIgeTI9IjE4IiAvPgo8L3N2Zz4K;">
-          <mxGeometry x="10" y="30" width="24" height="24" as="geometry" />
+        <mxCell id="decor8" value="날짜·슬롯 선택" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=14;fontColor=#50657B;fontStyle=0;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="96" y="193" width="109" height="39" as="geometry" />
         </mxCell>
-        <mxCell id="controller_label" parent="controller" vertex="1" value="신청 API" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=21;fontColor=#214F87;fontStyle=1;fontFamily=Arial;">
-          <mxGeometry x="49" y="15" width="153" height="29" as="geometry" />
+        <mxCell id="api" value="" style="rounded=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#D4DFE7;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="274" y="161" width="213" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="controller_desc" parent="controller" vertex="1" value="labId · slotId · 로그인 주체" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=12;fontColor=#425E70;fontStyle=0;fontFamily=Arial;">
-          <mxGeometry x="49" y="43" width="153" height="39" as="geometry" />
+        <mxCell id="decor9" value="" style="ellipse;fillColor=#E4F0F8;strokeColor=none;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="284" y="174.5" width="43" height="43" as="geometry" />
         </mxCell>
-        <mxCell id="service" parent="1" vertex="1" value="" style="rounded=0;fillColor=none;strokeColor=none;whiteSpace=wrap;html=0;">
-          <mxGeometry x="674" y="219" width="206" height="85" as="geometry" />
+        <mxCell id="decor10" value="" style="shape=image;imageAspect=1;aspect=fixed;image=data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%2314679D%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M13%2035a8%208%200%201%201%201-16%2011%2011%200%200%201%2021-3%2010%2010%200%201%201%200%2019z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="289.16" y="179.66" width="32.68" height="32.68" as="geometry" />
         </mxCell>
-        <mxCell id="service_tile" parent="service" vertex="1" value="" style="rounded=1;arcSize=16;fillColor=#FFFFFF;strokeColor=#9FBEB1;strokeWidth=1.2;html=0;">
-          <mxGeometry x="2" y="22" width="40" height="40" as="geometry" />
+        <mxCell id="decor11" value="신청 API" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=17;fontColor=#172D44;fontStyle=1;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="336" y="170" width="147" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="service_icon" parent="service" vertex="1" value="" style="shape=image;imageAspect=1;image=data:image/svg+xml,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiMxMjYxNEYiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTkgNWg4LjVhMSAxIDAgMDEwIDdoLTExYTEgMSAwIDAwMCA3SDE1IiAvPgogIDxjaXJjbGUgY3g9IjE4IiBjeT0iMTkiIHI9IjMiIC8+CiAgPGNpcmNsZSBjeD0iNiIgY3k9IjUiIHI9IjMiIC8+Cjwvc3ZnPgo=;">
-          <mxGeometry x="10" y="30" width="24" height="24" as="geometry" />
+        <mxCell id="decor12" value="labId · slotId · 로그인" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=14;fontColor=#50657B;fontStyle=0;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="336" y="195" width="147" height="33" as="geometry" />
         </mxCell>
-        <mxCell id="service_label" parent="service" vertex="1" value="신청 명령 서비스" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=19;fontColor=#12614F;fontStyle=1;fontFamily=Arial;">
-          <mxGeometry x="49" y="15" width="152" height="29" as="geometry" />
+        <mxCell id="service" value="" style="rounded=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#D4DFE7;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="161" width="210" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="service_desc" parent="service" vertex="1" value="중복·슬롯 가능 여부 검증" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=12;fontColor=#425E70;fontStyle=0;fontFamily=Arial;">
-          <mxGeometry x="49" y="43" width="152" height="39" as="geometry" />
+        <mxCell id="decor13" value="" style="ellipse;fillColor=#E4F0F8;strokeColor=none;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="520" y="174.5" width="43" height="43" as="geometry" />
         </mxCell>
-        <mxCell id="storage" parent="1" vertex="1" value="" style="rounded=0;fillColor=none;strokeColor=none;whiteSpace=wrap;html=0;">
-          <mxGeometry x="1007" y="219" width="224" height="85" as="geometry" />
+        <mxCell id="decor14" value="" style="shape=image;imageAspect=1;aspect=fixed;image=data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%2314679D%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%2217%22%2F%3E%3Cpath%20d%3D%22m17%2024%205%205%209-10M6%2024h4m28%200h4%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="525.16" y="179.66" width="32.68" height="32.68" as="geometry" />
         </mxCell>
-        <mxCell id="storage_tile" parent="storage" vertex="1" value="" style="rounded=1;arcSize=16;fillColor=#FFFFFF;strokeColor=#B9ADD4;strokeWidth=1.2;html=0;">
-          <mxGeometry x="2" y="22" width="40" height="40" as="geometry" />
+        <mxCell id="decor15" value="신청 명령 서비스" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=17;fontColor=#172D44;fontStyle=1;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="572" y="170" width="144" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="storage_icon" parent="storage" vertex="1" value="" style="shape=image;imageAspect=1;image=data:image/svg+xml,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiM1NDNFODMiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPGVsbGlwc2UgY3g9IjEyIiBjeT0iNSIgcng9IjkiIHJ5PSIzIiAvPgogIDxwYXRoIGQ9Ik0zIDVWMTlBOSAzIDAgMCAwIDIxIDE5VjUiIC8+CiAgPHBhdGggZD0iTTMgMTJBOSAzIDAgMCAwIDIxIDEyIiAvPgo8L3N2Zz4K;">
-          <mxGeometry x="10" y="30" width="24" height="24" as="geometry" />
+        <mxCell id="decor16" value="중복·슬롯 가능 검사" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=14;fontColor=#50657B;fontStyle=0;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="572" y="195" width="144" height="33" as="geometry" />
         </mxCell>
-        <mxCell id="storage_label" parent="storage" vertex="1" value="JPA 영속화" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=21;fontColor=#543E83;fontStyle=1;fontFamily=Arial;">
-          <mxGeometry x="49" y="15" width="170" height="29" as="geometry" />
-        </mxCell>
-        <mxCell id="storage_desc" parent="storage" vertex="1" value="잠금으로 슬롯 조회 · 신청 저장" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=12;fontColor=#425E70;fontStyle=0;fontFamily=Arial;">
-          <mxGeometry x="49" y="43" width="170" height="39" as="geometry" />
-        </mxCell>
-        <mxCell id="mock" parent="1" vertex="1" value="" style="rounded=0;fillColor=none;strokeColor=none;whiteSpace=wrap;html=0;">
-          <mxGeometry x="360" y="411" width="207" height="84" as="geometry" />
-        </mxCell>
-        <mxCell id="mock_tile" parent="mock" vertex="1" value="" style="rounded=1;arcSize=16;fillColor=#FFFFFF;strokeColor=#ABB7C1;strokeWidth=1.2;html=0;">
-          <mxGeometry x="2" y="22" width="40" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="mock_icon" parent="mock" vertex="1" value="" style="shape=image;imageAspect=1;image=data:image/svg+xml,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIyNCIKICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgZmlsbD0ibm9uZSIKICBzdHJva2U9IiM0MzU5NjgiCiAgc3Ryb2tlLXdpZHRoPSIyIgogIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICBzdHJva2UtbGluZWpvaW49InJvdW5kIgo+CiAgPHBhdGggZD0iTTE3LjUgMTlIOWE3IDcgMCAxIDEgNi43MS05aDEuNzlhNC41IDQuNSAwIDEgMSAwIDlaIiAvPgo8L3N2Zz4K;">
-          <mxGeometry x="10" y="30" width="24" height="24" as="geometry" />
-        </mxCell>
-        <mxCell id="mock_label" parent="mock" vertex="1" value="로컬 모의 API" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=21;fontColor=#435968;fontStyle=1;fontFamily=Arial;">
-          <mxGeometry x="49" y="15" width="153" height="29" as="geometry" />
-        </mxCell>
-        <mxCell id="mock_desc" parent="mock" vertex="1" value="요청 검사 후 201 응답" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=14;fontColor=#425E70;fontStyle=0;fontFamily=Arial;">
-          <mxGeometry x="49" y="43" width="153" height="39" as="geometry" />
-        </mxCell>
-        <mxCell id="edge-0" value="HTTP JSON" edge="1" parent="1" source="react" target="controller" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=blockThin;endFill=1;strokeColor=#415C70;strokeWidth=2.2;fontColor=#24435A;fontSize=16;labelBackgroundColor=#FFFFFF;labelPadding=2;fontFamily=Arial;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;">
+        <mxCell id="decor17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;strokeColor=#14679D;strokeWidth=2;endArrow=block;endFill=1;endSize=8;dashed=0;dashPattern=5 5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="react" target="api">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge-1" value="신청 위임" edge="1" parent="1" source="controller" target="service" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=blockThin;endFill=1;strokeColor=#415C70;strokeWidth=2.2;fontColor=#24435A;fontSize=16;labelBackgroundColor=#FFFFFF;labelPadding=2;fontFamily=Arial;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;">
+        <mxCell id="decor18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;strokeColor=#14679D;strokeWidth=2;endArrow=block;endFill=1;endSize=8;dashed=0;dashPattern=5 5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="api" target="service">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge-2" value="저장소 포트" edge="1" parent="1" source="service" target="storage" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=blockThin;endFill=1;strokeColor=#415C70;strokeWidth=2.2;fontColor=#24435A;fontSize=16;labelBackgroundColor=#FFFFFF;labelPadding=2;fontFamily=Arial;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;">
+        <mxCell id="fixture" value="" style="rounded=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#D4DFE7;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="34" y="293" width="178" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="decor19" value="" style="ellipse;fillColor=#E9EEF2;strokeColor=none;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="44" y="305.0" width="43" height="43" as="geometry" />
+        </mxCell>
+        <mxCell id="decor20" value="" style="shape=image;imageAspect=1;aspect=fixed;image=data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%235D6F80%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%228%22%20width%3D%2238%22%20height%3D%2226%22%20rx%3D%224%22%2F%3E%3Cpath%20d%3D%22M24%2035v6m-8%200h16%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="49.16" y="310.16" width="32.68" height="32.68" as="geometry" />
+        </mxCell>
+        <mxCell id="decor21" value="촬영용 모의 API" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=17;fontColor=#172D44;fontStyle=1;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="96" y="302" width="112" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="decor22" value="신청 요청 검사 · 201" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=14;fontColor=#50657B;fontStyle=0;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="96" y="327" width="112" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="persist" value="" style="rounded=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#D4DFE7;strokeWidth=1.1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="293" width="210" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="decor23" value="" style="ellipse;fillColor=#E4F0F8;strokeColor=none;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="520" y="305.0" width="43" height="43" as="geometry" />
+        </mxCell>
+        <mxCell id="decor24" value="" style="shape=image;imageAspect=1;aspect=fixed;image=data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%2314679D%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cellipse%20cx%3D%2224%22%20cy%3D%2211%22%20rx%3D%2215%22%20ry%3D%226%22%2F%3E%3Cpath%20d%3D%22M9%2011v24c0%208%2030%208%2030%200V11M9%2023c0%208%2030%208%2030%200%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="525.16" y="310.16" width="32.68" height="32.68" as="geometry" />
+        </mxCell>
+        <mxCell id="decor25" value="JPA 저장소" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=17;fontColor=#172D44;fontStyle=1;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="572" y="302" width="144" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="decor26" value="잠금으로 슬롯 조회 · 저장" style="text;html=0;align=left;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=14;fontColor=#50657B;fontStyle=0;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="572" y="327" width="144" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="decor27" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;strokeColor=#14679D;strokeWidth=2;endArrow=block;endFill=1;endSize=8;dashed=0;dashPattern=5 5;exitX=0.5;exitY=1;entryX=0.5;entryY=0;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="service" target="persist">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge-3" value="시연 경로" edge="1" parent="1" source="react" target="mock" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=blockThin;endFill=1;strokeColor=#415C70;strokeWidth=2.2;fontColor=#24435A;fontSize=16;labelBackgroundColor=#FFFFFF;labelPadding=2;fontFamily=Arial;dashed=1;dashPattern=6 4;strokeColor=#75818D;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="145" y="453" />
-            </Array>
-            <mxPoint x="0" y="9" as="offset" />
-          </mxGeometry>
+        <mxCell id="decor28" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;strokeColor=#5D6F80;strokeWidth=2;endArrow=block;endFill=1;endSize=8;dashed=1;dashPattern=5 5;exitX=0.5;exitY=1;entryX=0.5;entryY=0;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="react" target="fixture">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="note" parent="1" vertex="1" value="점선: 시연에서 앱 응답을 제공하는 로컬 API" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#43586D;fontSize=17;fontStyle=0;fontFamily=Arial;">
-          <mxGeometry x="45" y="531" width="1230" height="38" as="geometry" />
+        <mxCell id="decor29" value="시연만" style="text;html=0;align=center;verticalAlign=middle;spacing=0;fontFamily=Apple SD Gothic Neo;fontSize=15;fontColor=#5D6F80;fontStyle=1;fillColor=none;strokeColor=none;whiteSpace=wrap;overflow=visible;connectable=0;" vertex="1" parent="1">
+          <mxGeometry x="151" y="262" width="67" height="22" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
