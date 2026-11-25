@@ -1,5 +1,8 @@
 # Rankus - 대학교 랩실 통합 관리 플랫폼
 
+[Rankus 백엔드 포트폴리오: 학생 지원과 운영진 면접 흐름](docs/portfolio-readme/README.md)
+
+
 > 대학교 연구실(랩실) 정보 비대칭 문제를 해결하고, 랩 탐색부터 지원 · 운영 · 랭킹까지 하나의 플랫폼에서 관리하는 백엔드 서비스
 
 [![Java](https://img.shields.io/badge/Java-17-orange)](https://openjdk.org/)
