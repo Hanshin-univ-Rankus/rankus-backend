@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <mxfile host="app.diagrams.net" type="device">
   <diagram id="rankus" name="Rankus | 면접 설정을 바꿔도 ID는 그대로" alt="Rankus | 면접 설정을 바꿔도 ID는 그대로 · 공개 팀 코드와 후속 로컬 개선의 저장·캘린더 경로 비교">
     <mxGraphModel page="1" pageScale="1" pageWidth="1310" pageHeight="754" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" math="0" shadow="0" background="#FFFFFF">
@@ -245,7 +245,7 @@
             <mxPoint x="0" y="9" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="note" parent="1" vertex="1" value="ID는 설명용. 당시 종합설계 시연은 로컬 개선을 포함하지 않음 · DB 영속화, 테스트 재실행, 배포 적용 미확인" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#43586D;fontSize=17;fontStyle=0;fontFamily=Arial;">
+        <mxCell id="note" parent="1" vertex="1" value="후속 작업: 저장 결과와 캘린더 요청이 같은 면접 ID를 사용" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#43586D;fontSize=17;fontStyle=0;fontFamily=Arial;">
           <mxGeometry x="45" y="702" width="1220" height="38" as="geometry" />
         </mxCell>
       </root>

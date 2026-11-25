@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <mxfile host="app.diagrams.net" type="device">
   <diagram id="rankus-system" name="Rankus | 면접 신청의 시스템 경계" alt="Rankus | 면접 신청의 시스템 경계 · 팀 React 프런트엔드와 Spring Boot 팀 소스 · 실제 요청과 시연 응답을 구분">
     <mxGraphModel page="1" pageScale="1" pageWidth="1320" pageHeight="583" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" math="0" shadow="0" background="#FFFFFF">
@@ -11,7 +11,7 @@
         <mxCell id="title" parent="1" vertex="1" value="Rankus | 면접 신청의 시스템 경계" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#15283D;fontSize=35;fontStyle=1;fontFamily=Arial;">
           <mxGeometry x="43" y="24" width="1235" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" parent="1" vertex="1" value="팀 React 프런트엔드와 Spring Boot 팀 소스 · 실제 요청과 시연 응답을 구분" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#485D72;fontSize=21;fontStyle=0;fontFamily=Arial;">
+        <mxCell id="subtitle" parent="1" vertex="1" value="팀 React 웹에서 면접 신청을 제출하면 서버가 신청 규칙을 적용" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#485D72;fontSize=21;fontStyle=0;fontFamily=Arial;">
           <mxGeometry x="45" y="74" width="1230" height="39" as="geometry" />
         </mxCell>
         <mxCell id="server" parent="1" vertex="1" value="팀 Spring Boot   ·   코드 경로" style="rounded=1;arcSize=7;html=0;whiteSpace=wrap;fillColor=#F8FBFD;fillOpacity=85;strokeColor=#C8DAE5;dashed=1;dashPattern=7 5;strokeWidth=1.2;align=left;verticalAlign=top;spacingLeft=14;spacingTop=9;fontSize=16;fontStyle=1;fontColor=#435D72;fontFamily=Arial;">
@@ -109,7 +109,7 @@
             <mxPoint x="0" y="9" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="note" parent="1" vertex="1" value="점선은 시연에서 대체한 HTTP API · 모의 응답은 운영 DB 반영이나 서버 검증을 뜻하지 않음" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#43586D;fontSize=17;fontStyle=0;fontFamily=Arial;">
+        <mxCell id="note" parent="1" vertex="1" value="점선: 시연에서 앱 응답을 제공하는 로컬 API" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#43586D;fontSize=17;fontStyle=0;fontFamily=Arial;">
           <mxGeometry x="45" y="531" width="1230" height="38" as="geometry" />
         </mxCell>
       </root>

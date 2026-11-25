@@ -4,13 +4,13 @@
 
 [팀 백엔드 저장소](https://github.com/Hanshin-univ-Rankus/rankus-backend)
 
-## 주요 사용 흐름
+## 팀 React 웹 시연
 
 ### 학생: 연구실을 찾고 면접 신청하기
 
 ![연구실 목록에서 상세를 열고 면접 날짜와 14시 30분 슬롯을 선택해 신청을 완료하는 화면](demo/application-flow.gif)
 
-**연구실 목록 → 상세 → 가입 신청 → 면접 날짜와 시간 선택 → 접수 완료.** 학생은 마감된 시간을 건너뛰고 14:30 슬롯을 선택합니다. 접수된 신청은 승인 대기 상태로 남으며, 운영진이 승인하면 연구실에 참여할 수 있습니다.
+학생은 마감된 시간을 건너뛰고 14:30 면접 시간을 선택합니다. 신청을 제출하면 화면에 ‘가입 신청이 완료되었습니다!’가 표시됩니다.
 
 [연구실 목록](demo/application-labs.png) · [연구실 상세](demo/application-detail.png) · [슬롯 선택](demo/application-slot.png) · [접수 완료](demo/application-success.png)
 
@@ -18,13 +18,13 @@
 
 ![운영진이 캘린더에서 면접 일정 상세를 열고 슬롯 관리로 이동하는 화면](demo/interview-flow.gif)
 
-캘린더에서 면접 일정을 선택하면 해당 면접의 상세 정보가 열립니다. 슬롯 관리 화면에서는 날짜별로 열린 시간대를 확인합니다. 이 장면은 팀 종합설계 발표 영상에서 발췌했습니다.
+운영진은 캘린더에서 면접을 열고 날짜별 시간대를 확인합니다.
 
 [면접 캘린더](demo/interview-calendar.png) · [슬롯 관리](demo/interview-slots.png)
 
-## 시스템 구조
+## Spring Boot 백엔드 · 담당 범위
 
-![React에서 Spring Boot 신청 API, 명령 서비스와 JPA 저장소로 이어지는 시스템 구조](assets/rankus-system.svg)
+![React에서 Spring Boot 신청 API, 명령 서비스와 JPA 저장소로 이어지는 시스템 구조](assets/rankus-system.png)
 
 React는 연구실과 면접 슬롯을 조회하고, 신청할 때 연구실 ID는 URL로, 선택한 슬롯 ID는 본문으로 보냅니다. Spring Boot의 명령 서비스가 신청 규칙을 적용하고, JPA가 신청과 슬롯을 저장합니다.
 
@@ -40,7 +40,7 @@ React는 연구실과 면접 슬롯을 조회하고, 신청할 때 연구실 ID�
 
 운영진에게 면접 기간 수정은 이미 만들어진 면접의 설정을 바꾸는 일입니다. 그런데 [기존 구현](https://github.com/Hanshin-univ-Rankus/rankus-backend/blob/70910e0feef32f6044c03a23a997c1ebb5ea3ee7/rankus/src/main/java/org/univ/rankus/application/service/command/InterviewCommandService.java#L215-L247)은 기존 면접을 삭제하고 새 레코드를 만든 뒤, 캘린더에는 이전 ID를 전달했습니다. 수정과 캘린더 갱신이 서로 다른 면접을 가리킬 수 있는 구조였습니다.
 
-![면접 삭제·재생성 흐름과 같은 면접 ID를 유지하는 수정 흐름의 비교](assets/rankus.svg)
+![면접 삭제·재생성 흐름과 같은 면접 ID를 유지하는 수정 흐름의 비교](assets/rankus.png)
 
 후속 작업에서는 기존 면접 객체에서 날짜·시간·정원 검증을 거쳐 속성만 바꿉니다. 명령 서비스는 그 면접을 저장하고, 그대로 유지한 ID로 캘린더 갱신을 요청합니다. 면접의 식별자와 변경 가능한 설정을 나누면 호출하는 쪽에서도 기존 일정을 다시 찾아 연결할 필요가 없습니다.
 
@@ -50,8 +50,8 @@ React는 연구실과 면접 슬롯을 조회하고, 신청할 때 연구실 ID�
 
 ## 개발·시연 환경
 
-![팀 개발용 Spring Boot와 MySQL, 학생 시연용 React와 로컬 API를 나눠 표현한 그림](assets/rankus-environment.svg)
+![팀 개발용 Spring Boot와 MySQL, 학생 시연용 React와 로컬 API를 나눠 표현한 그림](assets/rankus-environment.png)
 
-팀 개발 환경에서는 Spring Boot가 JDBC로 MySQL 8.0에 연결되며, Docker Compose에서 기본 DB와 테스트용 DB를 별도로 띄울 수 있습니다. 학생 시연은 팀 React 화면에 연구실과 슬롯 데이터를 연결해, 접수 완료까지 재현할 수 있도록 구성했습니다.
+팀 개발 환경에서는 Spring Boot가 JDBC로 MySQL 8.0에 연결되며, Docker Compose에서 기본 DB와 테스트용 DB를 별도로 띄울 수 있습니다. 학생 웹에서는 연구실과 면접 시간대를 선택해 접수 결과를 확인합니다.
 
 [편집 가능한 환경 다이어그램](assets/rankus-environment.drawio) · [시연 재현 및 판본별 근거](docs/review-evidence.md)

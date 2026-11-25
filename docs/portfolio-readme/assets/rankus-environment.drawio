@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <mxfile host="app.diagrams.net" type="device">
   <diagram id="rankus-environment" name="Rankus | 촬영 환경과 팀 DB 설정" alt="Rankus | 촬영 환경과 팀 DB 설정 · 포트폴리오 시연은 루프백 · Compose 원본에는 데이터베이스만 정의">
     <mxGraphModel page="1" pageScale="1" pageWidth="1305" pageHeight="602" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" math="0" shadow="0" background="#FFFFFF">
@@ -11,7 +11,7 @@
         <mxCell id="title" parent="1" vertex="1" value="Rankus | 촬영 환경과 팀 DB 설정" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#15283D;fontSize=35;fontStyle=1;fontFamily=Arial;">
           <mxGeometry x="43" y="24" width="1220" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" parent="1" vertex="1" value="포트폴리오 시연은 루프백 · Compose 원본에는 데이터베이스만 정의" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#485D72;fontSize=21;fontStyle=0;fontFamily=Arial;">
+        <mxCell id="subtitle" parent="1" vertex="1" value="학생 웹 시연과 팀의 Spring Boot · MySQL 개발 구성" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#485D72;fontSize=21;fontStyle=0;fontFamily=Arial;">
           <mxGeometry x="45" y="74" width="1215" height="39" as="geometry" />
         </mxCell>
         <mxCell id="demo" parent="1" vertex="1" value="01   학생 시연 · 격리된 브라우저" style="rounded=1;arcSize=7;html=0;whiteSpace=wrap;fillColor=#F8FBFD;fillOpacity=85;strokeColor=#C8DAE5;dashed=1;dashPattern=7 5;strokeWidth=1.2;align=left;verticalAlign=top;spacingLeft=14;spacingTop=9;fontSize=16;fontStyle=1;fontColor=#435D72;fontFamily=Arial;">
@@ -47,7 +47,7 @@
         <mxCell id="fixture_label" parent="fixture" vertex="1" value="로컬 모의 API" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=21;fontColor=#435968;fontStyle=1;fontFamily=Arial;">
           <mxGeometry x="49" y="15" width="233" height="29" as="geometry" />
         </mxCell>
-        <mxCell id="fixture_desc" parent="fixture" vertex="1" value="앱 요청 검증 · 운영 연결 없음" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=16;fontColor=#425E70;fontStyle=0;fontFamily=Arial;">
+        <mxCell id="fixture_desc" parent="fixture" vertex="1" value="웹 요청에 응답" style="text;html=0;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=16;fontColor=#425E70;fontStyle=0;fontFamily=Arial;">
           <mxGeometry x="49" y="43" width="233" height="39" as="geometry" />
         </mxCell>
         <mxCell id="server" parent="1" vertex="1" value="" style="rounded=0;fillColor=none;strokeColor=none;whiteSpace=wrap;html=0;">
@@ -101,7 +101,7 @@
         <mxCell id="edge-1" value="JDBC" edge="1" parent="1" source="server" target="mysql" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=blockThin;endFill=1;strokeColor=#415C70;strokeWidth=2.2;fontColor=#24435A;fontSize=16;labelBackgroundColor=#FFFFFF;labelPadding=2;fontFamily=Arial;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="note" parent="1" vertex="1" value="설정 비교이며 운영 서버, 공개 프런트엔드, 원격 DB의 현재 배포 구성은 확인하지 않음" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#43586D;fontSize=17;fontStyle=0;fontFamily=Arial;">
+        <mxCell id="note" parent="1" vertex="1" value="팀 개발 구성: 기본 데이터 볼륨과 테스트 프로파일" style="text;html=0;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontColor=#43586D;fontSize=17;fontStyle=0;fontFamily=Arial;">
           <mxGeometry x="45" y="550" width="1215" height="38" as="geometry" />
         </mxCell>
       </root>
